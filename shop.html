@@ -7644,7 +7644,8 @@ function getOrderTypeText(type) {
                     type,
                     removable: ['saladCream', 'lettuce'].filter(isIngredientAvailable),
                     proteins,
-                    chickenStyles: proteins.includes('chicken') ? ['Grilled', 'Shredded'] : [],
+                    chickenPreparation: proteins.includes('chicken') ? 'Shredded' : null,
+                    chickenStyles: [],
                     additions: ['ex_egg', 'ex_avocado']
                 };
             }
@@ -7676,7 +7677,11 @@ function getOrderTypeText(type) {
                     'Extra Protein': configured.filter(item => ['chicken', 'beef', 'shrimps', 'asun'].includes(item.ingredient))
                 };
             }
-            if (rule.type === 'wrap') return { 'Wrap Add-ons': configured };
+            if (rule.type === 'wrap') {
+                return { 'Wrap Add-ons': configured.map(item => Object.assign({}, item, {
+                    name: item.ingredient === 'egg' ? 'Egg' : item.ingredient === 'avocado' ? 'Avocado' : item.name
+                })) };
+            }
             return { 'Fruit, Nut & Topping Add-ons': configured };
         }
 
@@ -7884,6 +7889,7 @@ function getOrderTypeText(type) {
             const choices = {};
             if (rule?.proteins?.length > 1) choices.protein = rule.proteins.join('+');
             if (rule?.chickenStyles?.length) choices.chickenStyle = rule.chickenStyles[0];
+            if (rule?.chickenPreparation) choices.chickenStyle = rule.chickenPreparation;
             if (rule?.type === 'parfait') {
                 choices.toppings = 'DEFAULT';
                 choices.placement = 'MIXED';
@@ -7933,9 +7939,10 @@ function getOrderTypeText(type) {
         function buildCustomizationFromState() {
             const additions = Object.entries(selectedExtras).map(([id, qty]) => {
                 const addOn = ADD_ONS[id] || Object.values(EXTRAS_DATA).flat().find(item => item.id === id) || { id, name: id, price: extrasDataMap[id] || 0 };
+                const addOnName = getProductCustomizationType(extrasBaseProduct) === 'wrap' && addOn.ingredient === 'egg' ? 'Egg' : getProductCustomizationType(extrasBaseProduct) === 'wrap' && addOn.ingredient === 'avocado' ? 'Avocado' : addOn.name;
                 return {
                     id,
-                    name: addOn.name,
+                    name: addOnName,
                     quantity: qty,
                     price: addOn.price || 0,
                     style: selectedChoices[`${id}_style`] || addOn.styles?.[0] || null
@@ -7989,7 +7996,7 @@ function getOrderTypeText(type) {
                 const selected = customizations.choices.protein.split('+');
                 if (selected.some(id => !rule.proteins.includes(id) || !isIngredientAvailable(id))) return false;
             }
-            if (customizations.choices?.chickenStyle && !rule.chickenStyles.includes(customizations.choices.chickenStyle)) return false;
+            if (customizations.choices?.chickenStyle && customizations.choices.chickenStyle !== rule.chickenPreparation && !rule.chickenStyles.includes(customizations.choices.chickenStyle)) return false;
             return true;
         }
 
