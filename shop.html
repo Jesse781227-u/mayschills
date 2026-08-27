@@ -8031,9 +8031,9 @@ function getOrderTypeText(type) {
             }
             if (rule?.type === 'parfait') {
                 const sections = [
-                    ['Parfait Toppings', 'custom_toppings', selectedChoices.toppings || 'DEFAULT', [['DEFAULT', 'Coconut + Granola'], ['COCONUT_ONLY', 'Coconut only'], ['GRANOLA_ONLY', 'Granola only'], ['EXTRA_COCONUT', 'Extra coconut'], ['LESS_COCONUT', 'Less coconut']]],
+                    ['Parfait Toppings', 'custom_toppings', selectedChoices.toppings || 'DEFAULT', [['DEFAULT', 'Toppings'], ['COCONUT_ONLY', 'Coconut only'], ['GRANOLA_ONLY', 'Granola only'], ['EXTRA_COCONUT', 'Extra coconut'], ['LESS_COCONUT', 'Less coconut']]],
                     ['Topping Placement', 'custom_placement', selectedChoices.placement || 'MIXED', [['MIXED', 'Mixed'], ['TOP', 'On Top'], ['SEPARATE', 'Separate']]],
-                    ['Honey', 'custom_honey', selectedChoices.honey || 'DEFAULT', [['DEFAULT', 'Default'], ['NONE', 'None'], ['SEPARATE', 'Separate'], ['EXTRA', 'Extra']]]
+                    ['Honey', 'custom_honey', selectedChoices.honey || 'DEFAULT', [['DEFAULT', 'Default'], ['NONE', 'None'], ['SEPARATE', 'Separate']]]
                 ];
                 sections.forEach(([title, name, current, options]) => {
                     html += `<div class="extras-section-title">${title}</div><div class="customization-choice-list">`;
