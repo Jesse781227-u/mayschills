@@ -7950,6 +7950,16 @@ function getOrderTypeText(type) {
             });
         }
 
+        function customizationIdSuffix(customizations) {
+            let hash = 0;
+            const key = cartCustomizationKey(customizations);
+            for (let index = 0; index < key.length; index += 1) {
+                hash = ((hash << 5) - hash) + key.charCodeAt(index);
+                hash |= 0;
+            }
+            return Math.abs(hash).toString(36);
+        }
+
         function validateCustomization(product, customizations) {
             const rule = getProductRule(product);
             if (!rule) return true;
@@ -8131,7 +8141,7 @@ function getOrderTypeText(type) {
             const customizationTotal = calculateCustomizationTotal(customizations);
             const unitPrice = extrasBaseProduct.price + customizationTotal;
             const cartItem = {
-                id: editingCartItemId || `${extrasBaseProduct.id}_${cartCustomizationKey(customizations)}`,
+                id: editingCartItemId || `${extrasBaseProduct.id}_custom_${customizationIdSuffix(customizations)}`,
                 productId: extrasBaseProduct.id,
                 name: extrasBaseProduct.name,
                 basePrice: extrasBaseProduct.price,
@@ -8180,7 +8190,7 @@ function getOrderTypeText(type) {
             } else {
                 const customizationTotal = customizations ? calculateCustomizationTotal(customizations) : 0;
                 cart.push({
-                    id: customizations ? `${productId}_${cartCustomizationKey(customizations)}` : id,
+                    id: customizations ? `${productId}_custom_${customizationIdSuffix(customizations)}` : id,
                     productId,
                     name,
                     basePrice: options.basePrice || price,
@@ -8496,6 +8506,41 @@ function updateCartItemQuantity(id, change) {
             document.querySelectorAll('[data-ordering-plus]').forEach(button => button.addEventListener('click', () => updateCartItemQuantity(button.dataset.orderingPlus, 1)));
             document.querySelectorAll('[data-ordering-minus]').forEach(button => button.addEventListener('click', () => updateCartItemQuantity(button.dataset.orderingMinus, -1)));
         }
+
+        renderOrderingCart = function() {
+            const items = cart.filter(item => item.id !== 'delivery_fee');
+            const itemCount = items.reduce((total, item) => total + item.quantity, 0);
+            const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
+            const delivery = cart.find(item => item.id === 'delivery_fee')?.price || 0;
+            const total = subtotal + delivery;
+            const empty = `<div class="ordering-cart-empty"><div class="empty-state-icon"><i class="hgi-stroke hgi-shopping-cart-01" aria-hidden="true"></i></div><p>Your cart is empty</p></div>`;
+
+            document.getElementById('ordering-cart-items').innerHTML = items.length ? items.map(item => `
+                <article class="ordering-cart-line">
+                    <img src="${item.image}" alt="${item.name}">
+                    <div>
+                        <h3>${item.name}</h3>
+                        <p>\u20A6${(item.price * item.quantity).toLocaleString()}</p>
+                        ${item.customizations ? `<div class="ordering-cart-customizations">${getCustomizationLines(item).join('<br>')}</div><button class="ordering-cart-edit" data-ordering-edit="${item.id}" type="button">Edit</button>` : ''}
+                    </div>
+                    <div class="ordering-vertical-stepper">
+                        <button type="button" data-ordering-plus="${item.id}" aria-label="Increase ${item.name}"><i class="hgi-stroke hgi-plus-sign" aria-hidden="true"></i></button>
+                        <span>${item.quantity}</span>
+                        <button type="button" data-ordering-minus="${item.id}" aria-label="Decrease ${item.name}"><i class="hgi-stroke hgi-minus-sign" aria-hidden="true"></i></button>
+                    </div>
+                </article>`).join('') : empty;
+
+            document.getElementById('ordering-summary-items').textContent = itemCount;
+            document.getElementById('ordering-summary-subtotal').textContent = `\u20A6${subtotal.toLocaleString()}`;
+            document.getElementById('ordering-summary-delivery').textContent = `\u20A6${delivery.toLocaleString()}`;
+            document.getElementById('ordering-summary-total').textContent = `\u20A6${total.toLocaleString()}`;
+            document.getElementById('ordering-cart-count').textContent = itemCount;
+            document.getElementById('ordering-detail-cart-count').textContent = itemCount;
+
+            document.querySelectorAll('[data-ordering-plus]').forEach(button => button.addEventListener('click', () => updateCartItemQuantity(button.dataset.orderingPlus, 1)));
+            document.querySelectorAll('[data-ordering-minus]').forEach(button => button.addEventListener('click', () => updateCartItemQuantity(button.dataset.orderingMinus, -1)));
+            document.querySelectorAll('[data-ordering-edit]').forEach(button => button.addEventListener('click', () => editCartItem(button.dataset.orderingEdit)));
+        };
 
         function initializeOrderingFlow() {
             document.getElementById('ordering-category-chips').innerHTML = orderingCategories.map((category, index) => `<button class="ordering-chip ${index === 0 ? 'active' : ''}" data-ordering-category="${category}" type="button">${category}</button>`).join('');
@@ -10036,6 +10081,42 @@ window.showOrderSummaryModal = function() {
 };
 // ================================
 // UPDATED: ORDER SUMMARY MODAL FUNCTION
+generateWhatsAppMessage = function() {
+    const orderItems = cart.filter(item => item.id !== 'delivery_fee');
+    const cartItems = orderItems.map(item => {
+        const customizationText = item.customizations ? `\nCustomizations:\n${getCustomizationLines(item).map(line => `- ${line}`).join('\n')}` : '';
+        return `${item.quantity}x ${item.name} - \u20A6${(item.price * item.quantity).toLocaleString()}${customizationText}`;
+    }).join('\n\n');
+    const subtotal = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const standardDeliveryFee = DeliveryLocationSystem.deliveryFee || 500;
+    const total = subtotal + standardDeliveryFee;
+    const address = document.getElementById('delivery-address').value.trim();
+    const lga = DeliveryLocationSystem.selectedLGA;
+    const area = DeliveryLocationSystem.selectedArea;
+    const formattedAddress = `${address}, ${area}, ${lga}, Lagos State`;
+    const phone = document.getElementById('delivery-phone').value.trim();
+    const slotText = DeliveryLocationSystem.slotText || 'Auto-allocated delivery slot';
+    const instructions = document.getElementById('delivery-instructions').value.trim();
+
+    return `Hello MAY'S CHILLS!
+
+I would like to place an order:
+
+${cartItems}
+
+SUBTOTAL: \u20A6${subtotal.toLocaleString()}
+STANDARD DELIVERY FEE: \u20A6${standardDeliveryFee.toLocaleString()}
+TOTAL: \u20A6${total.toLocaleString()}
+
+DELIVERY DETAILS:
+Address: ${formattedAddress}
+Phone: ${phone}
+Delivery Slot: ${slotText}
+${instructions ? `Instructions: ${instructions}` : ''}
+
+Thank you!`;
+};
+
 // ================================
 function showOrderSummaryModal() {
     // Calculate subtotal EXCLUDING delivery fee
