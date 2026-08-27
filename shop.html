@@ -4788,6 +4788,16 @@
                         <button class="back-to-cart" id="back-btn">Back</button>
                     </div>
 
+                    <!-- Pickup Details -->
+                    <div id="pickup-details" style="display: none; margin-top: 20px;">
+                        <h4 style="color: var(--green); margin-bottom: 15px; text-align: center;">Pickup Time</h4>
+                        <div class="form-group">
+                            <label class="required" for="pickup-time-select">Select a pickup time</label>
+                            <select id="pickup-time-select" class="location-select" required></select>
+                            <small id="pickup-hours-note" style="color: var(--muted); font-size: 12px; display: block; margin-top: 5px;"></small>
+                        </div>
+                    </div>
+
      
    <!-- Delivery Details (Hidden Initially) -->
 <div id="delivery-details" style="display: none; margin-top: 20px;">
@@ -7562,8 +7572,8 @@ function getOrderTypeText(type) {
         };
 
         const ADD_ONS = {
-            ex_tomatoes: { id: 'ex_tomatoes', name: 'Tomatoes', ingredient: 'tomatoes', price: 0 },
-            ex_onions: { id: 'ex_onions', name: 'Onions', ingredient: 'onions', price: 0 },
+            ex_tomatoes: { id: 'ex_tomatoes', name: 'Tomatoes', ingredient: 'tomatoes', price: 500 },
+            ex_onions: { id: 'ex_onions', name: 'Onions', ingredient: 'onions', price: 500 },
             ex_egg: { id: 'ex_egg', name: 'Extra Egg', ingredient: 'egg', price: 500 },
             ex_avocado: { id: 'ex_avocado', name: 'Extra Avocado', ingredient: 'avocado', price: 1000 },
             ex_chicken: { id: 'ex_chicken', name: 'Extra Chicken', ingredient: 'chicken', price: 3500, styles: ['Grilled', 'Shredded'] },
@@ -7616,11 +7626,8 @@ function getOrderTypeText(type) {
                 if (name.includes('GRILLED')) chickenStyles.push('Grilled');
                 if (name.includes('SHREDDED') || name.includes('SPICY CHICKEN') || name.includes('SWEETSPICY')) chickenStyles.push('Shredded');
                 if (proteins.includes('chicken') && !chickenStyles.length) chickenStyles.push('Grilled', 'Shredded');
-                const removable = ['cabbage', 'carrots', 'lettuce', 'raisins', 'chia', 'saladCream'];
+                const removable = ['raisins', 'chia'];
                 if (name.includes('EGG')) removable.push('egg');
-                if (name.includes('AVOCADO')) removable.push('avocado');
-                if (name.includes('GRAPE') || name.includes('VEGETABLE ONLY')) removable.push('grapes');
-                if (name.includes('CASHEW') || name.includes('NUT')) removable.push('cashew');
                 return {
                     type,
                     removable: uniq(removable),
@@ -7895,7 +7902,7 @@ function getOrderTypeText(type) {
         function getCustomizationLines(itemOrCustomizations) {
             const customizations = itemOrCustomizations?.customizations || itemOrCustomizations || {};
             const lines = [];
-            (customizations.removed || []).forEach(id => lines.push(`No ${INGREDIENTS[id]?.label || id}`));
+            (customizations.removed || []).forEach(id => lines.push(`Removed: ${INGREDIENTS[id]?.label || id}`));
             if (customizations.choices?.protein) {
                 lines.push(`Protein: ${customizations.choices.protein.split('+').map(id => INGREDIENTS[id]?.label || id).join(' + ')}`);
             }
@@ -7914,11 +7921,11 @@ function getOrderTypeText(type) {
             }
             Object.entries(customizations.substitutions || {}).forEach(([ingredientId, addOnId]) => {
                 const addOn = ADD_ONS[addOnId];
-                lines.push(`${INGREDIENTS[ingredientId]?.label || ingredientId} substitute: ${addOn?.name || addOnId}${addOn?.price ? ` +\u20A6${addOn.price.toLocaleString()}` : ''}`);
+                lines.push(`Substitute: ${INGREDIENTS[ingredientId]?.label || ingredientId} -> ${addOn?.name || addOnId}${addOn?.price ? ` +\u20A6${addOn.price.toLocaleString()}` : ''}`);
             });
             (customizations.additions || []).forEach(addition => {
                 const style = addition.style ? ` (${addition.style})` : '';
-                lines.push(`${addition.quantity > 1 ? `${addition.quantity}x ` : ''}${addition.name}${style}${addition.price ? ` +\u20A6${(addition.price * addition.quantity).toLocaleString()}` : ''}`);
+                lines.push(`Added: ${addition.quantity > 1 ? `${addition.quantity}x ` : ''}${addition.name}${style}${addition.price ? ` +\u20A6${(addition.price * addition.quantity).toLocaleString()}` : ''}`);
             });
             return lines;
         }
@@ -9020,6 +9027,55 @@ Object.entries(deliveryAreas).forEach(([price, areas]) => {
 // SIMPLIFIED DELIVERY LOCATION SYSTEM
 // ================================
 
+const PickupScheduleSystem = {
+    selectedTime: '',
+
+    getSchedule() {
+        const day = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Lagos', weekday: 'long' }).format(new Date());
+        if (day === 'Sunday') return { closed: true, day };
+        return { day, start: day === 'Saturday' ? '10:30' : '08:30', end: '18:50' };
+    },
+
+    init() {
+        const select = document.getElementById('pickup-time-select');
+        const note = document.getElementById('pickup-hours-note');
+        const schedule = this.getSchedule();
+        if (!select || !note) return false;
+        select.innerHTML = '';
+        if (schedule.closed) {
+            select.disabled = true;
+            note.textContent = 'Pickup is unavailable on Sundays.';
+            this.selectedTime = '';
+            return false;
+        }
+        select.disabled = false;
+        note.textContent = schedule.day === 'Saturday'
+            ? 'Saturday pickup hours: 10:30 AM - 6:50 PM.'
+            : 'Monday to Friday pickup hours: 8:30 AM - 6:50 PM.';
+        const [startHour, startMinute] = schedule.start.split(':').map(Number);
+        const [endHour, endMinute] = schedule.end.split(':').map(Number);
+        for (let minutes = startHour * 60 + startMinute; minutes <= endHour * 60 + endMinute; minutes += 30) {
+            this.addOption(select, minutes);
+        }
+        if (select.lastElementChild?.value !== schedule.end) this.addOption(select, endHour * 60 + endMinute);
+        this.selectedTime = select.value;
+        select.onchange = () => { this.selectedTime = select.value; };
+        return true;
+    },
+
+    addOption(select, minutes) {
+        const hour = Math.floor(minutes / 60);
+        const minute = minutes % 60;
+        const value = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+        const displayHour = hour % 12 || 12;
+        const period = hour >= 12 ? 'PM' : 'AM';
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = `${displayHour}:${String(minute).padStart(2, '0')} ${period}`;
+        select.appendChild(option);
+    }
+};
+
 const DeliveryLocationSystem = {
     selectedArea: null,
     selectedAreaDisplay: null,
@@ -9999,6 +10055,7 @@ document.querySelectorAll('#outside-options .order-type-btn').forEach(btn => {
         
         if (orderType === 'delivery') {
     deliveryDetails.style.display = 'block';
+    document.getElementById('pickup-details').style.display = 'none';
     confirmBtn.style.display = 'block';
     
     // Initialize delivery location system with delay
@@ -10019,7 +10076,13 @@ document.querySelectorAll('#outside-options .order-type-btn').forEach(btn => {
     }, 150);
 } else {
             deliveryDetails.style.display = 'none';
+            const pickupAvailable = PickupScheduleSystem.init();
+            document.getElementById('pickup-details').style.display = pickupAvailable ? 'block' : 'none';
             confirmBtn.style.display = 'block';
+            if (!pickupAvailable) {
+                showToast('Pickup is closed on Sundays');
+                return;
+            }
         }
     });
 });
@@ -10045,6 +10108,10 @@ document.getElementById('confirm-order-btn').addEventListener('click', function(
         
     } else if (orderType === 'pickup' || orderType === 'in-shop') {
         // For pickup/in-shop, remove any delivery fee from cart
+        if (orderType === 'pickup' && !PickupScheduleSystem.selectedTime) {
+            showToast('Please select a pickup time');
+            return;
+        }
         removeDeliveryFeeFromCart();
         showOrderSummaryModal();
     } else {
@@ -10181,6 +10248,12 @@ function showOrderSummaryModal() {
                 <strong>Delivery Fee:</strong> ₦${deliveryFee.toLocaleString()}
             </div>
         `;
+    } else if (orderType === 'pickup') {
+        orderSummaryHTML += `
+            <div style="margin-bottom: 10px;">
+                <strong>Pickup Time:</strong> ${PickupScheduleSystem.selectedTime || 'Not selected'}
+            </div>
+        `;
     }
 
     // Include optional order notes/allergies
@@ -10202,7 +10275,7 @@ function showOrderSummaryModal() {
                     <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e8e8e8;">
                         <div style="flex: 1;">
                             <strong>${item.quantity}x</strong> ${item.name}
-                            ${item.customizations ? `<div style="margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.4;">${getCustomizationLines(item).map(line => `- ${line}`).join('<br>')}</div>` : ''}
+                            ${getCustomizationLines(item).length ? `<div style="margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.4;"><strong>Customizations:</strong><br>${getCustomizationLines(item).map(line => `- ${line}`).join('<br>')}</div>` : ''}
                         </div>
                         <div style="min-width: 100px; text-align: right;">
                             ₦${(item.price * item.quantity).toLocaleString()}
@@ -10308,6 +10381,7 @@ function showOrderSummaryModal() {
             deliveryFee: deliveryFee,
             deliveryArea: orderType === 'delivery' ? DeliveryLocationSystem.selectedAreaDisplay : null,
             deliverySlot: orderType === 'delivery' ? DeliveryLocationSystem.slotText : null,
+            pickupTime: orderType === 'pickup' ? PickupScheduleSystem.selectedTime : null,
             orderNotes: (document.getElementById('order-notes') && document.getElementById('order-notes').value.trim()) || null
         };
         
