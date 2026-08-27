@@ -140,7 +140,7 @@
         if (!selectedTime) return alert('Please select a time for your order.');
         if (!items.length || !summaryTotal()) return alert('Your cart is empty.');
         try {
-            const availabilityResponse = await fetch('/api/availability', { cache: 'no-store' });
+            const availabilityResponse = await fetch((window.MAYCHILLS_API_URL || 'https://mayschills-backend.onrender.com') + '/api/availability', { cache: 'no-store' });
             if (availabilityResponse.ok) {
                 const availability = (await availabilityResponse.json()).items || {};
                 const unavailable = items.find(item => {

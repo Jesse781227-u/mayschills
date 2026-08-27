@@ -1,17 +1,15 @@
-# Cloudflare Worker Webhook Setup - May's Chills
+# Render Webhook Setup - May's Chills
 
 ## ⚡ Quick Deploy (5 minutes)
 
-### Step 1: Deploy the Worker
+### Step 1: Deploy the backend
 
-1. Go to **https://workers.cloudflare.com**
-2. Sign in or create free account
-3. Click **"Create a Service"**
-4. Name it: `mays-chills-webhook`
-5. Click **"Create Service"**
-6. Replace ALL the code with the code from `cloudflare-worker.js`
-7. Click **"Deploy"**
-8. **Copy your Worker URL** (looks like: `https://mays-chills-webhook.yourname.workers.dev`)
+1. Create a Render **Web Service** from this repository.
+2. Set **Root Directory** to `backend`.
+3. Set **Build Command** to `npm install`.
+4. Set **Start Command** to `npm start`.
+5. Add a Render PostgreSQL database and expose its `DATABASE_URL` to the service.
+6. Copy the backend URL, for example `https://mayschills-backend.onrender.com`.
 
 ### Step 2: Configure Paystack Webhook
 
@@ -19,7 +17,7 @@
 2. Click **Settings → Webhooks** (or API Keys & Webhooks)
 3. In the **Webhook URL** field, paste:
    ```
-   https://mays-chills-webhook.yourname.workers.dev/webhook
+   https://mayschills-backend.onrender.com/webhook
    ```
 4. Select Events: Check only **`charge.success`**
 5. Click **Save**
@@ -33,12 +31,12 @@
    - ✅ Email notification sent
    - ✅ Telegram notification sent
 
-### Step 4: Update shop.html
+### Step 4: Configure the frontend
 
-Replace the Cloudflare Worker URL in your `shop.html` file (around line 5000):
+Set the backend URL fallback in `admin.html`, `shop.html`, and `checkout.html` to your actual Render backend URL:
 
 ```javascript
-const WEBHOOK_URL = 'https://mays-chills-webhook.yourname.workers.dev/webhook';
+const API_BASE = 'https://mayschills-backend.onrender.com';
 ```
 
 ---
