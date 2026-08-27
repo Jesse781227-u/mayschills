@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>May's Chills · Admin</title>
+  <style>
+    :root{--green:#159447;--ink:#17231c;--muted:#718079;--line:#e6eee8;--bg:#f5f8f5}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px Arial,sans-serif}
+    .shell{max-width:1180px;margin:auto;padding:30px 20px 60px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:25px}.brand{font-size:24px;font-weight:800}.brand small{display:block;color:var(--muted);font-size:12px;font-weight:400;margin-top:5px}
+    .panel,.item{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 25px #20452b0a}.panel{padding:24px}.login{max-width:410px;margin:12vh auto}.login h1{margin-top:0}.input{width:100%;padding:13px;border:1px solid #ccd9cf;border-radius:10px;font-size:16px;margin:8px 0 14px}.btn{border:0;border-radius:10px;padding:11px 15px;cursor:pointer;font-weight:700;background:var(--green);color:white}.btn.secondary{background:#edf5ef;color:var(--green)}.btn.danger{background:#fff0f0;color:#b52d2d}.hidden{display:none!important}.notice{color:var(--muted);font-size:13px;margin:5px 0 0}.toolbar{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:18px 0}.stats{display:flex;gap:10px;flex-wrap:wrap}.stat{background:#edf8ef;color:var(--green);padding:10px 13px;border-radius:10px;font-weight:700}.group{margin-top:26px}.group h2{font-size:18px;margin:0 0 12px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}.item{padding:15px;display:flex;align-items:center;justify-content:space-between;gap:10px}.item-name{font-weight:700}.item-meta{font-size:12px;color:var(--muted);margin-top:5px}.actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.actions .btn{font-size:12px;padding:8px 9px}.status{font-size:11px;border-radius:20px;padding:4px 8px;display:inline-block;margin-top:8px;background:#e8f7eb;color:var(--green)}.status.off{background:#fff2e3;color:#a85b00}.status.forever{background:#ffe9e9;color:#b52d2d}@media(max-width:620px){.top{align-items:flex-start;flex-direction:column}.toolbar{align-items:flex-start;flex-direction:column}.item{align-items:flex-start;flex-direction:column}.actions{justify-content:flex-start}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section id="login-panel" class="panel login">
+      <h1>Admin access</h1><p class="notice">Manage what customers can order from May's Chills.</p>
+      <form id="login-form"><label for="password">Admin password</label><input class="input" id="password" type="password" autocomplete="current-password" required><button class="btn" type="submit">Sign in</button></form>
+      <p id="login-error" class="notice" style="color:#b52d2d"></p>
+    </section>
+    <section id="app" class="hidden">
+      <div class="top"><div class="brand">May's Chills<small>Menu availability</small></div><button class="btn secondary" id="logout">Sign out</button></div>
+      <div class="panel"><div class="toolbar"><div><strong>Availability controls</strong><p class="notice">“Rest of today” automatically turns back on at midnight Lagos time.</p></div><div class="stats"><span class="stat" id="on-count">0 available</span><span class="stat" id="off-count">0 unavailable</span></div></div><div id="catalog"><p class="notice">Loading catalog…</p></div></div>
+    </section>
+  </main>
+  <iframe id="catalog-source" src="shop.html" class="hidden" title="Catalog source"></iframe>
+  <script>
+    const API = '/api'; let token = sessionStorage.getItem('maychills_admin_token') || ''; let states = {}; let catalog = null;
+    const $ = id => document.getElementById(id);
+    function escapeHTML(value){return String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+    function currentMode(key){const value=states[key];if(!value)return'enabled';if(value.mode==='today'&&value.expiresAt<=Date.now())return'enabled';return value.mode;}
+    async function request(path, options={}){const response=await fetch(API+path,{...options,headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})}});if(!response.ok)throw new Error(await response.text()||'Request failed');return response.json();}
+    async function login(password){const data=await request('/admin/login',{method:'POST',body:JSON.stringify({password})});token=data.token;sessionStorage.setItem('maychills_admin_token',token);await start();}
+    function statusMarkup(mode){return mode==='enabled'?'<span class="status">Available</span>':mode==='today'?'<span class="status off">Unavailable · rest of today</span>':'<span class="status forever">Unavailable · until re-enabled</span>';}
+    function itemMarkup(item,type){const key=type+':'+item.id, mode=currentMode(key);return `<article class="item"><div><div class="item-name">${escapeHTML(item.name)}</div><div class="item-meta">${type==='product'?escapeHTML(item.category||'Product'):'Extra'}${item.price?` · ₦${Number(item.price).toLocaleString()}`:''}</div>${statusMarkup(mode)}</div><div class="actions"><button class="btn secondary" data-key="${escapeHTML(key)}" data-mode="enabled">Enable</button><button class="btn" data-key="${escapeHTML(key)}" data-mode="today">Today</button><button class="btn danger" data-key="${escapeHTML(key)}" data-mode="forever">Disable</button></div></article>`;}
+    function render(){if(!catalog)return;const groups={};catalog.products.forEach(p=>(groups[p.category||'Products']??=[]).push(itemMarkup(p,'product')));let html=Object.entries(groups).map(([name,items])=>`<section class="group"><h2>${escapeHTML(name)}</h2><div class="grid">${items.join('')}</div></section>`).join('');html+=`<section class="group"><h2>Extras</h2><div class="grid">${catalog.extras.map(e=>itemMarkup(e,'extra')).join('')}</div></section>`;$('catalog').innerHTML=html;updateStats();document.querySelectorAll('[data-key]').forEach(button=>button.addEventListener('click',()=>update(button.dataset.key,button.dataset.mode)));}
+    function updateStats(){let total=catalog?catalog.products.length+catalog.extras.length:0,off=Object.keys(states).filter(k=>currentMode(k)!=='enabled').length;$('on-count').textContent=(total-off)+' available';$('off-count').textContent=off+' unavailable';}
+    async function update(key,mode){try{await request('/availability',{method:'POST',body:JSON.stringify({key,mode})});if(mode==='enabled')delete states[key];else states[key]={mode,expiresAt:mode==='today'?new Date().setHours(23,59,59,999):null};render();}catch(error){alert(error.message.includes('KV')?'Connect the MAYCHILLS_KV binding in the Worker first.':error.message);}}
+    async function start(){try{const source=$('catalog-source');if(!source.contentWindow.MAYCHILLS_CATALOG){await new Promise(resolve=>source.addEventListener('load',resolve,{once:true}));}catalog=source.contentWindow.MAYCHILLS_CATALOG;states=(await request('/availability')).items||{};$('login-panel').classList.add('hidden');$('app').classList.remove('hidden');render();}catch(error){sessionStorage.removeItem('maychills_admin_token');token='';$('login-error').textContent='Unable to load admin data: '+error.message;}}
+    $('login-form').addEventListener('submit',async e=>{e.preventDefault();$('login-error').textContent='';try{await login($('password').value);}catch(error){$('login-error').textContent='Invalid password or unavailable admin API.';}});
+    $('logout').addEventListener('click',()=>{sessionStorage.removeItem('maychills_admin_token');location.reload();});
+    if(token)start();
+  </script>
+</body>
+</html>

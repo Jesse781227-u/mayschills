@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - May's Chills</title>
+    <link rel="icon" type="image/png" href="https://i.ibb.co/yFgsqx49/IMG-20251112-WA0082.jpg">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+        }
+
+        /* Navigation - Matching main site */
+        nav {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        nav .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav .logo {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        nav .logo img {
+            height: 50px;
+            width: auto;
+            transition: transform 0.3s ease;
+        }
+
+        nav .logo img:hover {
+            transform: scale(1.05);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #7ed321;
+        }
+
+        nav .menu-icon {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        nav .menu-icon span {
+            width: 35px;
+            height: 4px;
+            background: #333;
+            border-radius: 3px;
+            transition: all 0.3s;
+            display: block;
+        }
+
+        /* Hero Section for FAQ */
+        .faq-hero {
+            background: linear-gradient(rgba(126, 211, 33, 0.9), rgba(126, 211, 33, 0.8)), url('https://i.ibb.co/C3QwGCtD/unnamed.webp');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 150px 2rem 80px;
+            text-align: center;
+            margin-top: 70px;
+        }
+
+        .faq-hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .faq-hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.95;
+        }
+
+        /* Search Bar */
+        .search-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            position: relative;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            padding-left: 3rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            box-shadow: 0 8px 25px rgba(126, 211, 33, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-size: 1.2rem;
+        }
+
+        /* FAQ Container */
+        .faq-page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        .faq-categories {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0 3rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .category-btn {
+            background: white;
+            border: 2px solid #e8f5e8;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            background: #7ed321;
+            color: white;
+            border-color: #7ed321;
+            transform: translateY(-2px);
+        }
+
+        .category-btn i {
+            margin-right: 8px;
+        }
+
+        /* FAQ Grid */
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .faq-category-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+
+        .faq-category-section:hover {
+            transform: translateY(-5px);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .category-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #7ed321, #a8e063);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .category-header h3 {
+            color: #2c5530;
+            font-size: 1.3rem;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 1rem;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .faq-question {
+            width: 100%;
+            padding: 1rem 0;
+            background: none;
+            border: none;
+            text-align: left;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: color 0.3s;
+        }
+
+        .faq-question:hover {
+            color: #7ed321;
+        }
+
+        .faq-question.active {
+            color: #7ed321;
+        }
+
+        .faq-icon {
+            font-size: 1.2rem;
+            font-weight: 300;
+            transition: transform 0.3s;
+        }
+
+        .faq-question.active .faq-icon {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .faq-answer-content {
+            padding: 0 0 1rem 0;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .faq-answer-content a {
+            color: #7ed321;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .faq-answer-content a:hover {
+            text-decoration: underline;
+        }
+
+        .faq-answer-content ul {
+            margin: 0.5rem 0 0.5rem 1.5rem;
+        }
+
+        .faq-answer-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Quick Help Section */
+        .quick-help {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: 4rem;
+            border: 2px solid #7ed321;
+        }
+
+        .quick-help h2 {
+            color: #2c5530;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .quick-help p {
+            color: #666;
+            margin-bottom: 2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        .help-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .help-option {
+            background: #f8fff8;
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid #e8f5e8;
+            transition: transform 0.3s;
+        }
+
+        .help-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(126, 211, 33, 0.15);
+        }
+
+        .help-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .help-option h4 {
+            color: #2c5530;
+            margin-bottom: 0.5rem;
+        }
+
+        .help-option p {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+
+        .help-btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background: #7ed321;
+            color: white;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .help-btn:hover {
+            background: #6ab91c;
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 60px 2rem 30px;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h3 {
+            color: #7ed321;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: #7ed321;
+        }
+
+        .footer-section p {
+            color: #ccc;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #333;
+            color: #999;
+        }
+
+       /* Mobile Responsive */
+@media (max-width: 768px) {
+    nav ul {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+        flex-direction: column;
+        padding: 1rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        z-index: 999;
+    }
+
+    nav ul.active {
+        display: flex;
+    }
+
+    nav ul li {
+        width: 100%;
+        text-align: center;
+    }
+
+    nav ul li a {
+        display: block;
+        padding: 0.8rem;
+        font-size: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    nav ul li:last-child a {
+        border-bottom: none;
+    }
+
+    nav .menu-icon {
+        display: flex;
+    }
+    
+   
+}
+
+            .faq-hero {
+                padding: 120px 1.5rem 60px;
+            }
+
+            .faq-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .faq-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .faq-page-container {
+                padding: 0 1.5rem 3rem;
+            }
+
+            .quick-help {
+                padding: 2rem;
+                margin-top: 3rem;
+            }
+
+            .help-options {
+                grid-template-columns: 1fr;
+            }
+
+            .faq-categories {
+                gap: 0.5rem;
+            }
+
+            .category-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+        
+
+        @media (max-width: 480px) {
+            .faq-hero h1 {
+                font-size: 2rem;
+            }
+
+            .faq-hero p {
+                font-size: 1rem;
+            }
+
+            .faq-category-section {
+                padding: 1.5rem;
+            }
+
+            .quick-help {
+                padding: 1.5rem;
+            }
+        }
+        /* Mobile menu animation for FAQ page */
+        nav .menu-icon span.active:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+        
+        nav .menu-icon span.active:nth-child(2) {
+            opacity: 0;
+        }
+        
+        nav .menu-icon span.active:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+        
+        nav .menu-icon span {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <a href="/" class="logo">
+                <img src="https://i.postimg.cc/Pxk2tNWk/IMG-20251112-WA0082.jpg" alt="May's Chills Logo">
+            </a>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/shop" target= "_blank">Shop</a></li>
+                <li><a href="#footer-contact">Contact</a></li>
+            </ul>
+        
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- FAQ Hero -->
+    <section class="faq-hero">
+        <div class="container">
+            <h1>Frequently Asked Questions</h1>
+            <p>Find quick answers to common questions about our products, ordering process, delivery, and more.</p>
+            
+            
+        </div>
+    </section>
+
+    <!-- FAQ Content -->
+    <div class="faq-page-container">
+        <!-- Category Filter -->
+        <div class="faq-categories">
+            <button class="category-btn active" data-category="all">All Questions</button>
+            <button class="category-btn" data-category="products">🥤 Products</button>
+            <button class="category-btn" data-category="ordering">📦 Ordering</button>
+            <button class="category-btn" data-category="detox">🍃 Detox Plans</button>
+            <button class="category-btn" data-category="delivery">🚚 Delivery</button>
+            <button class="category-btn" data-category="payment">💳 Payment</button>
+        </div>
+
+        <!-- FAQ Grid -->
+        <div class="faq-grid">
+            <!-- Products Category -->
+            <div class="faq-category-section" data-category="products">
+                <div class="category-header">
+                    <div class="category-icon">🥤</div>
+                    <h3>Products & Ingredients</h3>
+                </div>
+                
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>What makes May's Chills products different from others?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>We stand out because:</p>
+                            <ul>
+                                <li>100% natural ingredients with no artificial additives</li>
+                                <li>Fresh fruits delivered daily from local farms</li>
+                                <li>Everything made to order for maximum freshness</li>
+                                <li>Unique flavor combinations developed by nutritionists</li>
+                                <li>Focus on both taste and health benefits</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Are your products suitable for specific diets?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Yes! We cater to various dietary needs:</p>
+                            <ul>
+                                <li><strong>Vegan:</strong> All juices are plant-based</li>
+                                <li><strong>Low-sugar:</strong> Natural fruit sugars only, no added sugar</li>
+                                <li><strong>Keto-friendly:</strong> Specific low-carb options available</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>How long do your products stay fresh?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>For optimal freshness and nutrition:</p>
+                            <ul>
+                                <li><strong>Smoothies & Juices:</strong> Consume within 1-3 days of delivery</li>
+                                <li><strong>Store in refrigerator or freezer</strong> if not consumed immediately</li>
+                                <li>Always shake well before drinking!</li>
+                                <li><strong>Salads & Wraps:</strong> Best enjoyed within 2-3 hours</li>
+                                <li><strong>Parfaits:</strong> Consume within 4 hours</li>
+                                
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ordering Category -->
+            <div class="faq-category-section" data-category="ordering">
+                <div class="category-header">
+                    <div class="category-icon">📱</div>
+                    <h3>Ordering Process</h3>
+                </div>
+                
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>What are the different ways to place an order?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>You can order through multiple channels:</p>
+                            <ul>
+                                <li><strong>WhatsApp:</strong> Lagos (08036815517) | Abuja (08064377758)</li>
+                                <li><strong>In-store:</strong> Visit our locations in Lagos (Victoria Island) or Abuja (Maitama)</li>
+                                <li><strong>Online:</strong> Browse our full menu at <a href="shop.html" target="_blank">Shop Now</a></li>
+                                <li><strong>Instagram:</strong> DM us @mayschills or @mayschillsabuja</li>
+                                </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>What information do I need to provide when ordering?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>For a smooth ordering process, please provide:</p>
+                            <ul>
+                                <li>Full name</li>
+                                <li>Delivery address (with landmarks)</li>
+                                <li>Phone number</li>
+                                <li>Order details (items, quantities)</li>
+                                <li>Preferred delivery time</li>
+                                <li>Any special instructions or allergies</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Can I customize my order?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Absolutely! We offer various customization options:</p>
+                            <ul>
+                                <li><strong>Sweetness levels</strong></li>
+                                <li><strong>Add-ons</strong></li>
+                                <li><strong>Allergies</strong></li>
+                                <li><strong>Salad dressings:</strong> Choice of dressing on the side</li>
+                            </ul>
+                            <p>Just mention your preferences when ordering!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detox Plans Category -->
+            <div class="faq-category-section" data-category="detox">
+                <div class="category-header">
+                    <div class="category-icon">🍃</div>
+                    <h3>Detox & Wellness Plans</h3>
+                </div>
+                
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Which detox plan is right for me?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Choose based on your goals:</p>
+                            <ul>
+                                <li><strong>Juice Only Plan:</strong> For deep cleansing and rapid results</li>
+                                <li><strong>Smoothie Only Plan:</strong> More filling, great for first-timers</li>
+                                <li><strong>Combo Plan:</strong> Best of both worlds - juices and smoothies</li>
+                                <li><strong>Salad & Drinks Plan:</strong> For those who prefer some solid food</li>
+                                <li><strong>Duration:</strong> Plans last anywhere between 1 and 7 days.</li>
+                            </ul>
+                            <p>Need help deciding? Text us on WhatsApp for a free consultation!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>What should I expect during a detox?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Common experiences include:</p>
+                            <ul>
+                                <li><strong>Days 1-2:</strong> Possible headaches or fatigue as body adjusts</li>
+                                <li><strong>Days 2-3:</strong> Increased energy and mental clarity</li>
+                                <li><strong>Throughout:</strong> Reduced bloating, clearer skin</li>
+                                <li><strong>Results:</strong> Weight loss, improved digestion, better sleep</li>
+                            </ul>
+                            <p><strong>Tips:</strong> Drink plenty of water, rest when needed, and avoid strenuous exercise.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Can I exercise during a detox?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>We recommend:</p>
+                            <ul>
+                                <li><strong>Light exercise:</strong> Walking, gentle yoga, stretching</li>
+                                <li><strong>Avoid:</strong> Intense workouts</li>
+                                <li><strong>Listen to your body:</strong> Rest if you feel tired</li>
+                                <li><strong>Stay hydrated:</strong> Drink extra water if exercising</li>
+                                <li><strong>Best time to start:</strong> Morning when energy levels are highest</li>
+                            </ul>
+                            <p>For detox plans with solid food (Salad & Drinks), moderate exercise is fine.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delivery Category -->
+            <div class="faq-category-section" data-category="delivery">
+                <div class="category-header">
+                    <div class="category-icon">🚚</div>
+                    <h3>Delivery Information</h3>
+                </div>
+                
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>What are your delivery hours?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Delivery times vary by service:</p>
+                            <ul>
+                                <li><strong>Regular Orders:</strong> 1:30 PM and 6:00 PM daily are our delivery batch times</li>
+                                <li><strong>Detox Plans:</strong> Daily delivery between 8:00AM - 11:00 AM</li>
+                                <li><strong>Express Delivery:</strong> Available 8:00 AM - 6:00 PM</li>
+                                </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>What are the delivery charges?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Delivery fees depend on location:</p>
+                            <ul>
+                            </ul>
+                            <p>Exact fee confirmed when you provide your address.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>What if I'm not home for delivery?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>We have solutions for this:</p>
+                            <ul>
+                                <li><strong>Leave with security:</strong> Provide guard's name</li>
+                                <li><strong>Neighbor/Office reception:</strong> Specify details</li>
+                                <li><strong>Reschedule:</strong> Contact us ASAP to rearrange</li>
+                                
+                            </ul>
+                            <p><strong>Note:</strong> For perishable items, someone must receive within 30 minutes of delivery.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Category -->
+            <div class="faq-category-section" data-category="payment">
+                <div class="category-header">
+                    <div class="category-icon">💳</div>
+                    <h3>Payment & Policies</h3>
+                </div>
+                
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>What payment methods do you accept?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>We accept various payment options:</p>
+                            <ul>
+                                <li><strong>Bank Transfer and card payments:</strong> At our physical stores and website</li>
+                                <li><strong>POS:</strong> At our physical stores only</li>
+                                </ul>
+                        </div>
+                    </div>
+                </div>
+
+          
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Do you offer discounts or loyalty programs?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Yes! We have several ways to save:</p>
+                            <ul>
+                                
+                                
+                                <li><strong>Bulk Orders:</strong> Discounts for orders above ₦100,000</li>
+                                <li><strong>Loyalty Points:</strong> Earn points with every purchase made through the website</li>
+                                <li><strong>Seasonal Promos:</strong> Follow us on social media for timely seasonal promos!</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Help Section -->
+        <div class="quick-help">
+            <h2>Still Need Help?</h2>
+            <p>Can't find what you're looking for? We're here to assist you!</p>
+            
+            <div class="help-options">
+                <div class="help-option">
+                    <div class="help-icon">💬</div>
+                    <h4>Chat with Us</h4>
+                    <p>Get instant answers via WhatsApp</p>
+                    <a href="https://wa.me/2348036815517" target="_blank" class="help-btn">Chat Lagos</a>
+                     <a href="https://wa.me/2348064377758" target="_blank" class="help-btn" style="margin-top: 10px;">Chat Abuja</a>
+                </div>
+                
+                <div class="help-option">
+                    <div class="help-icon">📞</div>
+                    <h4>Call Us</h4>
+                    <p>Speak directly with our team</p>
+                    <a href="tel:+2348036815517" class="help-btn">Call Lagos</a>
+                    <a href="tel:+2348064377758" class="help-btn" style="margin-top: 10px;">Call Abuja</a>
+                </div>
+                
+                <div class="help-option">
+                    <div class="help-icon">📍</div>
+                    <h4>Visit Store</h4>
+                    <p>Come see us in person</p>
+                    <a href="Home.html#locations" class="help-btn">View Locations</a>
+                </div>
+                
+               
+            </div>
+        </div>
+    </div>
+
+   <!-- Footer -->
+<footer id="footer-contact">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About May's Chills</h3>
+                <p>Fresh smoothies, detox juices, and healthy meals made with 100% natural ingredients. Serving Lagos and Abuja for years.</p>
+            </div>
+
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/shop" target="_blank">Shop</a></li>
+                    <li><a href="Home.html#locations">Locations</a></li>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>Contact Info</h3>
+                <ul>
+                    <li><strong>Lagos:</strong> 08036815517</li>
+                    <li><strong>Abuja:</strong> 08064377758</li>
+                    <li><strong>Email:</strong> info@mayschills.com</li>
+                    <li><strong>Hours:</strong> Mon-Fri: 8AM-7PM</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 May's Chills. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+   <script>
+    // FAQ Accordion Functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const faqQuestions = document.querySelectorAll('.faq-question');
+        const faqAnswers = document.querySelectorAll('.faq-answer');
+        
+        // Store original content for resetting
+        const originalContents = {};
+        faqQuestions.forEach((q, index) => {
+            originalContents[`question${index}`] = q.innerHTML;
+        });
+        faqAnswers.forEach((a, index) => {
+            originalContents[`answer${index}`] = a.innerHTML;
+        });
+        
+        // Initialize all FAQs as closed
+        faqAnswers.forEach(answer => {
+            answer.style.maxHeight = '0';
+        });
+        
+        // Toggle FAQ answers
+        faqQuestions.forEach(question => {
+            question.addEventListener('click', function() {
+                // Toggle active class
+                this.classList.toggle('active');
+                
+                // Toggle answer
+                const answer = this.nextElementSibling;
+                if (this.classList.contains('active')) {
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                } else {
+                    answer.style.maxHeight = '0';
+                }
+            });
+        });
+
+        // Category Filtering
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        const faqSections = document.querySelectorAll('.faq-category-section');
+        
+        categoryButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                categoryButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                const category = this.getAttribute('data-category');
+                
+                // Show/hide FAQ sections based on category
+                faqSections.forEach(section => {
+                    if (category === 'all' || section.getAttribute('data-category') === category) {
+                        section.style.display = 'block';
+                        
+                        // Show all FAQ items in this section
+                        const items = section.querySelectorAll('.faq-item');
+                        items.forEach(item => {
+                            item.style.display = 'block';
+                        });
+                    } else {
+                        section.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Search Functionality - FIXED VERSION
+        const searchBar = document.querySelector('.search-bar');
+        
+        // Store all FAQ content for searching
+        const allFAQContent = [];
+        faqQuestions.forEach((question, index) => {
+            const answer = question.nextElementSibling;
+            const answerContent = answer.querySelector('.faq-answer-content');
+            
+            allFAQContent.push({
+                question: question.textContent.trim(),
+                answer: answerContent.textContent.trim(),
+                questionElement: question,
+                answerElement: answerContent,
+                item: question.closest('.faq-item'),
+                section: question.closest('.faq-category-section')
+            });
+        });
+
+        searchBar.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            
+            // Reset all FAQ items and sections to visible
+            faqSections.forEach(section => {
+                section.style.display = 'block';
+                const items = section.querySelectorAll('.faq-item');
+                items.forEach(item => {
+                    item.style.display = 'block';
+                });
+            });
+            
+            if (searchTerm === '') {
+                // If search is empty, show all items
+                allFAQContent.forEach(faq => {
+                    faq.questionElement.innerHTML = faq.question;
+                    faq.answerElement.innerHTML = faq.answer;
+                });
+                return;
+            }
+            
+            // Hide all FAQ items initially
+            allFAQContent.forEach(faq => {
+                faq.item.style.display = 'none';
+            });
+            
+            // Filter and show matching FAQ items
+            let hasMatches = false;
+            
+            allFAQContent.forEach(faq => {
+                const questionMatch = faq.question.toLowerCase().includes(searchTerm);
+                const answerMatch = faq.answer.toLowerCase().includes(searchTerm);
+                
+                if (questionMatch || answerMatch) {
+                    faq.item.style.display = 'block';
+                    hasMatches = true;
+                    
+                    // Highlight matching text
+                    if (searchTerm.length > 2) {
+                        const regex = new RegExp(`(${searchTerm})`, 'gi');
+                        
+                        // Highlight in question
+                        const highlightedQuestion = faq.question.replace(regex, 
+                            '<mark style="background-color: #ffeb3b; padding: 2px 4px; border-radius: 3px;">$1</mark>'
+                        );
+                        faq.questionElement.innerHTML = highlightedQuestion;
+                        
+                        // Highlight in answer
+                        const highlightedAnswer = faq.answer.replace(regex, 
+                            '<mark style="background-color: #ffeb3b; padding: 2px 4px; border-radius: 3px;">$1</mark>'
+                        );
+                        faq.answerElement.innerHTML = highlightedAnswer;
+                    }
+                } else {
+                    faq.item.style.display = 'none';
+                }
+            });
+            
+            // Hide sections that have no visible items
+            faqSections.forEach(section => {
+                const visibleItems = section.querySelectorAll('.faq-item[style="display: block"]');
+                if (visibleItems.length === 0) {
+                    section.style.display = 'none';
+                }
+            });
+            
+            // Show message if no results found
+            if (!hasMatches && searchTerm.length > 0) {
+                // Check if no results message already exists
+                let noResultsMsg = document.querySelector('.no-results-message');
+                if (!noResultsMsg) {
+                    noResultsMsg = document.createElement('div');
+                    noResultsMsg.className = 'no-results-message';
+                    noResultsMsg.innerHTML = `
+                        <div style="text-align: center; padding: 2rem; background: #fff3cd; border-radius: 10px; margin: 2rem 0;">
+                            <h3 style="color: #856404; margin-bottom: 1rem;">No results found for "${searchTerm}"</h3>
+                            <p style="color: #666;">Try different keywords or contact us directly for help.</p>
+                        </div>
+                    `;
+                    const faqGrid = document.querySelector('.faq-grid');
+                    faqGrid.parentNode.insertBefore(noResultsMsg, faqGrid.nextSibling);
+                }
+            } else {
+                // Remove no results message if it exists
+                const noResultsMsg = document.querySelector('.no-results-message');
+                if (noResultsMsg) {
+                    noResultsMsg.remove();
+                }
+            }
+        });
+
+        // Mobile Menu Toggle - Fixed Version
+        const menuToggle = document.getElementById('mobile-menu-toggle');
+        const navMenu = document.querySelector('nav ul');
+        const menuSpans = document.querySelectorAll('.menu-icon span');
+        
+        if (menuToggle) {
+            menuToggle.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent event from bubbling up
+                
+                // Toggle menu visibility
+                navMenu.classList.toggle('active');
+                
+                // Toggle hamburger animation
+                this.classList.toggle('active');
+                menuSpans.forEach(span => {
+                    span.classList.toggle('active');
+                });
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('nav') && navMenu.classList.contains('active')) {
+                    navMenu.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                    menuSpans.forEach(span => {
+                        span.classList.remove('active');
+                    });
+                }
+            });
+            
+            // Close menu when clicking a link
+            const navLinks = document.querySelectorAll('nav ul li a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    navMenu.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                    menuSpans.forEach(span => {
+                        span.classList.remove('active');
+                    });
+                });
+            });
+        }
+
+        // Auto-open FAQs that contain search terms in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchQuery = urlParams.get('q');
+        if (searchQuery) {
+            searchBar.value = searchQuery;
+            // Trigger search after a short delay to ensure DOM is ready
+            setTimeout(() => {
+                searchBar.dispatchEvent(new Event('input'));
+            }, 100);
+        }
+        
+        // Auto-open first FAQ in each category
+        setTimeout(() => {
+            faqSections.forEach(section => {
+                const firstQuestion = section.querySelector('.faq-question');
+                if (firstQuestion) {
+                    firstQuestion.classList.add('active');
+                    const firstAnswer = firstQuestion.nextElementSibling;
+                    firstAnswer.style.maxHeight = firstAnswer.scrollHeight + 'px';
+                }
+            });
+        }, 500);
+    });
+</script>
+</body>
+</html>

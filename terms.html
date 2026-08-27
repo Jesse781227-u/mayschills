@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms & Conditions - May's Chills</title>
+    <link rel="icon" type="image/png" href="https://i.ibb.co/yFgsqx49/IMG-20251112-WA0082.jpg">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: #f8f9fa;
+        }
+
+        /* Navigation */
+        nav {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        nav .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav .logo {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        nav .logo img {
+            height: 50px;
+            width: auto;
+            transition: transform 0.3s ease;
+        }
+
+        nav .logo img:hover {
+            transform: scale(1.05);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #7ed321;
+        }
+
+        nav .menu-icon {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        nav .menu-icon span {
+            width: 35px;
+            height: 4px;
+            background: #333;
+            border-radius: 3px;
+            transition: all 0.3s;
+            display: block;
+        }
+
+        /* Hero Section */
+        .terms-hero {
+            background: linear-gradient(rgba(44, 85, 48, 0.9), rgba(44, 85, 48, 0.8)), url('https://i.ibb.co/C3QwGCtD/unnamed.webp');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 150px 2rem 80px;
+            text-align: center;
+            margin-top: 70px;
+        }
+
+        .terms-hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .terms-hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.95;
+        }
+
+        /* Content Container */
+        .terms-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-top: -50px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Acceptance Box */
+        .acceptance-box {
+            background: #f8fff8;
+            border: 2px solid #7ed321;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .acceptance-box h3 {
+            color: #2c5530;
+            margin-bottom: 1rem;
+        }
+
+        .acceptance-box p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        /* Table of Contents */
+        .toc {
+            background: #f8fff8;
+            border-left: 4px solid #7ed321;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 3rem;
+        }
+
+        .toc h3 {
+            color: #2c5530;
+            margin-bottom: 1rem;
+        }
+
+        .toc ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .toc li {
+            margin-bottom: 0.5rem;
+        }
+
+        .toc a {
+            color: #7ed321;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .toc a:hover {
+            color: #6ab91c;
+            text-decoration: underline;
+        }
+
+        /* Terms Content */
+        .terms-content {
+            padding-top: 2rem;
+        }
+
+        .terms-section {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .terms-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .terms-section h2 {
+            color: #2c5530;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            padding-top: 1rem;
+            scroll-margin-top: 100px;
+        }
+
+        .terms-section h3 {
+            color: #2c5530;
+            font-size: 1.4rem;
+            margin: 2rem 0 1rem;
+        }
+
+        .terms-section p {
+            margin-bottom: 1rem;
+            color: #555;
+        }
+
+        .terms-section ul, .terms-section ol {
+            margin: 1rem 0 1rem 2rem;
+            color: #555;
+        }
+
+        .terms-section li {
+            margin-bottom: 0.8rem;
+        }
+
+        .important-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .important-box strong {
+            color: #856404;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .warning-box {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .warning-box strong {
+            color: #721c24;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Contact Info */
+        .contact-info {
+            background: linear-gradient(135deg, #f8fff8, #ffffff);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 3rem;
+            border: 2px solid #7ed321;
+        }
+
+        .contact-info h3 {
+            color: #2c5530;
+            margin-bottom: 1rem;
+        }
+
+        .contact-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .contact-icon {
+            font-size: 1.5rem;
+            color: #7ed321;
+        }
+
+        /* Footer */
+        footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 60px 2rem 30px;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h3 {
+            color: #7ed321;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: #7ed321;
+        }
+
+        .footer-section p {
+            color: #ccc;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #333;
+            color: #999;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            nav ul {
+                display: none;
+            }
+
+            nav .menu-icon {
+                display: flex;
+            }
+
+            .terms-hero {
+                padding: 120px 1.5rem 60px;
+            }
+
+            .terms-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .terms-container {
+                padding: 3rem 1.5rem;
+                margin: -30px 1rem 0;
+            }
+
+            .acceptance-box, .toc {
+                padding: 1.5rem;
+            }
+
+            .terms-section h2 {
+                font-size: 1.6rem;
+            }
+
+            .terms-section h3 {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .terms-hero h1 {
+                font-size: 2rem;
+            }
+
+            .terms-hero p {
+                font-size: 1rem;
+            }
+
+            .terms-container {
+                padding: 2rem 1rem;
+            }
+
+            .contact-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+           <a href="/" class="logo">
+                <img src="https://i.postimg.cc/Pxk2tNWk/IMG-20251112-WA0082.jpg" alt="May's Chills Logo">
+            </a>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="https://mayschills.com/shop" target="_blank">Shop</a></li>
+                <li><a href="/faq">FAQ</a></li>
+                <li><a href="#contact-info">Contact</a></li>
+            </ul>
+            <div class="menu-icon" id="mobile-menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="terms-hero">
+        <div class="container">
+            <h1>Terms & Conditions</h1>
+            <p>Please read these terms carefully before using our services. By using May's Chills, you agree to these terms.</p>
+            <p style="margin-top: 1rem; font-size: 1rem; opacity: 0.9;">Last Updated: January 2025</p>
+        </div>
+    </section>
+
+    <!-- Terms Container -->
+    <div class="terms-container">
+        <!-- Acceptance Box -->
+        <div class="acceptance-box">
+            <h3>Acceptance of Terms</h3>
+            <p>By accessing and using May's Chills services (website, mobile app, purchases), you acknowledge that you have read, understood, and agree to be bound by these Terms & Conditions.</p>
+            <p>If you do not agree with any part of these terms, you must not use our services.</p>
+        </div>
+
+        <!-- Table of Contents -->
+        <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
+                <li><a href="#definitions">Definitions</a></li>
+                <li><a href="#account-registration">Account Registration</a></li>
+                <li><a href="#ordering-payments">Ordering & Payments</a></li>
+                <li><a href="#delivery-policy">Delivery Policy</a></li>
+                <li><a href="#product-information">Product Information</a></li>
+                <li><a href="#cancellation-refunds">Cancellation & Refunds</a></li>
+                <li><a href="#user-conduct">User Conduct</a></li>
+                <li><a href="#intellectual-property">Intellectual Property</a></li>
+                <li><a href="#limitation-liability">Limitation of Liability</a></li>
+                <li><a href="#dispute-resolution">Dispute Resolution</a></li>
+                <li><a href="#governing-law">Governing Law</a></li>
+                <li><a href="#changes-to-terms">Changes to Terms</a></li>
+                <li><a href="#contact-information">Contact Information</a></li>
+            </ol>
+        </div>
+
+        <!-- Terms Content -->
+        <div class="terms-content">
+            <!-- Definitions -->
+            <section class="terms-section" id="definitions">
+                <h2>1. Definitions</h2>
+                <p>In these Terms & Conditions:</p>
+                
+                <ul>
+                    <li><strong>"May's Chills," "we," "us," "our"</strong> refers to May's Chills brand and its operators</li>
+                    <li><strong>"Services"</strong> refers to our website, mobile application, delivery services, and all products offered</li>
+                    <li><strong>"Customer," "you," "your"</strong> refers to any individual or entity using our services</li>
+                    <li><strong>"Order"</strong> refers to a request for products or services placed through our platforms</li>
+                    <li><strong>"Products"</strong> refers to smoothies, juices, meals, detox plans, and all items available for purchase</li>
+                    <li><strong>"Content"</strong> refers to text, images, logos, trademarks, and all materials on our platforms</li>
+                </ul>
+            </section>
+
+            <!-- Account Registration -->
+            <section class="terms-section" id="account-registration">
+                <h2>2. Account Registration</h2>
+                
+                <h3>2.1 Account Creation</h3>
+                <p>To access certain features, you may need to create an account. You agree to:</p>
+                <ul>
+                    <li>Provide accurate, current, and complete information</li>
+                    <li>Maintain and promptly update account information</li>
+                    <li>Maintain the security of your password and account</li>
+                    <li>Accept responsibility for all activities under your account</li>
+                    <li>Notify us immediately of any unauthorized access</li>
+                </ul>
+
+                <h3>2.2 Account Termination</h3>
+                <p>We reserve the right to:</p>
+                <ul>
+                    <li>Suspend or terminate accounts for violation of these terms</li>
+                    <li>Remove or edit content at our sole discretion</li>
+                    <li>Refuse service to anyone for any reason at any time</li>
+                </ul>
+
+                <div class="important-box">
+                    <strong>Important:</strong>
+                    <p>You are responsible for maintaining the confidentiality of your account credentials. We are not liable for any loss or damage arising from your failure to protect your account.</p>
+                </div>
+            </section>
+
+            <!-- Ordering & Payments -->
+            <section class="terms-section" id="ordering-payments">
+                <h2>3. Ordering & Payments</h2>
+                
+                <h3>3.1 Order Process</h3>
+                <p>When placing an order:</p>
+                <ul>
+                    <li>Orders are subject to availability and confirmation</li>
+                    <li>We reserve the right to refuse any order at our discretion</li>
+                    <li>You must provide accurate delivery information</li>
+                    <li>Orders may be cancelled if information is incomplete or inaccurate</li>
+                    <li>We may limit quantities or refuse orders from resellers</li>
+                </ul>
+
+                <h3>3.2 Pricing</h3>
+                <ul>
+                    <li>All prices are in Nigerian Naira (₦)</li>
+                    <li>Prices are subject to change without notice</li>
+                    <li>We are not responsible for typographical errors in pricing</li>
+                    <li>Delivery charges are additional and vary by location</li>
+                    <li>Taxes are included in listed prices where applicable</li>
+                </ul>
+
+                <h3>3.3 Payment Methods</h3>
+                <p>We accept the following payment methods:</p>
+                <ul>
+                    <li>Bank Transfer</li>
+                    <li>Debit/Credit Cards (via secure payment gateway)</li>
+                    <li>Cash on Delivery (subject to area availability)</li>
+                    <li>POS payments at our stores</li>
+                </ul>
+
+                <div class="warning-box">
+                    <strong>Payment Security:</strong>
+                    <p>All payment information is processed through secure, encrypted channels. We do not store complete credit card information on our servers.</p>
+                </div>
+            </section>
+
+            <!-- Delivery Policy -->
+            <section class="terms-section" id="delivery-policy">
+                <h2>4. Delivery Policy</h2>
+                
+                <h3>4.1 Delivery Areas</h3>
+                <p>We currently deliver to:</p>
+                <ul>
+                    <li>Lagos Metropolitan Area</li>
+                    <li>Abuja Metropolitan Area</li>
+                    <li>Selected surrounding areas</li>
+                </ul>
+                <p>Delivery outside these areas may be available by special arrangement with additional charges.</p>
+
+                <h3>4.2 Delivery Times</h3>
+                <ul>
+                    <li><strong>Regular Orders:</strong> Delivery batches at 1:30 PM and 6:00 PM daily</li>
+                    <li><strong>Detox Plans:</strong> Daily delivery between 8:00 AM - 11:00 AM</li>
+                    <li><strong>Express Delivery:</strong> Available 8:00 AM - 6:00 PM (additional charge applies)</li>
+                    <li><strong>Weekend Deliveries:</strong> Available with adjusted hours</li>
+                </ul>
+
+                <h3>4.3 Delivery Charges</h3>
+                <p>Delivery fees:</p>
+                <ul>
+                    <li>Vary based on location and order value</li>
+                    <li>Calculated at checkout</li>
+                    <li>Free delivery for orders above ₦10,000 in central areas</li>
+                    <li>Detox plans include delivery in package price</li>
+                </ul>
+
+                <h3>4.4 Failed Deliveries</h3>
+                <p>If delivery cannot be completed:</p>
+                <ul>
+                    <li>Three delivery attempts will be made</li>
+                    <li>Additional delivery charges may apply for re-delivery</li>
+                    <li>Items may be returned if undeliverable after 48 hours</li>
+                    <li>Refunds subject to restocking fees (see cancellation policy)</li>
+                </ul>
+            </section>
+
+            <!-- Product Information -->
+            <section class="terms-section" id="product-information">
+                <h2>5. Product Information</h2>
+                
+                <h3>5.1 Product Descriptions</h3>
+                <p>We strive for accuracy but:</p>
+                <ul>
+                    <li>Product images are for illustrative purposes only</li>
+                    <li>Actual products may vary slightly</li>
+                    <li>We reserve the right to modify product formulations</li>
+                    <li>Nutritional information is approximate</li>
+                </ul>
+
+                <h3>5.2 Allergens & Dietary Information</h3>
+                <ul>
+                    <li>We handle various allergens in our kitchen</li>
+                    <li>Cross-contamination is possible</li>
+                    <li>Customers with severe allergies should contact us before ordering</li>
+                    <li>We provide allergen information upon request</li>
+                </ul>
+
+                <h3>5.3 Product Freshness</h3>
+                <p>Our products:</p>
+                <ul>
+                    <li>Are made fresh daily</li>
+                    <li>Have recommended consumption times</li>
+                    <li>Should be stored as directed</li>
+                    <li>Are not intended for long-term storage</li>
+                </ul>
+
+                <div class="warning-box">
+                    <strong>Health Disclaimer:</strong>
+                    <p>Our products are not medical treatments. Consult a healthcare professional before starting any detox program or making significant dietary changes, especially if you have health conditions.</p>
+                </div>
+            </section>
+
+            <!-- Cancellation & Refunds -->
+            <section class="terms-section" id="cancellation-refunds">
+                <h2>6. Cancellation & Refunds</h2>
+                
+                <h3>6.1 Order Cancellation</h3>
+                <p>Cancellation is available:</p>
+                <ul>
+                    <li><strong>Regular Orders:</strong> Up to 2 hours before delivery for full refund</li>
+                    <li><strong>Detox Plans:</strong> 24 hours before start date for full refund</li>
+                    <li><strong>Custom Orders:</strong> Non-refundable once preparation begins</li>
+                    <li><strong>Delivered Orders:</strong> No cancellations after delivery</li>
+                </ul>
+
+                <h3>6.2 Refund Policy</h3>
+                <p>Refunds are issued in the following cases:</p>
+                <ul>
+                    <li>Wrong item delivered (full refund + replacement)</li>
+                    <li>Damaged/spoiled items (full refund)</li>
+                    <li>Late delivery beyond 3 hours (partial refund)</li>
+                    <li>Cancellation within allowed timeframe (full refund)</li>
+                </ul>
+
+                <h3>6.3 Refund Process</h3>
+                <ul>
+                    <li>Refund requests must be made within 24 hours of delivery</li>
+                    <li>Provide photos of damaged items if applicable</li>
+                    <li>Refunds processed within 3-5 business days</li>
+                    <li>Refunds issued to original payment method</li>
+                </ul>
+            </section>
+
+            <!-- User Conduct -->
+            <section class="terms-section" id="user-conduct">
+                <h2>7. User Conduct</h2>
+                <p>You agree not to:</p>
+                
+                <ul>
+                    <li>Use our services for any unlawful purpose</li>
+                    <li>Violate any laws in your jurisdiction</li>
+                    <li>Infringe upon our intellectual property rights</li>
+                    <li>Harass, abuse, or harm others</li>
+                    <li>Submit false or misleading information</li>
+                    <li>Transmit viruses or malicious code</li>
+                    <li>Interfere with the security of our services</li>
+                    <li>Attempt to gain unauthorized access to our systems</li>
+                    <li>Use our services to compete with us</li>
+                </ul>
+
+                <div class="warning-box">
+                    <strong>Consequences:</strong>
+                    <p>Violation of these conduct rules may result in termination of your account, legal action, and reporting to law enforcement authorities.</p>
+                </div>
+            </section>
+
+            <!-- Intellectual Property -->
+            <section class="terms-section" id="intellectual-property">
+                <h2>8. Intellectual Property</h2>
+                
+                <h3>8.1 Our Content</h3>
+                <p>All content on our platforms is owned by or licensed to May's Chills, including:</p>
+                <ul>
+                    <li>Logos, trademarks, and brand names</li>
+                    <li>Website design and layout</li>
+                    <li>Product names and descriptions</li>
+                    <li>Photographs and graphics</li>
+                    <li>Text content and recipes</li>
+                </ul>
+
+                <h3>8.2 License Grant</h3>
+                <p>We grant you a limited, non-exclusive, non-transferable license to:</p>
+                <ul>
+                    <li>Access and use our services for personal, non-commercial purposes</li>
+                    <li>Download or print content for personal reference</li>
+                </ul>
+
+                <h3>8.3 Restrictions</h3>
+                <p>You may not:</p>
+                <ul>
+                    <li>Copy, modify, or distribute our content without permission</li>
+                    <li>Use our trademarks without authorization</li>
+                    <li>Reverse engineer or decompile our software</li>
+                    <li>Create derivative works based on our content</li>
+                </ul>
+            </section>
+
+            <!-- Limitation of Liability -->
+            <section class="terms-section" id="limitation-liability">
+                <h2>9. Limitation of Liability</h2>
+                
+                <h3>9.1 General Limitation</h3>
+                <p>To the maximum extent permitted by law, May's Chills shall not be liable for:</p>
+                <ul>
+                    <li>Any indirect, incidental, or consequential damages</li>
+                    <li>Loss of profits, data, or business opportunities</li>
+                    <li>Damages exceeding the amount paid for the specific product/service</li>
+                    <li>Issues beyond our reasonable control (force majeure)</li>
+                </ul>
+
+                <h3>9.2 Product Liability</h3>
+                <p>While we maintain high standards:</p>
+                <ul>
+                    <li>We are not liable for allergic reactions unless negligence is proven</li>
+                    <li>Customers are responsible for following storage instructions</li>
+                    <li>We are not medical providers - consult professionals for health advice</li>
+                </ul>
+
+                <div class="important-box">
+                    <strong>Disclaimer:</strong>
+                    <p>Our services are provided "as is" and "as available" without warranties of any kind, either express or implied. We do not warrant that our services will be uninterrupted or error-free.</p>
+                </div>
+            </section>
+
+            <!-- Dispute Resolution -->
+            <section class="terms-section" id="dispute-resolution">
+                <h2>10. Dispute Resolution</h2>
+                
+                <h3>10.1 Informal Resolution</h3>
+                <p>We prefer to resolve disputes informally:</p>
+                <ol>
+                    <li>Contact our customer service team first</li>
+                    <li>Allow 7 business days for investigation and response</li>
+                    <li>Provide all relevant information and documentation</li>
+                </ol>
+
+                <h3>10.2 Formal Resolution</h3>
+                <p>If informal resolution fails:</p>
+                <ul>
+                    <li>Disputes shall be resolved through arbitration in Lagos, Nigeria</li>
+                    <li>Arbitration shall be conducted in English</li>
+                    <li>Each party bears its own arbitration costs</li>
+                    <li>The arbitrator's decision shall be final and binding</li>
+                </ul>
+
+                <h3>10.3 Class Action Waiver</h3>
+                <p>You waive any right to participate in class actions or representative proceedings against May's Chills.</p>
+            </section>
+
+            <!-- Governing Law -->
+            <section class="terms-section" id="governing-law">
+                <h2>11. Governing Law</h2>
+                <p>These Terms & Conditions are governed by and construed in accordance with the laws of the Federal Republic of Nigeria.</p>
+                
+                <p>Any legal proceedings shall be brought in the courts of Lagos State, Nigeria.</p>
+                
+                <p>International customers agree that Nigerian law applies to their use of our services.</p>
+            </section>
+
+            <!-- Changes to Terms -->
+            <section class="terms-section" id="changes-to-terms">
+                <h2>12. Changes to Terms</h2>
+                
+                <h3>12.1 Modification Rights</h3>
+                <p>We reserve the right to:</p>
+                <ul>
+                    <li>Modify these terms at any time</li>
+                    <li>Update the "Last Updated" date accordingly</li>
+                    <li>Notify users of significant changes</li>
+                </ul>
+
+                <h3>12.2 Acceptance of Changes</h3>
+                <p>Your continued use of our services after changes constitutes:</p>
+                <ul>
+                    <li>Acceptance of the modified terms</li>
+                    <li>Agreement to be bound by the updated terms</li>
+                </ul>
+
+                <h3>12.3 Notification</h3>
+                <p>We may notify you of changes through:</p>
+                <ul>
+                    <li>Email (if you have an account)</li>
+                    <li>Notice on our website</li>
+                    <li>In-app notifications</li>
+                </ul>
+            </section>
+
+            <!-- Contact Information -->
+            <section class="terms-section" id="contact-information">
+                <h2>13. Contact Information</h2>
+                <p>For questions about these Terms & Conditions:</p>
+                
+                <div class="contact-info">
+                    <h3>May's Chills Legal Department</h3>
+                    
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <span class="contact-icon">📧</span>
+                            <div>
+                                <strong>Email:</strong>
+                                <p><a href="mailto:legal@mayschills.com">contact@mayschills.com</a></p>
+                            </div>
+                        </div>
+                        
+                     <div id="contact-info" class="contact-container">
+    <div class="contact-item">
+        <span class="contact-icon">📞</span>
+        <div>
+            <strong>Phone:</strong>
+            <p>Lagos: 08036815517</p>
+            <p>Abuja: 08064377758</p>
+        </div>
+    </div>
+    
+    <div class="contact-item">
+        <span class="contact-icon">📍</span>
+        <div>
+            <strong>Registered Address:</strong>
+            <p>Gbagada, Lagos</p>
+            <p>Garki, Abuja</p>
+        </div>
+    </div>
+</div>
+                        
+                        <div class="contact-item">
+                            <span class="contact-icon">⏰</span>
+                            <div>
+                                <strong>Response Time:</strong>
+                                <p>Legal inquiries: 5-10 business days</p>
+                                <p>Urgent matters: Please indicate "URGENT" in subject</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+   <!-- Footer -->
+<footer id="footer-contact">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About May's Chills</h3>
+                <p>Fresh smoothies, detox juices, and healthy meals made with 100% natural ingredients. Serving Lagos and Abuja since 2023.</p>
+            </div>
+
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/shop" target="_blank">Shop</a></li>
+                    <li><a href="Home.html#locations">Locations</a></li>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>Contact Info</h3>
+                <ul>
+                    <li><strong>Lagos:</strong> 08036815517</li>
+                    <li><strong>Abuja:</strong> 08064377758</li>
+                    <li><strong>Email:</strong> info@mayschills.com</li>
+                    <li><strong>Hours:</strong> Mon-Fri: 8AM-7PM</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 May's Chills. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+    <script>
+        // Mobile Menu Toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('mobile-menu-toggle');
+            const navMenu = document.querySelector('nav ul');
+            
+            if (menuToggle) {
+                menuToggle.addEventListener('click', function() {
+                    if (navMenu.style.display === 'flex') {
+                        navMenu.style.display = 'none';
+                    } else {
+                        navMenu.style.display = 'flex';
+                        navMenu.style.flexDirection = 'column';
+                        navMenu.style.position = 'absolute';
+                        navMenu.style.top = '100%';
+                        navMenu.style.left = '0';
+                        navMenu.style.width = '100%';
+                        navMenu.style.background = 'rgba(255, 255, 255, 0.98)';
+                        navMenu.style.backdropFilter = 'blur(10px)';
+                        navMenu.style.padding = '1rem';
+                        navMenu.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+                        navMenu.style.zIndex = '999';
+                    }
+                    this.classList.toggle('active');
+                });
+                
+                // Close menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!event.target.closest('nav') && navMenu.style.display === 'flex') {
+                        navMenu.style.display = 'none';
+                        menuToggle.classList.remove('active');
+                    }
+                });
+                
+                // Close menu when clicking a link
+                const navLinks = document.querySelectorAll('nav ul li a');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        navMenu.style.display = 'none';
+                        menuToggle.classList.remove('active');
+                    });
+                });
+            }
+            
+            // Mobile menu animation
+            const menuIcon = document.querySelector('.menu-icon');
+            if (menuIcon) {
+                menuIcon.addEventListener('click', function() {
+                    const spans = this.querySelectorAll('span');
+                    spans.forEach(span => {
+                        span.classList.toggle('active');
+                    });
+                });
+            }
+            
+            // Smooth scrolling for table of contents links
+            document.querySelectorAll('.toc a').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 100,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

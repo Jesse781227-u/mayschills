@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - MAY'S CHILLS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css">
+    <script src="https://js.paystack.co/v2/inline.js"></script>
+    <style>
+        :root { --green:#009444; --light-green:#8DC63F; --bg:#f6f6f6; --text:#171717; --muted:#8d9398; --white:#fff; }
+        * { box-sizing:border-box; }
+        body { margin:0; background:var(--bg); color:var(--text); font-family:Rubik,sans-serif; }
+        main { width:min(100%,430px); min-height:100vh; margin:auto; padding:20px 18px 30px; }
+        .topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; }
+        .topbar h1 { margin:0; font-size:23px; }
+        .icon-button { width:42px; height:42px; border:0; border-radius:50%; background:var(--white); color:var(--green); box-shadow:0 5px 16px #00000010; font-size:20px; cursor:pointer; }
+        .card { background:var(--white); border-radius:20px; padding:18px; margin-bottom:14px; box-shadow:0 7px 22px #00000008; }
+        h2 { margin:0 0 14px; font-size:17px; }
+        .item { display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px solid #eee; font-size:13px; }
+        .item:last-child { border-bottom:0; }
+        .item span:last-child { color:var(--green); font-weight:600; white-space:nowrap; }
+        label { display:block; color:#555; font-size:13px; margin:0 0 6px; }
+        input, textarea, select { width:100%; border:1px solid #e1e4e5; border-radius:12px; padding:12px; font:14px Rubik; margin-bottom:12px; background:#fff; }
+        textarea { min-height:75px; resize:vertical; }
+        .choices { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+        .choice { border:1px solid #dfe5e1; background:var(--white); color:#555; padding:12px 8px; border-radius:12px; font:500 13px Rubik; cursor:pointer; }
+        .choice.active { border-color:var(--green); color:var(--green); background:#effaf0; }
+        .row { display:flex; justify-content:space-between; margin:0 0 10px; color:#555; font-size:14px; }
+        .row strong { color:var(--text); }
+        .row.total { border-top:1px solid #eee; padding-top:13px; margin-top:4px; color:var(--text); font-size:18px; }
+        .primary, .secondary { width:100%; border:0; border-radius:999px; padding:14px 18px; font:600 15px Rubik; cursor:pointer; }
+        .primary { background:linear-gradient(135deg,var(--green),var(--light-green)); color:#fff; }
+        .secondary { background:transparent; color:var(--green); margin-top:5px; }
+    </style>
+</head>
+<body>
+<main>
+    <div class="topbar">
+        <button class="icon-button" id="back" aria-label="Back to cart"><i class="hgi-stroke hgi-arrow-left-01"></i></button>
+        <h1>Checkout</h1>
+        <span></span>
+    </div>
+    <section class="card"><h2>Order summary</h2><div id="summary"></div><div class="row total"><span>Total</span><strong id="total">₦0</strong></div></section>
+    <section class="card">
+        <h2>Order type</h2>
+        <div class="choices"><button class="choice active" data-type="pickup" type="button">Pick up</button><button class="choice" data-type="delivery" type="button">Delivery</button></div>
+        <div style="margin-top:14px"><label for="name">Name</label><input id="name" autocomplete="name" placeholder="Your name" required><label for="email">Email for payment receipt</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com" required><label for="phone">Phone number</label><input id="phone" autocomplete="tel" placeholder="08012345678" required><div id="pickupFields"><label for="pickupTime">Pickup time</label><select id="pickupTime"></select></div><div id="deliveryFields" hidden><label for="area">Delivery area</label><select id="area"><option value="">Loading delivery areas...</option></select><label for="deliveryTime">Delivery time</label><select id="deliveryTime"></select><label for="address">Exact delivery address</label><textarea id="address" placeholder="House number, street and landmarks"></textarea></div><label for="notes">Order note / allergies (optional)</label><textarea id="notes" placeholder="Any special instructions"></textarea><div id="feeNotice" style="color:var(--green);font-size:13px;margin-top:2px"></div></div>
+    </section>
+    <button class="primary" id="place" type="button">Continue to Payment</button>
+    <button class="secondary" id="backCart" type="button">Back to Cart</button>
+</main>
+<script>
+    const cart = JSON.parse(localStorage.getItem('maychills_cart') || '[]');
+    const items = cart.filter(item => item.id !== 'delivery_fee');
+    const money = value => `₦${Number(value || 0).toLocaleString()}`;
+    const total = items.reduce((sum,item) => sum + Number(item.price || 0) * Number(item.quantity || 0), 0);
+    document.getElementById('summary').innerHTML = items.length ? items.map(item => `<div class="item"><span>${item.quantity} × ${item.name}</span><span>${money(item.price * item.quantity)}</span></div>`).join('') : '<p>Your cart is empty.</p>';
+    document.getElementById('total').textContent = money(total);
+    document.querySelectorAll('[data-type]').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('[data-type]').forEach(item => item.classList.remove('active')); button.classList.add('active'); }));
+    document.getElementById('back').onclick = document.getElementById('backCart').onclick = () => window.location.href='cart.html';
+    const paystackKey = 'pk_live_46a7c9b30ca3da53f1691d449397d51bc9e2d6ca';
+    let orderType = 'pickup';
+    let deliveryFee = 0;
+    let selectedArea = '';
+    let selectedTime = '';
+    const format = value => `₦${Number(value || 0).toLocaleString()}`;
+    const summaryTotal = () => total + (orderType === 'delivery' ? deliveryFee : 0);
+    function updateSummary() {
+        document.getElementById('total').textContent = format(summaryTotal());
+        document.getElementById('feeNotice').textContent = orderType === 'delivery' && deliveryFee ? `Delivery charge: ${format(deliveryFee)}` : '';
+    }
+    async function loadDeliveryAreas() {
+        const response = await fetch('shop.html');
+        const html = await response.text();
+        const source = new DOMParser().parseFromString(html, 'text/html');
+        const sourceOptions = [...source.querySelectorAll('#delivery-area option')].filter(option => option.value);
+        const select = document.getElementById('area');
+        select.innerHTML = '<option value="">Select your area</option>' + sourceOptions.map(option => `<option value="${option.value}" data-label="${option.textContent}">${option.textContent}</option>`).join('');
+        select.onchange = () => {
+            const option = select.options[select.selectedIndex];
+            selectedArea = option.dataset.label || '';
+            const match = selectedArea.match(/([0-9][0-9,]*)\s*$/);
+            deliveryFee = match ? Number(match[1].replace(/,/g, '')) : 0;
+            updateSummary();
+        };
+        populatePickupTimes();
+        populateDeliveryTimes();
+    }
+    function populatePickupTimes() {
+        const select = document.getElementById('pickupTime');
+        const now = new Date();
+        const start = new Date(now.getTime() + 30 * 60000);
+        start.setMinutes(Math.ceil(start.getMinutes() / 30) * 30, 0, 0);
+        const endHour = 18;
+        const options = [];
+        for (let time = new Date(start); time.getHours() < endHour; time.setMinutes(time.getMinutes() + 30)) {
+            options.push({ value: time.toISOString(), label: `Today, ${time.toLocaleTimeString([], { hour:'numeric', minute:'2-digit' })}` });
+        }
+        if (!options.length) {
+            const tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate() + 1); tomorrow.setHours(10, 0, 0, 0);
+            for (let i = 0; i < 16; i += 1) {
+                const time = new Date(tomorrow.getTime() + i * 30 * 60000);
+                options.push({ value: time.toISOString(), label: `Tomorrow, ${time.toLocaleTimeString([], { hour:'numeric', minute:'2-digit' })}` });
+            }
+        }
+        select.innerHTML = options.map(option => `<option value="${option.value}">${option.label}</option>`).join('');
+        selectedTime = select.value;
+        select.onchange = () => { selectedTime = select.value; };
+    }
+    function populateDeliveryTimes() {
+        const select = document.getElementById('deliveryTime');
+        const minutes = new Date().getHours() * 60 + new Date().getMinutes();
+        const slots = [];
+        if (minutes < 10 * 60) slots.push({ value:'morning', label:'Morning — delivery by 1:30 PM today' });
+        if (minutes < 15 * 60) slots.push({ value:'afternoon', label:'Afternoon — delivery by 6:00 PM today' });
+        if (!slots.length) slots.push({ value:'next_day_morning', label:'Next day morning — delivery by 1:30 PM' });
+        select.innerHTML = slots.map(slot => `<option value="${slot.value}">${slot.label}</option>`).join('');
+        if (orderType === 'delivery') selectedTime = select.value;
+        select.onchange = () => { selectedTime = select.value; };
+    }
+    document.querySelectorAll('[data-type]').forEach(button => button.addEventListener('click', () => {
+        document.querySelectorAll('[data-type]').forEach(item => item.classList.remove('active'));
+        button.classList.add('active');
+        orderType = button.dataset.type;
+        document.getElementById('deliveryFields').hidden = orderType !== 'delivery';
+        document.getElementById('pickupFields').hidden = orderType === 'delivery';
+        selectedTime = orderType === 'delivery' ? document.getElementById('deliveryTime').value : document.getElementById('pickupTime').value;
+        updateSummary();
+    }));
+    document.getElementById('place').onclick = async event => {
+        const button = event.currentTarget;
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim().replace(/\s/g, '');
+        const address = document.getElementById('address').value.trim();
+        if (!name || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert('Please enter your name and a valid email.');
+        if (!/^(\+234|0)[789][01]\d{8}$/.test(phone)) return alert('Please enter a valid Nigerian phone number.');
+        if (orderType === 'delivery' && (!document.getElementById('area').value || !address || !deliveryFee)) return alert('Please select a delivery area and enter your exact address.');
+        if (!selectedTime) return alert('Please select a time for your order.');
+        if (!items.length || !summaryTotal()) return alert('Your cart is empty.');
+        try {
+            const availabilityResponse = await fetch('/api/availability', { cache: 'no-store' });
+            if (availabilityResponse.ok) {
+                const availability = (await availabilityResponse.json()).items || {};
+                const unavailable = items.find(item => {
+                    const baseId = String(item.id).split('_')[0];
+                    const state = availability[`product:${baseId}`];
+                    return state && (state.mode === 'forever' || (state.mode === 'today' && state.expiresAt > Date.now()));
+                });
+                if (unavailable) return alert(`${unavailable.name} is no longer available. Please return to your cart and remove it.`);
+            }
+        } catch (_) { /* Availability is advisory here; the storefront remains usable if the API is unavailable. */ }
+        if (!window.PaystackPop) return alert('Payment is still loading. Please try again.');
+        button.disabled = true; button.textContent = 'Opening Paystack...';
+        const reference = 'MCH_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
+        const metadata = { orderType, customerName:name, customerEmail:email, deliveryPhone:phone, deliveryAddress:orderType === 'delivery' ? address : null, deliveryArea:orderType === 'delivery' ? selectedArea : null, deliveryFee:orderType === 'delivery' ? deliveryFee : 0, deliverySlot:orderType === 'delivery' ? document.getElementById('deliveryTime').selectedOptions[0].textContent : null, pickupTime:orderType === 'pickup' ? document.getElementById('pickupTime').selectedOptions[0].textContent : null, orderNotes:document.getElementById('notes').value.trim(), items:items.map(item => ({ id:item.id, name:item.name, price:Number(item.price), quantity:Number(item.quantity) })), subtotal:total };
+        const payment = new window.PaystackPop();
+        payment.newTransaction({ key:paystackKey, email, amount:Math.round(summaryTotal() * 100), currency:'NGN', ref:reference, reference, metadata, onSuccess: response => { localStorage.setItem('maychills_last_order', JSON.stringify({...metadata, total:summaryTotal(), reference:response.reference || reference, date:new Date().toISOString()})); localStorage.removeItem('maychills_cart'); document.querySelector('main').innerHTML='<div class="card" style="margin-top:35vh;text-align:center"><h2>Payment successful</h2><p>Your order has been received.</p><button class="primary" onclick="location.href=\'shop.html\'">Return to menu</button></div>'; }, onCancel: () => { button.disabled=false; button.textContent='Continue to Payment'; }, onError: error => { button.disabled=false; button.textContent='Continue to Payment'; alert(error?.message || 'Payment could not be completed.'); } });
+    };
+    loadDeliveryAreas().catch(() => { document.getElementById('area').innerHTML = '<option value="">Unable to load delivery areas</option>'; });
+    updateSummary();
+</script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart - MAY'S CHILLS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css">
+    <style>
+        :root { --green:#009444; --light-green:#8DC63F; --bg:#f6f6f6; --text:#171717; --muted:#8d9398; --white:#fff; }
+        * { box-sizing:border-box; }
+        body { margin:0; background:var(--bg); color:var(--text); font-family:Rubik, sans-serif; }
+        main { width:min(100%, 430px); min-height:100vh; margin:auto; padding:20px 18px 30px; display:flex; flex-direction:column; }
+        .topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; }
+        .topbar h1 { margin:0; font-size:24px; }
+        .icon-button { width:42px; height:42px; border:0; border-radius:50%; background:var(--white); color:var(--green); box-shadow:0 5px 16px #00000010; font-size:20px; cursor:pointer; }
+        .tabs { display:flex; gap:26px; border-bottom:1px solid #e4e4e4; margin-bottom:18px; }
+        .tab { border:0; background:none; padding:0 0 12px; color:var(--muted); font:500 14px Rubik; cursor:pointer; }
+        .tab.active { color:var(--green); border-bottom:2px solid var(--green); }
+        #items { display:grid; gap:12px; }
+        .line { display:grid; grid-template-columns:58px 1fr auto; gap:12px; align-items:center; background:var(--white); padding:10px; border-radius:18px; box-shadow:0 7px 22px #00000008; }
+        .line img { width:58px; height:58px; border-radius:14px; object-fit:cover; background:#eee; }
+        .line h2 { margin:0 0 5px; font-size:14px; line-height:1.25; }
+        .line p { margin:0; color:var(--green); font-size:13px; font-weight:600; }
+        .stepper { display:flex; flex-direction:column; align-items:center; gap:4px; }
+        .stepper button { border:0; background:#edf7ee; color:var(--green); width:26px; height:24px; border-radius:8px; cursor:pointer; }
+        .stepper span { font-size:13px; font-weight:600; }
+        .empty { text-align:center; color:var(--muted); padding:65px 15px; }
+        .empty i { display:block; font-size:45px; color:var(--green); margin-bottom:12px; }
+        .summary { margin-top:auto; background:var(--white); border-radius:22px; padding:18px; box-shadow:0 8px 22px #0000000d; }
+        .row { display:flex; justify-content:space-between; margin:0 0 11px; font-size:14px; color:#555; }
+        .row strong { color:var(--text); }
+        .row.total { border-top:1px solid #eee; padding-top:14px; margin-top:5px; font-size:18px; color:var(--text); }
+        .checkout, .back { width:100%; border:0; border-radius:999px; padding:14px 18px; font:600 15px Rubik; cursor:pointer; }
+        .checkout { background:linear-gradient(135deg,var(--green),var(--light-green)); color:white; margin-top:8px; }
+        .back { background:transparent; color:var(--green); margin-top:8px; }
+        .toast { position:fixed; left:50%; bottom:20px; transform:translateX(-50%); background:#222; color:white; padding:11px 16px; border-radius:999px; font-size:13px; }
+    </style>
+</head>
+<body>
+<main>
+    <div class="topbar">
+        <button class="icon-button" id="back" aria-label="Back to menu"><i class="hgi-stroke hgi-arrow-left-01"></i></button>
+        <h1>Your Cart</h1>
+        <button class="icon-button" aria-label="Cart"><i class="hgi-stroke hgi-shopping-cart-01"></i></button>
+    </div>
+    <div class="tabs"><button class="tab active" type="button">Active</button><button class="tab" type="button">Previous</button></div>
+    <section id="items" aria-live="polite"></section>
+    <section class="summary">
+        <div class="row"><span>Items</span><strong id="count">0</strong></div>
+        <div class="row"><span>Subtotal</span><strong id="subtotal">₦0</strong></div>
+        <div class="row"><span>Delivery charge</span><strong>₦0</strong></div>
+        <div class="row total"><span>Total</span><strong id="total">₦0</strong></div>
+        <button class="checkout" id="checkout" type="button">Proceed to Checkout</button>
+        <button class="back" id="continue" type="button">Continue Shopping</button>
+    </section>
+</main>
+<script>
+    const money = value => `₦${Number(value || 0).toLocaleString()}`;
+    let cart = JSON.parse(localStorage.getItem('maychills_cart') || '[]');
+    const save = () => localStorage.setItem('maychills_cart', JSON.stringify(cart));
+    const toast = message => { const node = document.createElement('div'); node.className='toast'; node.textContent=message; document.body.appendChild(node); setTimeout(()=>node.remove(),2200); };
+    function render() {
+        const items = cart.filter(item => item.id !== 'delivery_fee');
+        const count = items.reduce((sum,item)=>sum + Number(item.quantity || 0),0);
+        const subtotal = items.reduce((sum,item)=>sum + Number(item.price || 0) * Number(item.quantity || 0),0);
+        document.getElementById('count').textContent=count;
+        document.getElementById('subtotal').textContent=money(subtotal);
+        document.getElementById('total').textContent=money(subtotal);
+        document.getElementById('items').innerHTML = items.length ? items.map(item => `
+            <article class="line">
+                <img src="${item.image || ''}" alt="${item.name}">
+                <div><h2>${item.name}</h2><p>${money(item.price)} each</p></div>
+                <div class="stepper">
+                    <button type="button" data-change="1" data-id="${item.id}" aria-label="Increase ${item.name}"><i class="hgi-stroke hgi-plus-sign"></i></button>
+                    <span>${item.quantity}</span>
+                    <button type="button" data-change="-1" data-id="${item.id}" aria-label="Decrease ${item.name}"><i class="hgi-stroke hgi-minus-sign"></i></button>
+                </div>
+            </article>`).join('') : '<div class="empty"><i class="hgi-stroke hgi-shopping-cart-01"></i><p>Your cart is empty</p></div>';
+    }
+    document.getElementById('items').addEventListener('click', event => {
+        const button = event.target.closest('[data-change]'); if (!button) return;
+        const item = cart.find(entry => String(entry.id) === String(button.dataset.id)); if (!item) return;
+        item.quantity += Number(button.dataset.change);
+        if (item.quantity <= 0) cart = cart.filter(entry => String(entry.id) !== String(button.dataset.id));
+        save(); render();
+    });
+    document.getElementById('back').onclick = document.getElementById('continue').onclick = () => window.location.href='shop.html';
+    document.getElementById('checkout').onclick = () => cart.length ? window.location.href='checkout.html' : toast('Your cart is empty');
+    render();
+</script>
+</body>
+</html>

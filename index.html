@@ -1,0 +1,4574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>May's Chills</title>
+    <link rel="icon" type="image/png" href="https://i.ibb.co/yFgsqx49/IMG-20251112-WA0082.jpg">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px #0000001a;
+            backdrop-filter: blur(10px);
+        }
+
+        nav .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+       nav .logo {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+nav .logo img {
+    height: 70px;
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+nav .logo img:hover {
+    transform: scale(1.05);
+}
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+        }
+
+        nav a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #ff6b6b;
+        }
+
+        nav .menu-icon {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            padding: 10px;
+            z-index: 100;
+        }
+
+        nav .menu-icon span {
+            width: 35px;
+            height: 4px;
+            background: #333;
+            border-radius: 3px;
+            transition: all 0.3s;
+            display: block;
+        }
+
+        nav .menu-icon:hover span {
+            background: #7ed321;
+        }
+
+        nav .cart-icon {
+            background: #7ed321;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://i.postimg.cc/bYSw-XJ6z/22633.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 200px 2rem 150px;
+            text-align: center;
+            margin-top: 80px;
+            position: relative;
+        }
+
+        .hero h1 {
+    font-size: 4.0rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    text-shadow: 
+        2px 2px 4px rgba(0,0,0,0.8),  /* Stronger black shadow for better contrast */
+        -2px -2px 4px rgba(0,0,0,0.8),
+        2px -2px 4px rgba(0,0,0,0.8),
+        -2px 2px 4px rgba(0,0,0,0.8),
+        0 0 20px rgba(0,0,0,0.5); /* Additional glow effect */
+}
+
+.hero p {
+    font-size: 1.3rem;
+    margin-bottom: 2.5rem;
+    text-shadow: 
+        1px 1px 3px rgba(0,0,0,0.8),
+        -1px -1px 3px rgba(0,0,0,0.8),
+        1px -1px 3px rgba(0,0,0,0.8),
+        -1px 1px 3px rgba(0,0,0,0.8),
+        0 0 15px rgba(0,0,0,0.5);
+    font-weight: 500; /* Make paragraph text slightly bolder */
+}
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: #7ed321;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #6ab91c;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(126, 211, 33, 0.4);
+        }
+
+        .btn-secondary {
+            background: #feca57;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #feb526;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(254, 202, 87, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-outline:hover {
+            background: white;
+            color: #333;
+        }
+
+        /* Carousel Section */
+        .carousel-section {
+            padding: 80px 2rem;
+            background: white;
+            position: relative;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+            margin: 0 auto;
+            max-width: 1200px;
+        }
+
+       .carousel-track {
+    display: flex;
+    gap: 1.5rem;
+    transition: transform 0.5s ease;
+    padding: 10px 0;
+    cursor: grab;
+    user-select: none;
+}
+
+.carousel-track:active {
+    cursor: grabbing;
+}
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: center;
+            padding: 2rem;
+            flex: 0 0 calc(33.333% - 1.33rem);
+            min-width: 300px;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, #7ed321, #a8e063);
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+        }
+
+        .product-card h3 {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-rating {
+            color: #feca57;
+            margin-bottom: 1rem;
+        }
+
+        .product-price {
+            font-size: 1.5rem;
+            color: #7ed321;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .product-price del {
+            color: #999;
+            font-size: 1.1rem;
+            margin-right: 0.5rem;
+        }
+
+        .carousel-nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .carousel-btn {
+            background: #7ed321;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .carousel-btn:hover {
+            background: #6ab91c;
+            transform: scale(1.1);
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ddd;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: #7ed321;
+            transform: scale(1.2);
+        }
+
+
+        
+        /* Dark Section */
+        .dark-section {
+                        background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><rect fill="%231a1a1a" width="1200" height="800"/></svg>');
+            background-size: cover;
+            background-attachment: fixed;
+            color: white;
+            padding: 100px 2rem;
+            text-align: center;
+        }
+
+        .dark-section h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .dark-section p {
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            opacity: 0.9;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .feature-item {
+            text-align: center;
+        }
+
+        .feature-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #7ed321, #a8e063);
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .feature-item h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+
+
+        
+        /* Full Width Products Section */
+        .products-section {
+            padding: 100px 2rem;
+            background: #f8f9fa;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        /* Image with Text Section */
+        .image-text-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            padding: 100px 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .image-text-section.reverse {
+            background: #f8f9fa;
+        }
+
+        .image-text-section.reverse .content-box {
+            order: 2;
+        }
+
+        .image-text-section.reverse .image-box {
+            order: 1;
+        }
+
+        .content-box h2 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+
+        .content-box p {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        .content-box ul {
+            list-style: none;
+            margin: 2rem 0;
+        }
+
+        .content-box ul li {
+            padding: 0.5rem 0;
+            padding-left: 2rem;
+            position: relative;
+            color: #666;
+        }
+
+        .content-box ul li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #7ed321;
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+
+        .image-box {
+            width: 100%;
+            height: 500px;
+            background: linear-gradient(135deg, #7ed321, #a8e063);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        /* Testimonial Section */
+        .testimonial-section {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%234a5568" width="1200" height="600"/></svg>');
+            background-size: cover;
+            background-attachment: fixed;
+            padding: 100px 2rem;
+            color: white;
+            text-align: center;
+        }
+
+        .testimonial-box {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .testimonial-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7ed321, #a8e063);
+            margin: 0 auto 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            border: 4px solid white;
+        }
+
+        .testimonial-box p {
+            font-size: 1.3rem;
+            font-style: italic;
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .testimonial-author {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        /* Badges Section */
+        .badges-section {
+            padding: 100px 2rem;
+            background: white;
+        }
+
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .badge-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-align: center;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .badge-circle.red {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+        }
+
+        .badge-circle.yellow {
+            background: linear-gradient(135deg, #feca57, #feb526);
+        }
+
+        .badge-circle.green {
+            background: linear-gradient(135deg, #7ed321, #6ab91c);
+        }
+
+
+
+        /* Footer */
+        footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 60px 2rem 30px;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h3 {
+            color: #7ed321;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: #7ed321;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #333;
+            color: #999;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            background: #333;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .social-icon:hover {
+            background: #7ed321;
+        }
+
+       @media (max-width: 768px) {
+    nav ul {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+        flex-direction: column;
+        padding: 1rem; /* Reduced from 2rem */
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        z-index: 999;
+        max-height: 70vh; /* Limit height */
+        overflow-y: auto; /* Add scroll if needed */
+    }
+
+    nav ul.active {
+        display: flex;
+    }
+
+    nav ul li {
+        width: 100%;
+        text-align: center;
+    }
+
+    nav ul li a {
+        display: block;
+        padding: 0.8rem; /* Reduced from 1rem */
+        font-size: 1rem; /* Reduced from 1.2rem */
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    nav ul li:last-child a {
+        border-bottom: none;
+    }
+
+    /* Reduce logo size on mobile */
+    nav .logo img {
+        height: 45px; /* Reduced from 70px */
+    }
+
+    /* Reduce navigation padding */
+    nav {
+        padding: 1rem 1.5rem; /* Reduced from 1.5rem 2rem */
+    }
+
+    /* Hero section adjustments */
+    .hero h1 {
+        font-size: 2rem; /* Keep as is */
+    }
+    
+    .hero {
+        padding: 150px 1.5rem 100px; /* Reduced padding */
+        margin-top: 70px; /* Adjust for smaller nav */
+    }
+    
+    .hero p {
+        font-size: 1.1rem; /* Slightly smaller */
+    }
+    
+    /* Other mobile styles remain the same */
+    .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .image-text-section {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .image-text-section.reverse .content-box,
+    .image-text-section.reverse .image-box {
+        order: initial;
+    }
+
+    .section-header h2 {
+        font-size: 2rem;
+    }
+
+    .dark-section h2 {
+        font-size: 2rem;
+    }
+
+    .product-card {
+        flex: 0 0 calc(100% - 1rem);
+    }
+}
+
+/* Mobile Menu Icon Animation */
+.menu-icon span.active:nth-child(1) {
+    transform: rotate(45deg) translate(6px, 6px);
+}
+
+.menu-icon span.active:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-icon span.active:nth-child(3) {
+    transform: rotate(-45deg) translate(6px, -6px);
+}
+
+.menu-icon span {
+    transition: all 0.3s ease;
+}
+
+/* Prevent scrolling when menu is open */
+body.menu-open {
+    overflow: hidden;
+}
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.8s ease;
+        }
+        
+
+
+    </style>
+</head>
+<body>
+  
+   <!-- Newsletter Popup -->
+<div id="newsletter-popup" class="newsletter-popup">
+  <div class="popup-content">
+    <button id="close-popup" class="close-btn">×</button>
+    <h2>Join the Blender Boss Newsletter</h2>
+    <p>Get exclusive offers, fresh flavour updates, and health tips straight to your inbox.</p>
+    <form id="newsletter-form">
+      <input type="email" placeholder="Enter your email" required>
+      <button type="submit">Sign Me Up</button>
+    </form>
+
+    <!-- Hidden thank-you message -->
+    <div id="thank-you-message" class="thank-you-message">
+      <h3>🎉 You’re In!</h3>
+      <p>Thanks for subscribing!</p>
+    </div>
+  </div>
+</div>
+
+<style>
+.newsletter-popup {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(5px);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.popup-content {
+  position: relative;
+  background: #fff;
+  border-radius: 20px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 420px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  animation: fadeIn 0.4s ease;
+}
+
+.popup-content h2 {
+  color: #2f613a;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.popup-content p {
+  color: #555;
+  font-size: 0.95rem;
+  margin-bottom: 1.2rem;
+}
+
+.popup-content input {
+  width: 80%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  margin-bottom: 1rem;
+}
+
+.popup-content button {
+  background: linear-gradient(135deg, #3db36b, #8fdc9b);
+  border: none;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.popup-content button:hover {
+  transform: scale(1.05);
+}
+
+.close-btn {
+  position: absolute;
+  top: 8px;  /* Reduced from 15px */
+  right: 12px;  /* Reduced from 20px */
+  background: none;
+  border: none;
+  font-size: 1.8rem;  /* Changed from 1.5rem */
+  color: #333;
+  cursor: pointer;
+  width: 32px;  /* Added fixed width */
+  height: 32px;  /* Added fixed height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+}
+
+/* Make it even smaller on mobile */
+@media (max-width: 768px) {
+  .close-btn {
+    top: 6px;
+    right: 8px;
+    font-size: 1.5rem;
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* Optional: Add hover effect */
+.close-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: scale(1.1);
+}
+
+.thank-you-message {
+  display: none;
+  margin-top: 1rem;
+}
+
+@keyframes fadeIn {
+  from {opacity: 0; transform: scale(0.9);}
+  to {opacity: 1; transform: scale(1);}
+}
+
+</style>
+
+<script>
+window.addEventListener("load", () => {
+  const popup = document.getElementById("newsletter-popup");
+  const closeBtn = document.getElementById("close-popup");
+  const form = document.getElementById("newsletter-form");
+  const thankYou = document.getElementById("thank-you-message");
+
+  setTimeout(() => popup.style.display = "flex", 3000);
+
+  closeBtn.addEventListener("click", () => popup.style.display = "none");
+
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    form.style.display = "none";
+    thankYou.style.display = "block";
+    setTimeout(() => popup.style.display = "none", 2500);
+  });
+});
+</script>
+
+
+ <!-- Navigation -->
+<nav>
+    <div class="container">
+        <a href="/" class="logo">
+            <img src="https://i.postimg.cc/Pxk2tNWk/IMG-20251112-WA0082.jpg" alt="May's Chills Logo" style="height: 50px; width: auto;">
+        </a>
+       <ul>
+   <li><a href="/">Home</a></li>
+    <li><a href="/shop" target= "_blank">Shop</a></li>
+     <li><a href="#contact">Contact</a></li>
+</ul>
+        <div class="menu-icon" id="mobile-menu-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <h1>Eat Well. Drink Well. Live Well.</h1>
+        <p>Fresh smoothies, detox juices, and guilt-free meals that taste as good as they work - we serve all, and we serve fast.</p>
+        <div class="hero-buttons">
+             <a href="shop.html" target="_blank" class="btn btn-primary">Shop Now</a>
+           
+        </div>
+    </section>
+
+
+<!-- Carousel Section -->
+<section class="carousel-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Our Bestsellers</h2>
+            <p>Luxurious Self-Care in Every Bite & Blend</p>
+        </div>
+        
+        <div class="carousel-container">
+            <div class="carousel-track">
+                <!-- Product 1 -->
+<div class="product-card">
+    <a href="shop.html" target="_blank" class="product-link">
+        <div class="product-image-container">
+            <img src="https://i.ibb.co/NntWJ35r/IMG-20251214-172816-208.jpg" alt="Chicken salad" class="product-img">
+        </div>
+        <div class="product-content">
+            <h3>Grilled Chicken Salad</h3>
+            <p class="product-ingredients">Grilled Chicken, Egg, Fresh Vegetables/p>
+            <div class="product-rating">⭐⭐⭐⭐⭐</div>
+            <div class="product-price">6,500NGN</div>
+            <span class="btn btn-primary">Go To Shop</span>
+        </div>
+    </a>
+</div>
+
+<!-- Product 2 -->
+<div class="product-card">
+    <a href="shop.html" target="_blank" class="product-link">
+        <div class="product-image-container">
+            <img src="https://i.ibb.co/qM4FtQFq/IMG-20251214-172855-010.jpg" alt="400ml parfait" class="product-img">
+        </div>
+        <div class="product-content">
+            <h3>Premium Parfait - 400ml Cup</h3>
+            <p class="product-ingredients">Greek Yoghurt, Granola, Fresh Fruits, Honey</p>
+            <div class="product-rating">⭐⭐⭐⭐⭐</div>
+            <div class="product-price">6,500NGN</div>
+            <span class="btn btn-primary">Go To Shop</span>
+        </div>
+    </a>
+</div>
+
+<!-- Product 3 -->
+<div class="product-card">
+    <a href="shop.html" target="_blank" class="product-link">
+        <div class="product-image-container">
+            <img src="https://i.ibb.co/1f5FK259/IMG-20251219-130436-348.jpg" alt="Chicken Wrap" class="product-img">
+        </div>
+        <div class="product-content">
+            <h3>Veggie Chicken Wrap</h3>
+            <p class="product-ingredients">Chicken, Fresh Vegetables, Tortilla</p>
+            <div class="product-rating">⭐⭐⭐⭐⭐</div>
+            <div class="product-price">5,500NGN</div>
+            <span class="btn btn-primary">Go To Shop</span>
+        </div>
+    </a>
+</div>
+
+<!-- Product 4 -->
+<div class="product-card">
+    <a href="shop.html" target="_blank" class="product-link">
+        <div class="product-image-container">
+            <img src="https://i.ibb.co/gZvyPCKC/IMG-3965.jpg" alt="Juice Plan" class="product-img">
+        </div>
+        <div class="product-content">
+            <h3>Juice Only Detox Plan</h3>
+            <p class="product-ingredients">Detox Juices</p>
+            <div class="product-rating">⭐⭐⭐⭐⭐</div>
+            <div class="product-price">From 22,500NGN</div>
+            <span class="btn btn-primary">Go To Shop</span>
+        </div>
+    </a>
+</div>
+
+<!-- Product 5 -->
+<div class="product-card">
+    <a href="shop.html" target="_blank" class="product-link">
+        <div class="product-image-container">
+            <img src="https://i.ibb.co/cSCPKT4V/22.png" alt="BEAUTY BOOSTER Smoothie" class="product-img">
+        </div>
+        <div class="product-content">
+            <h3>Beauty Booster</h3>
+            <p class="product-ingredients">Mulberry, Yoghurt, Strawberry, Banana</p>
+            <div class="product-rating">⭐⭐⭐⭐⭐</div>
+            <div class="product-price">4,500NGN</div>
+            <span class="btn btn-primary">Go To Shop</span>
+        </div>
+    </a>
+</div>  </div>
+            </div>
+        </div>
+        
+        <div class="carousel-dots">
+            <span class="dot active" data-index="0"></span>
+            <span class="dot" data-index="1"></span>
+            <span class="dot" data-index="2"></span>
+            <span class="dot" data-index="3"></span>
+            <span class="dot" data-index="4"></span>
+        </div>
+    </div>
+
+    <style>
+        .carousel-section {
+    padding: 60px 2rem;
+    background: white;
+}
+
+.carousel-container {
+    position: relative;
+    max-width: 1200px;
+    margin: 2rem auto;
+    overflow: hidden;
+    touch-action: pan-y;
+}
+
+.carousel-track {
+    display: flex;
+    gap: 1.5rem;
+    transition: transform 0.5s ease;
+    padding: 10px 0;
+    cursor: pointer;
+}
+
+.product-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
+    flex: 0 0 280px;
+    min-width: 280px;
+    user-select: none;
+}
+
+.product-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+.product-image-container {
+    width: 100%;
+    height: 180px; /* Reduced from 250px */
+    border-radius: 10px 10px 0 0;
+    margin-bottom: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.product-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-img {
+    transform: scale(1.05);
+}
+
+.product-content {
+    text-align: center;
+    padding: 1.5rem 1rem; /* Reduced padding */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: calc(100% - 180px); /* Adjust based on image height */
+}
+
+.product-content h3 {
+    font-size: 1.2rem; /* Slightly smaller */
+    color: #2c5530;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.product-ingredients {
+    color: #666;
+    font-size: 0.85rem; /* Smaller font */
+    margin-bottom: 0.8rem;
+    font-style: italic;
+    line-height: 1.4;
+    min-height: 40px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.product-rating {
+    color: #feca57;
+    margin-bottom: 0.8rem;
+    font-size: 0.9rem;
+}
+
+.product-price {
+    font-size: 1.3rem; /* Slightly smaller */
+    color: #7ed321;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.btn-primary {
+    background: #7ed321;
+    color: white;
+    padding: 10px 24px; /* Slightly smaller */
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-block;
+    font-size: 0.9rem;
+    margin-top: auto;
+}
+
+.btn-primary:hover {
+    background: #6ab91c;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(126, 211, 33, 0.3);
+}
+
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ddd;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.dot.active {
+    background: #7ed321;
+    transform: scale(1.2);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .product-card {
+        flex: 0 0 250px; /* Smaller on mobile */
+        min-width: 250px;
+        padding: 0;
+    }
+    
+    .product-image-container {
+        height: 160px; /* Smaller on mobile */
+    }
+    
+    .product-content {
+        padding: 1.2rem 0.8rem;
+        height: calc(100% - 160px);
+    }
+    
+    .product-content h3 {
+        font-size: 1.1rem;
+    }
+    
+    .btn-primary {
+        padding: 8px 20px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .product-card {
+        flex: 0 0 230px;
+        min-width: 230px;
+    }
+    
+    .product-image-container {
+        height: 150px;
+    }
+    
+    .product-content {
+        height: calc(100% - 150px);
+        padding: 1rem 0.6rem;
+    }
+}
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .product-card {
+                flex: 0 0 260px;
+                min-width: 260px;
+                padding: 1.5rem;
+            }
+            
+            .product-image-container {
+                height: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product-card {
+                flex: 0 0 240px;
+                min-width: 240px;
+                padding: 1.2rem;
+            }
+            
+            .product-image-container {
+                height: 180px;
+            }
+        }
+    </style>
+
+    <script>
+        // Swipeable Carousel Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const track = document.querySelector('.carousel-track');
+            const products = document.querySelectorAll('.product-card');
+            const dots = document.querySelectorAll('.dot');
+            
+            let currentIndex = 0;
+            let startX = 0;
+            let currentX = 0;
+            let isDragging = false;
+            let clickStartTime = 0;
+            let clickStartX = 0;
+            let clickStartY = 0;
+            const productsToShow = window.innerWidth <= 768 ? 1 : 3;
+            
+            function getProductWidth() {
+                return products[0].offsetWidth + 32; // width + gap
+            }
+            
+            function updateCarousel() {
+                const productWidth = getProductWidth();
+                const translateX = currentIndex * productWidth;
+                track.style.transform = `translateX(-${translateX}px)`;
+                
+                // Update dots
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentIndex);
+                });
+            }
+            
+            function getMaxIndex() {
+                const totalProducts = products.length;
+                return Math.max(0, totalProducts - productsToShow);
+            }
+            
+            // Touch/Mouse events for swiping
+            track.addEventListener('mousedown', startDrag);
+            track.addEventListener('touchstart', startDrag);
+            
+            track.addEventListener('mousemove', drag);
+            track.addEventListener('touchmove', drag);
+            
+            track.addEventListener('mouseup', endDrag);
+            track.addEventListener('touchend', endDrag);
+            track.addEventListener('mouseleave', endDrag);
+            
+            function startDrag(e) {
+                // Record start time and position for click detection
+                clickStartTime = Date.now();
+                clickStartX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                clickStartY = e.type.includes('mouse') ? e.pageY : e.touches[0].pageY;
+                
+                isDragging = true;
+                startX = clickStartX;
+                currentX = startX;
+                track.style.cursor = 'grabbing';
+                track.style.transition = 'none';
+            }
+            
+            function drag(e) {
+                if (!isDragging) return;
+                e.preventDefault();
+                
+                currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                const diff = currentX - startX;
+                
+                const productWidth = getProductWidth();
+                const baseTranslate = currentIndex * productWidth;
+                const dragTranslate = baseTranslate - (diff / 2);
+                
+                track.style.transform = `translateX(-${Math.max(0, dragTranslate)}px)`;
+            }
+            
+            function endDrag(e) {
+                if (!isDragging) return;
+                isDragging = false;
+                track.style.cursor = 'grab';
+                track.style.transition = 'transform 0.5s ease';
+                
+                // Check if it was a click or a drag
+                const clickEndTime = Date.now();
+                const clickDuration = clickEndTime - clickStartTime;
+                const endX = e.type.includes('mouse') ? e.pageX : e.changedTouches[0].pageX;
+                const endY = e.type.includes('mouse') ? e.pageY : e.changedTouches[0].pageY;
+                const distanceX = Math.abs(endX - clickStartX);
+                const distanceY = Math.abs(endY - clickStartY);
+                const totalDistance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+                
+                // If it was a short, small movement, treat it as a click and let the link handle it
+                if (clickDuration < 200 && totalDistance < 10) {
+                    // Find which product was clicked
+                    const clickedElement = e.target.closest('.product-card');
+                    if (clickedElement) {
+                        const link = clickedElement.querySelector('.product-link');
+                        if (link) {
+                            // Let the browser handle the link naturally
+                            return;
+                        }
+                    }
+                }
+                
+                // Otherwise, process as a drag/swipe
+                const diff = currentX - startX;
+                const threshold = 50; // Minimum swipe distance
+                
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0) {
+                        // Swipe right - go to previous
+                        const maxIndex = getMaxIndex();
+                        if (currentIndex > 0) {
+                            currentIndex -= 1;
+                        } else {
+                            currentIndex = maxIndex;
+                        }
+                    } else {
+                        // Swipe left - go to next
+                        const maxIndex = getMaxIndex();
+                        if (currentIndex < maxIndex) {
+                            currentIndex += 1;
+                        } else {
+                            currentIndex = 0;
+                        }
+                    }
+                }
+                
+                updateCarousel();
+            }
+            
+            // Dot navigation
+            dots.forEach(dot => {
+                dot.addEventListener('click', function() {
+                    currentIndex = parseInt(this.getAttribute('data-index'));
+                    updateCarousel();
+                });
+            });
+            
+            // Auto-advance every 8 seconds
+            let autoAdvanceInterval = setInterval(function() {
+                const maxIndex = getMaxIndex();
+                if (currentIndex < maxIndex) {
+                    currentIndex += 1;
+                } else {
+                    currentIndex = 0;
+                }
+                updateCarousel();
+            }, 8000);
+            
+            // Pause auto-advance on hover/touch
+            track.addEventListener('mouseenter', () => clearInterval(autoAdvanceInterval));
+            track.addEventListener('touchstart', () => clearInterval(autoAdvanceInterval));
+            
+            track.addEventListener('mouseleave', () => {
+                autoAdvanceInterval = setInterval(function() {
+                    const maxIndex = getMaxIndex();
+                    if (currentIndex < maxIndex) {
+                        currentIndex += 1;
+                    } else {
+                        currentIndex = 0;
+                    }
+                    updateCarousel();
+                }, 8000);
+            });
+            
+            window.addEventListener('resize', function() {
+                updateCarousel();
+            });
+        });
+    </script>
+</section>
+
+
+<!-- Dark Section - Natural Ingredients -->
+<section class="dark-section" id="natural-ingredients">
+    <div class="container">
+        <h2 class="fade-in-element">Only The Good Stuff</h2>
+        <p class="fade-in-element" data-delay="100">Every sip, every bite — whether a smoothie, juice, parfait, salad, or wrap, it's all made from 100% natural ingredients, that make healthy food taste heavenly.</p>
+        
+        <div class="features-grid">
+            <div class="feature-item fade-in-element" data-delay="200">
+                <div class="feature-icon">
+                    <img src="https://e7.pngegg.com/pngimages/673/287/png-clipart-100-natural-all-natural-ingredients-text-overlay-organic-food-ingredient-natural-foods-nature-natural-environment-miscellaneous-food.png" alt="100% Natural">
+                </div>
+                <h3>100% Natural</h3>
+                <p>Made from real fruits, no artificial flavors, colors or preservatives.</p>
+            </div>
+
+            <div class="feature-item fade-in-element" data-delay="300">
+                <div class="feature-icon">
+                    <img src="https://static.vecteezy.com/system/resources/thumbnails/029/242/033/small_2x/set-of-fresh-fruits-agriculture-farmers-market-local-produce-shopping-and-harvesting-text-poster-flat-illustration-vector.jpg" alt="Always Fresh">
+                </div>
+                <h3>Always Fresh</h3>
+                <p>Fresh fruits delivered daily from local farms. Made for maximum freshness and flavor.</p>
+            </div>
+            
+            <div class="feature-item fade-in-element" data-delay="400">
+                <div class="feature-icon">
+                    <img src="https://img.freepik.com/premium-vector/premium-organic-food-logo-badge-template_130382-102.jpg" alt="Best Quality">
+                </div>
+                <h3>Best Quality</h3>
+                <p>Premium organic ingredients sourced from trusted suppliers who share our commitment to quality.</p>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .feature-item {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .feature-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feature-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f5f5f5;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: 50%;
+        }
+
+        .feature-item h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: white;
+            order: 2;
+        }
+
+        .feature-item p {
+            font-size: 1rem;
+            color: #FFFFFF;
+            opacity: 0.9;
+            line-height: 1.6;
+            order: 3;
+        }
+
+        /* Fade-in animation for text elements */
+        .fade-in-element {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in-element.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+
+    <script>
+        // Scroll-triggered fade-in animation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create Intersection Observer
+            const fadeInObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const element = entry.target;
+                        const delay = element.getAttribute('data-delay') || 0;
+                        
+                        setTimeout(() => {
+                            element.classList.add('visible');
+                        }, parseInt(delay));
+                        
+                        // Unobserve after animation
+                        fadeInObserver.unobserve(element);
+                    }
+                });
+            }, {
+                threshold: 0.2, // Trigger when 20% of element is visible
+                rootMargin: '0px 0px -50px 0px' // Trigger slightly before element enters viewport
+            });
+
+            // Observe all fade-in elements in this section
+            const fadeElements = document.querySelectorAll('#natural-ingredients .fade-in-element');
+            fadeElements.forEach(element => {
+                fadeInObserver.observe(element);
+            });
+
+            // Also add fade-in to the section itself
+            const section = document.getElementById('natural-ingredients');
+            const sectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        sectionObserver.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+            
+            if (section) {
+                sectionObserver.observe(section);
+            }
+        });
+    </script>
+</section>
+    <style>
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .feature-item {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .feature-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f5f5f5;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: 50%;
+        }
+
+        .feature-item h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: white;
+            order: 2;
+        }
+
+        .feature-item p {
+            font-size: 1rem;
+            color: #FFFFFF;
+            opacity: 0.9;
+            line-height: 1.6;
+            order: 3;
+        }
+    </style>
+</section>
+
+<!-- Detox Plans Section -->
+<section class="detox-plans" id="detox">
+    <div class="container">
+        <div class="section-header">
+            <h2>Detox & Weight Loss Plans</h2>
+            <p>Refresh your system with natural detox blends, and sip your way to slim</p>
+        </div>
+
+        <div class="plans-carousel-container">
+            <div class="plans-track">
+                <!-- Plan 1: Juice Cleanse -->
+                <div class="plan-card">
+                    <a href="shop.html" target="_blank" class="plan-link">
+                        <div class="plan-image">
+                            <img src="https://i.ibb.co/gZvyPCKC/IMG-3965.jpg" alt="Juice Cleanse">
+                        </div>
+                        <div class="plan-header">
+                            <h3>JUICE ONLY PLAN</h3>
+                            <p class="plan-subtitle">6 Bottles Per Day</p>
+                        </div>
+                        <div class="plan-price">
+                            <span class="price-from">From</span>
+                            <span class="price-amount">22,500NGN</span>
+                        </div>
+                        <div class="plan-features">
+                            <div class="feature-item">
+                                <span class="feature-duration">1 Day</span>
+                                <span class="feature-price">67,000NGN</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-duration">3 Days</span>
+                                <span class="feature-price">110,000NGN</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-duration">5 Days</span>
+                                <span class="feature-price">153,000NGN</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-duration">7 Days</span>
+                                <span class="feature-price">N134,000</span>
+                            </div>
+                        </div>
+                        <div class="plan-description">
+                          
+                        </div>
+                       
+                    </a>
+                </div>
+
+                <!-- Plan 2: Smoothie Detox -->
+                <div class="plan-card popular">
+                    <div class="popular-badge">MOST POPULAR</div>
+                    <a href="shop.html" target="_blank" class="plan-link">
+                        <div class="plan-image">
+                            <img src="https://i.ibb.co/p6nDQcbp/IMG-3967.jpg" alt="Smoothie Detox">
+                        </div>
+                        <div class="plan-header">
+                            <h3>SMOOTHIE ONLY PLAN</h3>
+                            <p class="plan-subtitle">4 Bottles Per Day</p>
+                        </div>
+                        <div class="plan-price">
+                            <span class="price-from">From</span>
+                            <span class="price-amount">15,500NGN</span>
+                        </div>
+                        <div class="plan-features">
+                            <div class="feature-item">
+                                <span class="feature-duration">1 Day</span>
+                                <span class="feature-price">15,500NGN</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-duration">3 Days</span>
+                                <span class="feature-price">46,000NGN</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-duration">5 Days</span>
+                                <span class="feature-price">76,000NGN</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-duration">7 Days</span>
+                                <span class="feature-price">106,000NGN</span>
+                            </div>
+                        </div>
+                        <div class="plan-description">
+                           
+                        </div>
+                      
+                    </a>
+                </div>
+
+                <!-- Plan 3: Combo Cleanse -->
+                <div class="plan-card">
+                    <a href="shop.html" target="_blank" class="plan-link">
+                        <div class="plan-image">
+                            <img src="https://i.ibb.co/CpvQNMj1/571098384-18423089074109247-7757058062439157513-n.jpg" alt="Combo Cleanse">
+                        </div>
+                        <div class="plan-header">
+                            <h3>COMBO PLAN</h3>
+                            <p class="plan-subtitle">2 Smoothies + 3 Juices</p>
+                        </div>
+                        <div class="plan-price">
+                            <span class="price-from">From</span>
+                            <span class="price-amount">19,500NGN</span>
+                        </div>
+                        <div class="plan-features">
+                            <div class="feature-item">
+                                <span class="feature-duration">1 Day</span>
+                                <span class="feature-price">19,500NGN</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-duration">3 Days</span>
+                                <span class="feature-price">58,000NGN</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-duration">5 Days</span>
+                                <span class="feature-price">96,000NGN</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-duration">7 Days</span>
+                                <span class="feature-price">133,000NGN</span>
+                            </div>
+                        </div>
+                        <div class="plan-description">
+                           
+                        </div>
+                       
+                    </a>
+                </div>
+
+                <!-- Plan 4: Salad & Drinks -->
+                <div class="plan-card">
+                    <a href="shop.html" target="_blank" class="plan-link">
+                        <div class="plan-image">
+                            <img src="https://i.ibb.co/ZtPRvL5/IMG-3971.jpg" alt="Salad & Drinks">
+                        </div>
+                        <div class="plan-header">
+                            <h3>SALAD & DRINKS PLAN</h3>
+                            <p class="plan-subtitle">4 Drinks + 1 Salad</p>
+                        </div>
+                        <div class="plan-price">
+                            <span class="price-from">From</span>
+                            <span class="price-amount">22,500NGN</span>
+                        </div>
+                        <div class="plan-features">
+                            <div class="feature-item">
+                                <span class="feature-duration">1 Day</span>
+                                <span class="feature-price">22,500NGN</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-duration">3 Days</span>
+                                <span class="feature-price">69,000NGN</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-duration">5 Days</span>
+                                <span class="feature-price">114,000NGN</span>
+                            </div>
+                           
+                            </div>
+                        </div>
+                       
+                    </a>
+                </div>
+            </div>
+            
+            <div class="carousel-dots">
+                <span class="dot active" data-index="0"></span>
+                <span class="dot" data-index="1"></span>
+                <span class="dot" data-index="2"></span>
+                <span class="dot" data-index="3"></span>
+            </div>
+        </div>
+
+            </div>
+        </div>
+    </div>
+    <style>
+        /* Detox Plans Section */
+        .detox-plans {
+            padding: 80px 2rem;
+            background: #f8f9fa;
+        }
+
+        .plans-carousel-container {
+            position: relative;
+            max-width: 1200px;
+            margin: 3rem auto;
+            overflow: hidden;
+            touch-action: pan-y;
+        }
+
+        .plans-track {
+            display: flex;
+            gap: 1.5rem;
+            transition: transform 0.5s ease;
+            padding: 10px 0;
+            cursor: grab;
+        }
+
+        .plans-track:active {
+            cursor: grabbing;
+        }
+
+        .plan-card {
+            background: white;
+            border-radius: 15px;
+            padding: 0 0 2rem 0; /* Changed padding */
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            border: 2px solid #e8f5e8;
+            transition: transform 0.3s, box-shadow 0.3s;
+            flex: 0 0 320px;
+            min-width: 320px;
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+
+        .plan-card.popular {
+            border-color: #7ed321;
+            background: linear-gradient(135deg, #f8fff8, #ffffff);
+        }
+
+        /* Plan Image Styling */
+        .plan-image {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .plan-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .plan-card:hover .plan-image img {
+            transform: scale(1.05);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #7ed321;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            z-index: 2;
+        }
+
+        .plan-header {
+            padding: 0 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .plan-header h3 {
+            color: #2c5530;
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+
+        .plan-subtitle {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+
+        .plan-price {
+            margin-bottom: 1.5rem;
+            padding: 0 1.5rem;
+        }
+
+        .price-from {
+            display: block;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-amount {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #7ed321;
+        }
+
+        .plan-features {
+            margin-bottom: 1.5rem;
+            padding: 0 1.5rem;
+        }
+
+        .feature-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.9rem;
+        }
+
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+
+        .feature-duration {
+            color: #666;
+        }
+
+        .feature-price {
+            font-weight: bold;
+            color: #2c5530;
+        }
+
+        .plan-description {
+            margin-bottom: 1.5rem;
+            padding: 0 1.5rem;
+        }
+
+        .plan-description p {
+            color: #666;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .plan-card .btn {
+            margin: 0 1.5rem;
+            margin-top: auto; /* Push button to bottom */
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #7ed321;
+            border: 2px solid #7ed321;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            text-decoration: none;
+            border-radius: 25px;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .btn-outline:hover {
+            background: #7ed321;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: #7ed321;
+            color: white;
+            border: 2px solid #7ed321;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            text-decoration: none;
+            border-radius: 25px;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #6ab91c;
+            border-color: #6ab91c;
+            transform: translateY(-2px);
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ddd;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: #7ed321;
+            transform: scale(1.2);
+        }
+
+        .plan-benefits {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .benefit-item {
+            padding: 1.5rem;
+        }
+
+        .benefit-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .benefit-item h4 {
+            color: #2c5530;
+            font-size: 1.1rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .plan-card {
+                flex: 0 0 280px;
+                min-width: 280px;
+            }
+            
+            .plan-image {
+                height: 180px;
+            }
+            
+            .plan-benefits {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            
+            .price-amount {
+                font-size: 1.6rem;
+            }
+            
+            .plan-header,
+            .plan-price,
+            .plan-features,
+            .plan-description {
+                padding: 0 1rem;
+            }
+            
+            .plan-card .btn {
+                margin: 0 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .plan-card {
+                flex: 0 0 260px;
+                min-width: 260px;
+            }
+            
+            .plan-image {
+                height: 160px;
+            }
+            
+            .plan-benefits {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <script>
+        // Swipeable Detox Plans Carousel
+        document.addEventListener('DOMContentLoaded', function() {
+            const track = document.querySelector('.plans-track');
+            const plans = document.querySelectorAll('.plan-card');
+            const dots = document.querySelectorAll('.dot');
+            
+            let currentIndex = 0;
+            let startX = 0;
+            let currentX = 0;
+            let isDragging = false;
+            let clickStartTime = 0;
+            let clickStartX = 0;
+            let clickStartY = 0;
+            const plansToShow = window.innerWidth <= 768 ? 1 : 2;
+            
+            function getPlanWidth() {
+                return plans[0].offsetWidth + 24; // width + gap
+            }
+            
+            function updateCarousel() {
+                const planWidth = getPlanWidth();
+                const translateX = currentIndex * planWidth;
+                track.style.transform = `translateX(-${translateX}px)`;
+                
+                // Update dots
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentIndex);
+                });
+            }
+            
+            function getMaxIndex() {
+                const totalPlans = plans.length;
+                return Math.max(0, totalPlans - plansToShow);
+            }
+            
+            // Touch/Mouse events for swiping
+            track.addEventListener('mousedown', startDrag);
+            track.addEventListener('touchstart', startDrag);
+            
+            track.addEventListener('mousemove', drag);
+            track.addEventListener('touchmove', drag);
+            
+            track.addEventListener('mouseup', endDrag);
+            track.addEventListener('touchend', endDrag);
+            track.addEventListener('mouseleave', endDrag);
+            
+            function startDrag(e) {
+                // Record start time and position for click detection
+                clickStartTime = Date.now();
+                clickStartX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                clickStartY = e.type.includes('mouse') ? e.pageY : e.touches[0].pageY;
+                
+                isDragging = true;
+                startX = clickStartX;
+                currentX = startX;
+                track.style.cursor = 'grabbing';
+                track.style.transition = 'none';
+            }
+            
+            function drag(e) {
+                if (!isDragging) return;
+                e.preventDefault();
+                
+                currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                const diff = currentX - startX;
+                
+                const planWidth = getPlanWidth();
+                const baseTranslate = currentIndex * planWidth;
+                const dragTranslate = baseTranslate - (diff / 2);
+                
+                track.style.transform = `translateX(-${Math.max(0, dragTranslate)}px)`;
+            }
+            
+            function endDrag(e) {
+                if (!isDragging) return;
+                isDragging = false;
+                track.style.cursor = 'grab';
+                track.style.transition = 'transform 0.5s ease';
+                
+                // Check if it was a click or a drag
+                const clickEndTime = Date.now();
+                const clickDuration = clickEndTime - clickStartTime;
+                const endX = e.type.includes('mouse') ? e.pageX : e.changedTouches[0].pageX;
+                const endY = e.type.includes('mouse') ? e.pageY : e.changedTouches[0].pageY;
+                const distanceX = Math.abs(endX - clickStartX);
+                const distanceY = Math.abs(endY - clickStartY);
+                const totalDistance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+                
+                // If it was a short, small movement, treat it as a click and let the link handle it
+                if (clickDuration < 200 && totalDistance < 10) {
+                    // Find which plan was clicked
+                    const clickedElement = e.target.closest('.plan-card');
+                    if (clickedElement) {
+                        const link = clickedElement.querySelector('.btn');
+                        if (link) {
+                            // Let the browser handle the link naturally
+                            return;
+                        }
+                    }
+                }
+                
+                // Otherwise, process as a drag/swipe
+                const diff = currentX - startX;
+                const threshold = 50; // Minimum swipe distance
+                
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0) {
+                        // Swipe right - go to previous
+                        const maxIndex = getMaxIndex();
+                        if (currentIndex > 0) {
+                            currentIndex -= 1;
+                        } else {
+                            currentIndex = maxIndex;
+                        }
+                    } else {
+                        // Swipe left - go to next
+                        const maxIndex = getMaxIndex();
+                        if (currentIndex < maxIndex) {
+                            currentIndex += 1;
+                        } else {
+                            currentIndex = 0;
+                        }
+                    }
+                }
+                
+                updateCarousel();
+            }
+            
+            // Dot navigation
+            dots.forEach(dot => {
+                dot.addEventListener('click', function() {
+                    currentIndex = parseInt(this.getAttribute('data-index'));
+                    updateCarousel();
+                });
+            });
+            
+            // Auto-advance every 10 seconds
+            let autoAdvanceInterval = setInterval(function() {
+                const maxIndex = getMaxIndex();
+                if (currentIndex < maxIndex) {
+                    currentIndex += 1;
+                } else {
+                    currentIndex = 0;
+                }
+                updateCarousel();
+            }, 10000);
+            
+            // Pause auto-advance on hover/touch
+            track.addEventListener('mouseenter', () => clearInterval(autoAdvanceInterval));
+            track.addEventListener('touchstart', () => clearInterval(autoAdvanceInterval));
+            
+            track.addEventListener('mouseleave', () => {
+                autoAdvanceInterval = setInterval(function() {
+                    const maxIndex = getMaxIndex();
+                    if (currentIndex < maxIndex) {
+                        currentIndex += 1;
+                    } else {
+                        currentIndex = 0;
+                    }
+                    updateCarousel();
+                }, 10000);
+            });
+            
+            window.addEventListener('resize', function() {
+                updateCarousel();
+            });
+        });
+    </script>
+</section>
+           
+        </div>
+
+        <div class="benefits-carousel">
+    <div class="benefits-track">
+        <!-- Benefit 1 -->
+        <div class="benefit-slide active">
+            <div class="feature-icon">
+                <img src="https://i.ibb.co/LXC09TR9/Screenshot-20251108-203850-Chrome.jpg" alt="Weight Loss">
+            </div>
+            <h4>Kickstart Weight Loss</h4>
+            <p>Jumpstart your journey with our nutrient-packed blends</p>
+        </div>
+        
+        <!-- Benefit 2 -->
+        <div class="benefit-slide">
+            <div class="feature-icon">
+                <img src="https://i.ibb.co/cXV0Zktq/Screenshot-20251108-204726-Chrome.jpg" alt="Gut Health">
+            </div>
+            <h4>Improve Gut Health</h4>
+            <p>Support digestion with fiber-rich ingredients</p>
+        </div>
+        
+        <!-- Benefit 3 -->
+        <div class="benefit-slide">
+            <div class="feature-icon">
+                <img src="https://thumbs.dreamstime.com/b/cute-boy-red-shirt-holding-beverage-cans-kid-drinking-sparkling-water-abdominal-pain-flatulence-gas-stomach-bad-109127936.jpg" alt="Reduce Bloating">
+            </div>
+            <h4>Reduce Bloating</h4>
+            <p>Feel lighter and more comfortable</p>
+        </div>
+        
+        <!-- Benefit 4 -->
+        <div class="benefit-slide">
+            <div class="feature-icon">
+                <img src="https://i.ibb.co/KzWqxqSr/Screenshot-20251108-205527-Chrome.jpg" alt="Boost Metabolism">
+            </div>
+            <h4>Boost Metabolism</h4>
+            <p>Rev up your body's natural fat-burning</p>
+        </div>
+    </div>
+    
+   
+</div>
+    <style>
+
+     /* Benefits Carousel */
+.benefits-carousel {
+    max-width: 400px;
+    margin: 2rem auto 0;
+    position: relative;
+    text-align: center;
+}
+
+.benefits-track {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.benefit-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    pointer-events: none;
+}
+
+.benefit-slide.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.benefit-slide .feature-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    box-shadow: 0 5px 15px rgba(126, 211, 33, 0.2);
+    border: 2px solid #7ed321;
+}
+
+.benefit-slide .feature-icon img {
+    width: 60%;
+    height: 60%;
+    object-fit: contain;
+}
+
+.benefit-slide h4 {
+    font-size: 1.2rem;
+    color: #2c5530;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.benefit-slide p {
+    color: #666;
+    font-size: 0.95rem;
+    max-width: 300px;
+    margin: 0 auto;
+    line-height: 1.4;
+}
+
+.benefit-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.benefit-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ddd;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.benefit-dot.active {
+    background: #7ed321;
+    transform: scale(1.2);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .benefits-carousel {
+        max-width: 300px;
+    }
+    
+    .benefit-slide .feature-icon {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .benefit-slide h4 {
+        font-size: 1.1rem;
+    }
+    
+    .benefit-slide p {
+        font-size: 0.9rem;
+    }
+}   
+        /* Detox Plans Section */
+        .detox-plans {
+            padding: 80px 2rem;
+            background: #f8f9fa;
+        }
+
+        .plans-carousel-container {
+            position: relative;
+            max-width: 1200px;
+            margin: 3rem auto;
+            overflow: hidden;
+            touch-action: pan-y;
+        }
+
+        .plans-track {
+            display: flex;
+            gap: 1.5rem;
+            transition: transform 0.5s ease;
+            padding: 10px 0;
+            cursor: grab;
+        }
+
+        .plans-track:active {
+            cursor: grabbing;
+        }
+
+        .plan-card {
+            background: white;
+            border-radius: 15px;
+            padding: 0;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            border: 2px solid #e8f5e8;
+            transition: transform 0.3s, box-shadow 0.3s;
+            flex: 0 0 280px;
+            min-width: 280px;
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            /* REMOVED fixed height - let content determine height */
+        }
+
+        .plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+
+        .plan-card.popular {
+            border-color: #7ed321;
+            background: linear-gradient(135deg, #f8fff8, #ffffff);
+        }
+
+        .plan-link {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .plan-link:hover {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Plan Image Styling */
+        .plan-image {
+            width: 100%;
+            height: 180px; /* Increased from 140px */
+            overflow: hidden;
+            border-radius: 15px 15px 0 0;
+            flex-shrink: 0; /* Prevent image from shrinking */
+        }
+
+        .plan-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .plan-card:hover .plan-image img {
+            transform: scale(1.05);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: 8px; /* Adjusted position */
+            left: 50%;
+            transform: translateX(-50%);
+            background: #7ed321;
+            color: white;
+            padding: 6px 15px; /* Reduced padding */
+            border-radius: 15px;
+            font-size: 0.7rem; /* Reduced font size */
+            font-weight: bold;
+            text-transform: uppercase;
+            z-index: 2;
+        }
+
+        .plan-header {
+            padding: 0.5rem 0.8rem; /* Reduced by half */
+            margin-bottom: 0.3rem; /* Reduced by half */
+        }
+
+        .plan-header h3 {
+            color: #2c5530;
+            margin-bottom: 0.2rem; /* Reduced by half */
+            font-size: 1rem; /* Slightly smaller */
+            line-height: 1.1;
+        }
+
+        .plan-subtitle {
+            color: #666;
+            font-size: 0.75rem; /* Smaller */
+            margin-bottom: 0;
+            line-height: 1.1;
+        }
+
+        .plan-price {
+            margin-bottom: 0.5rem; /* Reduced by half */
+            padding: 0 0.8rem;
+        }
+
+        .price-from {
+            display: block;
+            color: #666;
+            font-size: 0.75rem; /* Smaller */
+            margin-bottom: 0.2rem; /* Reduced by half */
+        }
+
+        .price-amount {
+            font-size: 1.2rem; /* Smaller */
+            font-weight: bold;
+            color: #7ed321;
+            line-height: 1;
+        }
+
+        .plan-features {
+            margin-bottom: 0.5rem; /* Reduced by half */
+            padding: 0 0.8rem;
+        }
+
+        .feature-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.2rem 0; /* Reduced by half */
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.75rem; /* Smaller */
+            line-height: 1.1;
+        }
+
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+
+        .feature-duration {
+            color: #666;
+        }
+
+        .feature-price {
+            font-weight: bold;
+            color: #2c5530;
+        }
+
+        .plan-description {
+            margin-bottom: 0.5rem; /* Reduced by half */
+            padding: 0 0.8rem;
+            flex-grow: 1;
+        }
+
+        .plan-description p {
+            color: #666;
+            font-size: 0.7rem; /* Smaller */
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        .plan-link .btn {
+            margin: 0 0.8rem 0.8rem 0.8rem; /* Reduced by half */
+            padding: 6px 12px; /* Reduced by half */
+            font-size: 0.8rem; /* Smaller */
+            margin-top: auto;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #7ed321;
+            border: 2px solid #7ed321;
+            text-decoration: none;
+            border-radius: 25px;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .btn-outline:hover {
+            background: #7ed321;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: #7ed321;
+            color: white;
+            border: 2px solid #7ed321;
+            text-decoration: none;
+            border-radius: 25px;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #6ab91c;
+            border-color: #6ab91c;
+            transform: translateY(-2px);
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ddd;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: #7ed321;
+            transform: scale(1.2);
+        }
+
+        .plan-benefits {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .benefit-item {
+            padding: 1.5rem;
+        }
+
+        .benefit-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .benefit-item h4 {
+            color: #2c5530;
+            font-size: 1.1rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .plan-card {
+                flex: 0 0 250px;
+                min-width: 250px;
+                /* REMOVED height property */
+            }
+            
+            .plan-image {
+                height: 120px; /* Reduced for mobile */
+            }
+            
+            .plan-header {
+                padding: 0.6rem 0.8rem;
+            }
+            
+            .plan-header h3 {
+                font-size: 1rem;
+            }
+            
+            .plan-price,
+            .plan-features,
+            .plan-description {
+                padding: 0 0.8rem;
+            }
+            
+            .plan-link .btn {
+                margin: 0 0.8rem 0.8rem 0.8rem;
+            }
+            
+            .plan-benefits {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            
+            .price-amount {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .plan-card {
+                flex: 0 0 230px;
+                min-width: 230px;
+                /* REMOVED height property */
+            }
+            
+            .plan-image {
+                height: 110px;
+            }
+            
+            .plan-benefits {
+                grid-template-columns: 1fr;
+            }
+        }
+        /* FIX FOR SPACING ISSUE - ADD AT END OF STYLE SECTION */
+#locations.find-us-section {
+    padding: 40px 2rem !important;
+    margin-bottom: 20px !important;
+}
+
+#locations .location-features {
+    margin-top: 30px !important;
+    margin-bottom: 0 !important;
+}
+
+#locations + .image-text-section {
+    padding-top: 40px !important;
+    margin-top: 0 !important;
+}
+
+/* Reduce spacing in location cards */
+.location-card {
+    margin-bottom: 20px !important;
+}
+
+.location-info {
+    padding-bottom: 1.5rem !important;
+}
+
+.btn.btn-outline {
+    margin-top: 15px !important;
+    margin-bottom: 5px !important;
+}
+   
+   
+   /* ===== FIX FOR CAROUSEL "GO TO SHOP" BUTTONS ===== */
+
+/* Target the first carousel (Bestsellers) */
+.carousel-section .product-card .btn-primary {
+    background: #7ed321;
+    color: white;
+    padding: 7px 16px !important;
+    border-radius: 18px;
+    text-decoration: none;
+    font-weight: 500 !important;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-block;
+    font-size: 0.8rem !important;
+    margin-top: 10px;
+    min-width: 90px;
+    text-align: center;
+    line-height: 1.2;
+    white-space: nowrap;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.carousel-section .product-card .btn-primary:hover {
+    background: #6ab91c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(126, 211, 33, 0.25);
+}
+
+/* Target the detox plans carousel */
+.detox-plans .plan-card .btn {
+    background: #7ed321;
+    color: white;
+    padding: 8px 18px !important;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 500 !important;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-block;
+    font-size: 0.8rem !important;
+    margin: 15px auto 10px;
+    min-width: 100px;
+    text-align: center;
+    line-height: 1.2;
+    white-space: nowrap;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.detox-plans .plan-card .btn:hover {
+    background: #6ab91c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(126, 211, 33, 0.25);
+}
+
+/* Override any existing .btn-primary styles for these sections */
+.carousel-section .btn-primary,
+.detox-plans .btn-primary {
+    background: #7ed321 !important;
+    color: white !important;
+    border: none !important;
+    padding: 7px 16px !important;
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .carousel-section .product-card .btn-primary {
+        padding: 6px 14px !important;
+        font-size: 0.75rem !important;
+        min-width: 85px;
+    }
+    
+    .detox-plans .plan-card .btn {
+        padding: 7px 15px !important;
+        font-size: 0.75rem !important;
+        min-width: 90px;
+    }
+}
+
+@media (max-width: 480px) {
+    .carousel-section .product-card .btn-primary {
+        padding: 5px 12px !important;
+        font-size: 0.7rem !important;
+        min-width: 80px;
+    }
+    
+    .detox-plans .plan-card .btn {
+        padding: 6px 12px !important;
+        font-size: 0.7rem !important;
+        min-width: 85px;
+    }
+}
+   
+   </style>
+
+    <script>
+        // Swipeable Detox Plans Carousel
+        document.addEventListener('DOMContentLoaded', function() {
+            const track = document.querySelector('.plans-track');
+            const plans = document.querySelectorAll('.plan-card');
+            const dots = document.querySelectorAll('.dot');
+            
+            let currentIndex = 0;
+            let startX = 0;
+            let currentX = 0;
+            let isDragging = false;
+            const plansToShow = window.innerWidth <= 768 ? 1 : 2;
+            
+            function getPlanWidth() {
+                return plans[0].offsetWidth + 24; // width + gap
+            }
+            
+            function updateCarousel() {
+                const planWidth = getPlanWidth();
+                const translateX = currentIndex * planWidth;
+                track.style.transform = `translateX(-${translateX}px)`;
+                
+                // Update dots
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentIndex);
+                });
+            }
+            
+            function getMaxIndex() {
+                const totalPlans = plans.length;
+                return Math.max(0, totalPlans - plansToShow);
+            }
+            
+            // Touch/Mouse events for swiping
+            track.addEventListener('mousedown', startDrag);
+            track.addEventListener('touchstart', startDrag);
+            
+            track.addEventListener('mousemove', drag);
+            track.addEventListener('touchmove', drag);
+            
+            track.addEventListener('mouseup', endDrag);
+            track.addEventListener('touchend', endDrag);
+            track.addEventListener('mouseleave', endDrag);
+            
+            function startDrag(e) {
+                isDragging = true;
+                startX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                currentX = startX;
+                track.style.cursor = 'grabbing';
+                track.style.transition = 'none';
+            }
+            
+            function drag(e) {
+                if (!isDragging) return;
+                e.preventDefault();
+                
+                currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                const diff = currentX - startX;
+                
+                const planWidth = getPlanWidth();
+                const baseTranslate = currentIndex * planWidth;
+                const dragTranslate = baseTranslate - (diff / 2);
+                
+                track.style.transform = `translateX(-${Math.max(0, dragTranslate)}px)`;
+            }
+            
+            function endDrag() {
+                if (!isDragging) return;
+                isDragging = false;
+                track.style.cursor = 'grab';
+                track.style.transition = 'transform 0.5s ease';
+                
+                const diff = currentX - startX;
+                const threshold = 50; // Minimum swipe distance
+                
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0) {
+                        // Swipe right - go to previous
+                        const maxIndex = getMaxIndex();
+                        if (currentIndex > 0) {
+                            currentIndex -= 1;
+                        } else {
+                            currentIndex = maxIndex;
+                        }
+                    } else {
+                        // Swipe left - go to next
+                        const maxIndex = getMaxIndex();
+                        if (currentIndex < maxIndex) {
+                            currentIndex += 1;
+                        } else {
+                            currentIndex = 0;
+                        }
+                    }
+                }
+                
+                updateCarousel();
+            }
+            
+            // Dot navigation
+            dots.forEach(dot => {
+                dot.addEventListener('click', function() {
+                    currentIndex = parseInt(this.getAttribute('data-index'));
+                    updateCarousel();
+                });
+            });
+            
+            // Auto-advance every 10 seconds
+            setInterval(function() {
+                const maxIndex = getMaxIndex();
+                if (currentIndex < maxIndex) {
+                    currentIndex += 1;
+                } else {
+                    currentIndex = 0;
+                }
+                updateCarousel();
+            }, 10000);
+            
+            window.addEventListener('resize', function() {
+                updateCarousel();
+            });
+        });
+    </script>
+</section>
+
+
+<!-- Find Us Section - UPDATED WITH SVG ICONS -->
+<section class="find-us-section" id="locations">
+    <div class="container">
+        <div class="section-header">
+            <h2>Find Us</h2>
+            <p>Experience our signature blends and healthy delights at our Lagos and Abuja locations</p>
+        </div>
+
+        <div class="locations-grid">
+            <!-- Lagos Branch -->
+            <div class="location-card">
+                <div class="location-image">
+                    <img src="https://i.ibb.co/C3QwGCtD/unnamed.webp" alt="May's Chills Lagos Branch">
+                </div>
+                <div class="location-info">
+                    <h3>Lagos</h3>
+                    <div class="location-details">
+                        <!-- Instagram -->
+                        <div class="detail-item">
+                            <span class="detail-icon">
+                                <svg class="instagram-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M17 3H7C4.79086 3 3 4.79086 3 7V17C3 19.2091 4.79086 21 7 21H17C19.2091 21 21 19.2091 21 17V7C21 4.79086 19.2091 3 17 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M17.5 7.5C17.7761 7.5 18 7.27614 18 7C18 6.72386 17.7761 6.5 17.5 6.5C17.2239 6.5 17 6.72386 17 7C17 7.27614 17.2239 7.5 17.5 7.5Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                            <div class="detail-content">
+                                <p class="detail-label">Instagram</p>
+                                <a href="https://instagram.com/mayschills" target="_blank" class="social-link">
+                                    @mayschills
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Hours -->
+                        <div class="detail-item">
+                            <span class="detail-icon">
+                                <svg class="clock-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                            <div class="detail-content">
+                                <p class="detail-label">Open Hours</p>
+                                <div class="hours-list">
+                                    <p class="hours">Monday to Friday: 8:00 AM - 7:00 PM</p>
+                                    <p class="hours">Saturday: 10:00 AM - 7:00 PM</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Phone -->
+                        <div class="detail-item">
+                            <span class="detail-icon">
+                                <svg class="whatsapp-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M21 11.5C21.0034 12.8199 20.6951 14.1219 20.1 15.3C19.3944 16.7118 18.3098 17.8992 16.9674 18.7293C15.6251 19.5594 14.0782 19.9994 12.5 20C11.1801 20.0035 9.87812 19.6951 8.7 19.1L3 21L4.9 15.3C4.30493 14.1219 3.99656 12.8199 4 11.5C4.00061 9.92179 4.44061 8.37488 5.27072 7.03258C6.10083 5.69028 7.28825 4.6056 8.7 3.90003C9.87812 3.30496 11.1801 2.99659 12.5 3.00003H13C15.0843 3.11502 17.053 3.99479 18.5291 5.47089C20.0052 6.94699 20.885 8.91568 21 11V11.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                            <div class="detail-content">
+                                <p class="detail-label">Phone / WhatsApp</p>
+                                <a href="https://wa.me/2348036815517" target="_blank" class="phone-link">
+                                    08036815517
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="map-container">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3964.611284461441!2d3.424234074820547!3d6.441223223752947!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103bf4523e80db31%3A0x9e357415c295d53b!2sVictoria%20Island%2C%20Lagos!5e0!3m2!1sen!2sng!4v1700000000000!5m2!1sen!2sng" 
+                            width="100%" 
+                            height="200" 
+                            style="border:0; border-radius: 10px;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                    
+                    <div class="location-actions">
+                        <a href="https://maps.app.goo.gl/XLEYYtmkWfXzvoBBA?g_st=ac" target="_blank" class="btn btn-outline">
+                            Get Directions
+                        </a>
+                        <a href="https://wa.me/2348036815517" target="_blank" class="btn btn-whatsapp">
+                            <svg class="whatsapp-btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 11.5C21.0034 12.8199 20.6951 14.1219 20.1 15.3C19.3944 16.7118 18.3098 17.8992 16.9674 18.7293C15.6251 19.5594 14.0782 19.9994 12.5 20C11.1801 20.0035 9.87812 19.6951 8.7 19.1L3 21L4.9 15.3C4.30493 14.1219 3.99656 12.8199 4 11.5C4.00061 9.92179 4.44061 8.37488 5.27072 7.03258C6.10083 5.69028 7.28825 4.6056 8.7 3.90003C9.87812 3.30496 11.1801 2.99659 12.5 3.00003H13C15.0843 3.11502 17.053 3.99479 18.5291 5.47089C20.0052 6.94699 20.885 8.91568 21 11V11.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Text Us
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Abuja Branch -->
+            <div class="location-card">
+                <div class="location-image">
+                    <img src="https://i.ibb.co/ynkWHH7y/1000270087.jpg" alt="May's Chills Abuja Branch">
+                </div>
+                <div class="location-info">
+                    <h3>Abuja</h3>
+                    <div class="location-details">
+                        <!-- Instagram -->
+                        <div class="detail-item">
+                            <span class="detail-icon">
+                                <svg class="instagram-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M17 3H7C4.79086 3 3 4.79086 3 7V17C3 19.2091 4.79086 21 7 21H17C19.2091 21 21 19.2091 21 17V7C21 4.79086 19.2091 3 17 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M17.5 7.5C17.7761 7.5 18 7.27614 18 7C18 6.72386 17.7761 6.5 17.5 6.5C17.2239 6.5 17 6.72386 17 7C17 7.27614 17.2239 7.5 17.5 7.5Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                            <div class="detail-content">
+                                <p class="detail-label">Instagram</p>
+                                <a href="https://instagram.com/mayschillsabuja" target="_blank" class="social-link">
+                                    @mayschillsabuja
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Hours -->
+                        <div class="detail-item">
+                            <span class="detail-icon">
+                                <svg class="clock-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                            <div class="detail-content">
+                                <p class="detail-label">Open Hours</p>
+                                <div class="hours-list">
+                                    <p class="hours">Monday to Friday: 8:00 AM - 7:00 PM</p>
+                                    <p class="hours">Saturday: 10:00 AM - 7:00 PM</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Phone -->
+                        <div class="detail-item">
+                            <span class="detail-icon">
+                                <svg class="whatsapp-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M21 11.5C21.0034 12.8199 20.6951 14.1219 20.1 15.3C19.3944 16.7118 18.3098 17.8992 16.9674 18.7293C15.6251 19.5594 14.0782 19.9994 12.5 20C11.1801 20.0035 9.87812 19.6951 8.7 19.1L3 21L4.9 15.3C4.30493 14.1219 3.99656 12.8199 4 11.5C4.00061 9.92179 4.44061 8.37488 5.27072 7.03258C6.10083 5.69028 7.28825 4.6056 8.7 3.90003C9.87812 3.30496 11.1801 2.99659 12.5 3.00003H13C15.0843 3.11502 17.053 3.99479 18.5291 5.47089C20.0052 6.94699 20.885 8.91568 21 11V11.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                            <div class="detail-content">
+                                <p class="detail-label">Phone / WhatsApp</p>
+                                <a href="https://wa.me/2348064377758" target="_blank" class="phone-link">
+                                    08064377758
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="map-container">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3940.923284383702!2d7.489274074812902!3d9.05739929104059!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x104e0b3b9c71d5a5%3A0x7b7d1e6b6b6b6b6b!2sMaitama%2C%20Abuja!5e0!3m2!1sen!2sng!4v1700000000000!5m2!1sen!2sng" 
+                            width="100%" 
+                            height="200" 
+                            style="border:0; border-radius: 10px;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                    
+                    <div class="location-actions">
+                        <a href="https://maps.app.goo.gl/iowjgNpDntaZGZaVA?g_st=ac" target="_blank" class="btn btn-outline">
+                            Get Directions
+                        </a>
+                        <a href="https://wa.me/2348064377758" target="_blank" class="btn btn-whatsapp">
+                            <svg class="whatsapp-btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 11.5C21.0034 12.8199 20.6951 14.1219 20.1 15.3C19.3944 16.7118 18.3098 17.8992 16.9674 18.7293C15.6251 19.5594 14.0782 19.9994 12.5 20C11.1801 20.0035 9.87812 19.6951 8.7 19.1L3 21L4.9 15.3C4.30493 14.1219 3.99656 12.8199 4 11.5C4.00061 9.92179 4.44061 8.37488 5.27072 7.03258C6.10083 5.69028 7.28825 4.6056 8.7 3.90003C9.87812 3.30496 11.1801 2.99659 12.5 3.00003H13C15.0843 3.11502 17.053 3.99479 18.5291 5.47089C20.0052 6.94699 20.885 8.91568 21 11V11.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Text Us
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Find Us Section - UPDATED WITH SVG STYLING */
+    .find-us-section {
+        padding: 80px 2rem;
+        background: #f8f9fa;
+    }
+    
+    .section-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+    
+    .section-header h2 {
+        font-size: 2.8rem;
+        color: #2c5530;
+        margin-bottom: 15px;
+    }
+    
+    .section-header p {
+        color: #666;
+        font-size: 1.1rem;
+        max-width: 700px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    
+    .locations-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+        gap: 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .location-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .location-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+    }
+    
+    .location-image {
+        width: 100%;
+        height: 220px;
+        overflow: hidden;
+    }
+    
+    .location-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .location-card:hover .location-image img {
+        transform: scale(1.05);
+    }
+    
+    .location-info {
+        padding: 30px;
+    }
+    
+    .location-info h3 {
+        font-size: 1.8rem;
+        color: #2c5530;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
+        text-align: center;
+    }
+    
+    .location-details {
+        margin-bottom: 30px;
+    }
+    
+    .detail-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 25px;
+        padding-bottom: 25px;
+        border-bottom: 1px solid #f5f5f5;
+    }
+    
+    .detail-item:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+    
+    .detail-icon {
+        flex-shrink: 0;
+        width: 48px;
+        height: 48px;
+        background: #f8fff8;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 18px;
+        margin-top: 4px;
+    }
+    
+    /* SVG Icon Styling */
+    .instagram-icon,
+    .clock-icon,
+    .whatsapp-icon {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .instagram-icon {
+        color: #E1306C; /* Instagram pink */
+    }
+    
+    .clock-icon {
+        color: #4A90E2; /* Blue for clock */
+    }
+    
+    .whatsapp-icon {
+        color: #25D366; /* WhatsApp green */
+    }
+    
+    .detail-content {
+        flex: 1;
+    }
+    
+    .detail-label {
+        color: #666;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+    
+    .social-link,
+    .phone-link {
+        display: inline-block;
+        color: #2c5530;
+        font-size: 1.05rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        padding: 4px 0;
+    }
+    
+    .social-link:hover {
+        color: #E1306C;
+        transform: translateX(3px);
+    }
+    
+    .phone-link:hover {
+        color: #25D366;
+        transform: translateX(3px);
+    }
+    
+    .hours-list {
+        margin-top: 5px;
+    }
+    
+    .hours {
+        color: #444;
+        font-size: 1rem;
+        line-height: 1.5;
+        margin: 5px 0;
+        font-weight: 500;
+    }
+    
+    .map-container {
+        margin: 35px 0;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .location-actions {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+    
+    .btn {
+        flex: 1;
+        min-width: 140px;
+        padding: 14px 24px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .btn-outline {
+        background: transparent;
+        color: #2c5530;
+        border-color: #2c5530;
+    }
+    
+    .btn-outline:hover {
+        background: #2c5530;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(44, 85, 48, 0.2);
+    }
+    
+    .btn-whatsapp {
+        background: #25D366;
+        color: white;
+    }
+    
+    .btn-whatsapp:hover {
+        background: #128C7E;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+    }
+    
+    .whatsapp-btn-icon {
+        width: 20px;
+        height: 20px;
+        color: white;
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .find-us-section {
+            padding: 60px 1.5rem;
+        }
+        
+        .section-header h2 {
+            font-size: 2.2rem;
+        }
+        
+        .locations-grid {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        
+        .location-info {
+            padding: 25px;
+        }
+        
+        .detail-item {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+        }
+        
+        .detail-icon {
+            width: 42px;
+            height: 42px;
+            margin-right: 15px;
+        }
+        
+        .instagram-icon,
+        .clock-icon,
+        .whatsapp-icon {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .location-actions {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .find-us-section {
+            padding: 50px 1rem;
+        }
+        
+        .location-info {
+            padding: 20px;
+        }
+        
+        .detail-icon {
+            width: 36px;
+            height: 36px;
+            margin-right: 12px;
+        }
+        
+        .instagram-icon,
+        .clock-icon,
+        .whatsapp-icon {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .social-link,
+        .phone-link {
+            font-size: 1rem;
+        }
+        
+        .hours {
+            font-size: 0.95rem;
+        }
+    }
+</style></div>
+
+    <style>
+        .find-us-section {
+            padding: 100px 2rem;
+            background: white;
+        }
+
+        .locations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 3rem;
+            margin: 4rem 0;
+        }
+
+        .location-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .location-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .location-image {
+            width: 100%;
+            height: 250px;
+            overflow: hidden;
+        }
+
+        .location-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .location-card:hover .location-image img {
+            transform: scale(1.05);
+        }
+
+        .location-info {
+            padding: 2rem;
+        }
+
+        .location-info h3 {
+            color: #2c5530;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .location-details {
+            margin-bottom: 2rem;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .detail-icon {
+            font-size: 1.2rem;
+            margin-top: 0.2rem;
+        }
+
+        .address, .hours, .phone {
+            color: #333;
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .area {
+            color: #666;
+            margin: 0;
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+
+        .map-container {
+            margin: 1.5rem 0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .location-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+            text-align: center;
+        }
+
+        .location-features .feature-item {
+            padding: 1.5rem;
+        }
+
+        .location-features .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .location-features h4 {
+            color: #2c5530;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .location-features p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .contact-cta {
+            margin-top: 4rem;
+            padding: 3rem;
+            background: linear-gradient(135deg, #f8fff8, #ffffff);
+            border-radius: 20px;
+            text-align: center;
+            border: 2px solid #7ed321;
+        }
+
+        .contact-cta h3 {
+            color: #2c5530;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-cta p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .whatsapp-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #7ed321;
+            border: 2px solid #7ed321;
+            width: 100%;
+            text-align: center;
+            padding: 12px 20px;
+        }
+
+        .btn-outline:hover {
+            background: #7ed321;
+            color: white;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .locations-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .location-card {
+                margin: 0 auto;
+                max-width: 400px;
+            }
+            
+            .location-features {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            
+            .whatsapp-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-cta {
+                padding: 2rem;
+                margin-top: 3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .location-features {
+                grid-template-columns: 1fr;
+            }
+            
+            .location-info {
+                padding: 1.5rem;
+            }
+            
+            .contact-cta {
+                padding: 1.5rem;
+            }
+        }
+        /* NUCLEAR OPTION - Force remove all spacing */
+#locations,
+.find-us-section,
+[class*="find"],
+[class*="location"] {
+    margin: 0 !important;
+    padding: 20px 2rem !important;
+}
+
+#locations *,
+.find-us-section * {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+#locations .container {
+    margin: 0 auto !important;
+    padding: 0 !important;
+}
+
+#locations .section-header {
+    margin-bottom: 1rem !important;
+}
+
+#locations .locations-grid {
+    margin: 1rem auto !important;
+}
+
+#locations .location-card {
+    margin-bottom: 1rem !important;
+}
+
+#locations .btn {
+    margin: 10px auto !important;
+    display: block;
+    width: fit-content;
+}
+
+#locations + section {
+    margin-top: 0 !important;
+    padding-top: 20px !important;
+}
+    </style>
+</section>
+
+
+   <!-- Image with Text Section -->
+<section class="image-text-section">
+    <div class="content-box">
+        <h2>From The Best Farms To Your Table</h2>
+        <p>We partner with the best local suppliers to bring you the freshest tropical fruits and ingredients. Each drink is crafted with care using produce picked at peak ripeness.</p>
+        <ul>
+            <li>100% organic fruits</li>
+            <li>No pesticides or chemicals</li>
+            <li>Supporting local farmers</li>
+            <li>Sustainably sourced ingredients</li>
+            <li>Fresh daily deliveries</li>
+        </ul>
+        <a href="https://wa.me/2348036815517" class="btn btn-primary">Learn More</a>
+    </div>
+    <div class="image-box">
+        <img src="https://i.ibb.co/p6Lc0L4r/gettyimages-2172032082-612x612.jpg" alt="Fresh farm ingredients" style="width: 100%; height: 100%; object-fit: cover; border-radius: 20px;">
+    </div>
+</section>
+
+    <!-- Image with Text Section Reverse -->
+<section class="image-text-section reverse">
+    <div class="content-box">
+        <h2>Your Daily Dose of Delicious</h2>
+        <p>We believe healthy eating should be exciting, not restrictive. That's why we've created a diverse menu that goes beyond smoothies to nourish your body throughout the day with flavors that feel like a treat.</p>
+        <ul>
+            <li><strong>Morning Boost</strong> - Greek yogurt parfaits & protein-packed breakfast options</li>
+            <li><strong>Lunch Made Right</strong> - Fresh salads and gourmet wraps for midday fuel</li>
+            <li><strong>Guilt-Free Indulgence</strong> - Healthy versions of your favorite comfort foods</li>
+            <li><strong>Detox Companions</strong> - Specially crafted meals for our detox program</li>
+            <li><strong>All-Day Nutrition</strong> - From sunrise to sunset, we've got you covered</li>
+        </ul>
+       <a href="shop.html" target="_blank" class="btn btn-primary">Discover All Products</a>
+    </div>
+    <div class="image-box">
+        <img src="https://i.ibb.co/hxq7XB72/1000270068.jpg" alt="Diverse healthy menu" style="width: 100%; height: 100%; object-fit: cover; border-radius: 20px;">
+    </div>
+</section>
+
+
+
+
+
+
+
+
+
+<!-- Video Testimonials Section -->
+<section class="video-testimonials">
+    <div class="container">
+        <div class="section-header">
+            <h2 style="color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Real Results, Real Stories</h2>
+            <p style="color: #ffffff; opacity: 0.95; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">From weight loss & detox wins to everyday cravings, discover stories, reviews, and moments from our May's Chills community</p>
+        </div>
+
+        <div class="videos-carousel-container">
+            <div class="videos-track">
+                <!-- Instagram Video with Caption -->
+                <div class="video-card">
+                    <div class="video-container">
+                        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DHF3w_csErA/?utm_source=ig_embed&utm_campaign=loading" data-instgrm-version="14" style="background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin:0; max-width:658px; min-width:326px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);">
+                            <div style="padding:16px;">
+                                <a href="https://www.instagram.com/reel/DHF3w_csErA/?utm_source=ig_embed&utm_campaign=loading" style="background:#FFFFFF; line-height:0; padding:0 0; text-align:center; text-decoration:none; width:100%;" target="_blank">
+                                    <div style="display: flex; flex-direction: row; align-items: center;">
+                                        <div style="background-color: #F4F4F4; border-radius: 50%; flex-grow: 0; height: 40px; margin-right: 14px; width: 40px;"></div>
+                                        <div style="display: flex; flex-direction: column; flex-grow: 1; justify-content: center;">
+                                            <div style="background-color: #F4F4F4; border-radius: 4px; flex-grow: 0; height: 14px; margin-bottom: 6px; width: 100px;"></div>
+                                            <div style="background-color: #F4F4F4; border-radius: 4px; flex-grow: 0; height: 14px; width: 60px;"></div>
+                                        </div>
+                                    </div>
+                                    <div style="padding: 19% 0;"></div>
+                                    <div style="display:block; height:50px; margin:0 auto 12px; width:50px;">
+                                        <svg width="50px" height="50px" viewBox="0 0 60 60" version="1.1" xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                <g transform="translate(-511.000000, -20.000000)" fill="#000000">
+                                                    <g>
+                                                        <path d="M556.869,30.41 C554.814,30.41 553.148,32.076 553.148,34.131 C553.148,36.186 554.814,37.852 556.869,37.852 C558.924,37.852 560.59,36.186 560.59,34.131 C560.59,32.076 558.924,30.41 556.869,30.41 M541,60.657 C535.114,60.657 530.342,55.887 530.342,50 C530.342,44.114 535.114,39.342 541,39.342 C546.887,39.342 551.658,44.114 551.658,50 C551.658,55.887 546.887,60.657 541,60.657 M541,33.886 C532.1,33.886 524.886,41.1 524.886,50 C524.886,58.899 532.1,66.113 541,66.113 C549.9,66.113 557.115,58.899 557.115,50 C557.115,41.1 549.9,33.886 541,33.886 M565.378,62.101 C565.244,65.022 564.756,66.606 564.346,67.663 C563.803,69.06 563.154,70.057 562.106,71.106 C561.058,72.155 560.06,72.803 558.662,73.347 C557.607,73.757 556.021,74.244 553.102,74.378 C549.944,74.521 548.997,74.552 541,74.552 C533.003,74.552 532.056,74.521 528.898,74.378 C525.979,74.244 524.393,73.757 523.338,73.347 C521.94,72.803 520.942,72.155 519.894,71.106 C518.846,70.057 518.197,69.06 517.654,67.663 C517.244,66.606 516.755,65.022 516.623,62.101 C516.479,58.943 516.448,57.996 516.448,50 C516.448,42.003 516.479,41.056 516.623,37.899 C516.755,34.978 517.244,33.391 517.654,32.338 C518.197,30.938 518.846,29.942 519.894,28.894 C520.942,27.846 521.94,27.196 523.338,26.654 C524.393,26.244 525.979,25.756 528.898,25.623 C532.057,25.479 533.004,25.448 541,25.448 C548.997,25.448 549.943,25.479 553.102,25.623 C556.021,25.756 557.607,26.244 558.662,26.654 C560.06,27.196 561.058,27.846 562.106,28.894 C563.154,29.942 563.803,30.938 564.346,32.338 C564.756,33.391 565.244,34.978 565.378,37.899 C565.522,41.056 565.552,42.003 565.552,50 C565.552,57.996 565.522,58.943 565.378,62.101 M570.82,37.631 C570.674,34.438 570.167,32.258 569.425,30.349 C568.659,28.377 567.633,26.702 565.965,25.035 C564.297,23.368 562.623,22.342 560.652,21.575 C558.743,20.834 556.562,20.326 553.369,20.18 C550.169,20.033 549.148,20 541,20 C532.853,20 531.831,20.033 528.631,20.18 C525.438,20.326 523.257,20.834 521.349,21.575 C519.376,22.342 517.703,23.368 516.035,25.035 C514.368,26.702 513.342,28.377 512.574,30.349 C511.834,32.258 511.326,34.438 511.181,37.631 C511.035,40.831 511,41.851 511,50 C511,58.147 511.035,59.17 511.181,62.369 C511.326,65.562 511.834,67.743 512.574,69.651 C513.342,71.625 514.368,73.296 516.035,74.965 C517.703,76.634 519.376,77.658 521.349,78.425 C523.257,79.167 525.438,79.673 528.631,79.82 C531.831,79.965 532.853,80.001 541,80.001 C549.148,80.001 550.169,79.965 553.369,79.82 C556.562,79.673 558.743,79.167 560.652,78.425 C562.623,77.658 564.297,76.634 565.965,74.965 C567.633,73.296 568.659,71.625 569.425,69.651 C570.167,67.743 570.674,65.562 570.82,62.369 C570.966,59.17 571,58.147 571,50 C571,41.851 570.966,40.831 570.82,37.631"></path>
+                                                    </g>
+                                                </g>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                    <div style="padding-top: 8px;">
+                                        <div style="color:#3897f0; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:550; line-height:18px;">View this post on Instagram</div>
+                                    </div>
+                                    <div style="padding: 12.5% 0;"></div>
+                                    <div style="display: flex; flex-direction: row; margin-bottom: 14px; align-items: center;">
+                                        <div>
+                                            <div style="background-color: #F4F4F4; border-radius: 50%; height: 12.5px; width: 12.5px; transform: translateX(0px) translateY(7px);"></div>
+                                            <div style="background-color: #F4F4F4; height: 12.5px; transform: rotate(-45deg) translateX(3px) translateY(1px); width: 12.5px; flex-grow: 0; margin-right: 14px; margin-left: 2px;"></div>
+                                            <div style="background-color: #F4F4F4; border-radius: 50%; height: 12.5px; width: 12.5px; transform: translateX(9px) translateY(-18px);"></div>
+                                        </div>
+                                        <div style="margin-left: 8px;">
+                                            <div style="background-color: #F4F4F4; border-radius: 50%; flex-grow: 0; height: 20px; width: 20px;"></div>
+                                            <div style="width: 0; height: 0; border-top: 2px solid transparent; border-left: 6px solid #f4f4f4; border-bottom: 2px solid transparent; transform: translateX(16px) translateY(-4px) rotate(30deg)"></div>
+                                        </div>
+                                        <div style="margin-left: auto;">
+                                            <div style="width: 0px; border-top: 8px solid #F4F4F4; border-right: 8px solid transparent; transform: translateY(16px);"></div>
+                                            <div style="background-color: #F4F4F4; flex-grow: 0; height: 12px; width: 16px; transform: translateY(-4px);"></div>
+                                            <div style="width: 0; height: 0; border-top: 8px solid #F4F4F4; border-left: 8px solid transparent; transform: translateY(-4px) translateX(8px);"></div>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; flex-grow: 1; justify-content: center; margin-bottom: 24px;">
+                                        <div style="background-color: #F4F4F4; border-radius: 4px; flex-grow: 0; height: 14px; margin-bottom: 6px; width: 224px;"></div>
+                                        <div style="background-color: #F4F4F4; border-radius: 4px; flex-grow: 0; height: 14px; width: 144px;"></div>
+                                    </div>
+                                </a>
+                            </div>
+                        </blockquote>
+                    </div>
+                    <div class="video-caption">
+                        <h4 style="color: #ffffff;">Amazing results from our detox plan!</h4>
+                        <p style="color: #ffffff; opacity: 0.9;">@mayschills</p>
+                    </div>
+                </div>
+
+                <!-- Video 2 - TikTok with official embed -->
+                <div class="video-card">
+                    <div class="video-container">
+                        <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@mayschillsabuja/video/7551345714723425554" data-video-id="7551345714723425554" data-embed-from="oembed" style="max-width:605px; min-width:325px;"> 
+                            <section> 
+                                <a target="_blank" title="@mayschillsabuja" href="https://www.tiktok.com/@mayschillsabuja?refer=embed">@mayschillsabuja</a> 
+                                <p>it's breakfast time 🤗🤗 the only run you're allowed to run is to our DM to order some delicious healthy treats for you and your loved ones 💚😋 good morning, beautiful people of the chillville, we're open and ready to serve you 🙏 we're located at  855 Tafawa balewa way opposite Nicon luxury hotel in area 11, Garki Abuja. Lagos branch @MayschillsLagos  
+                                    <a title="abujasalads" target="_blank" href="https://www.tiktok.com/tag/abujasalads?refer=embed">#abujasalads</a> 
+                                    <a title="parfait" target="_blank" href="https://www.tiktok.com/tag/parfait?refer=embed">#parfait</a> 
+                                    <a title="abujahealthydrinks" target="_blank" href="https://www.tiktok.com/tag/abujahealthydrinks?refer=embed">#abujahealthydrinks</a> 
+                                    <a title="mayschills" target="_blank" href="https://www.tiktok.com/tag/mayschills?refer=embed">#mayschills</a> 
+                                    <a title="abujatreats" target="_blank" href="https://www.tiktok.com/tag/abujatreats?refer=embed">#abujatreats</a> 
+                                </p> 
+                                <a target="_blank" title="♬ original sound - Mayschillsabuja" href="https://www.tiktok.com/music/original-sound-7551345738517793552?refer=embed">♬ original sound - Mayschillsabuja</a> 
+                            </section> 
+                        </blockquote> 
+                    </div>
+                    <div class="video-caption">
+                        <h4 style="color: #ffffff;">May's Chills makes amazing breakfasts</h4>
+                        <p style="color: #ffffff; opacity: 0.9;">@mayschillsabuja</p>
+                    </div>
+                </div>
+
+                <!-- TikTok Video with Caption -->
+                <div class="video-card">
+                    <div class="video-container">
+                        <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@blaxe__/video/7555967761692888327" data-video-id="7555967761692888327" data-embed-from="oembed" style="max-width:605px; min-width:325px;"> 
+                            <section> 
+                                <a target="_blank" title="@blaxe__" href="https://www.tiktok.com/@blaxe__?refer=embed">@blaxe__</a> 
+                                <p>Healthy food doesn't have to be boring 😍✨ I stopped by @mayschills and everything was so fresh, yummy, and beautiful 🌸🍴 Definitely a hidden gem in Lagos and I'll definitely visit again🍱 
+                                    <a title="cafereview" target="_blank" href="https://www.tiktok.com/tag/cafereview?refer=embed">#cafereview</a> 
+                                    <a title="cafeinlagos" target="_blank" href="https://www.tiktok.com/tag/cafeinlagos?refer=embed">#cafeinlagos</a> 
+                                    <a title="restaurantreview" target="_blank" href="https://www.tiktok.com/tag/restaurantreview?refer=embed">#restaurantreview</a> 
+                                    <a title="foodcreator" target="_blank" href="https://www.tiktok.com/tag/foodcreator?refer=embed">#foodcreator</a> 
+                                    <a title="healthycafe" target="_blank" href="https://www.tiktok.com/tag/healthycafe?refer=embed">#healthycafe</a> 
+                                </p> 
+                                <a target="_blank" title="♬ original sound - Chisom✨BEAUTY CONTENT CREATOR" href="https://www.tiktok.com/music/original-sound-7555967805951101697?refer=embed">♬ original sound - Chisom✨BEAUTY CONTENT CREATOR</a> 
+                            </section> 
+                        </blockquote> 
+                    </div>
+                    <div class="video-caption">
+                        <h4 style="color: #ffffff;">Healthy food doesn't have to be boring!</h4>
+                        <p style="color: #ffffff; opacity: 0.9;">Customer Review</p>
+                    </div>
+                </div>
+
+                <!-- TikTok Video with Caption -->
+                <div class="video-card">
+                    <div class="video-container">
+                        <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@0iza_xx/video/7553301101764742408" data-video-id="7553301101764742408" data-embed-from="oembed" style="max-width:605px; min-width:325px;"> 
+                            <section> 
+                                <a target="_blank" title="@0iza_xx" href="https://www.tiktok.com/@0iza_xx?refer=embed">@0iza_xx</a> 
+                                <p>Just a chill day with @mayschills 🍓✨  Came through for a quick break 😩, definitely needed🤭 Oh- and the sandwich? 10/10!!!  So whether  you're on a weight loss or weight gain journey — they've got something healthy for you!  Send them a dm🙂‍↔️💕 Btw… my bubu is from @esbysal_rtw  
+                                    <a title="mayschills" target="_blank" href="https://www.tiktok.com/tag/mayschills?refer=embed">#Mayschills</a> 
+                                    <a title="healthyliving" target="_blank" href="https://www.tiktok.com/tag/healthyliving?refer=embed">#healthyliving</a> 
+                                    <a title="explore" target="_blank" href="https://www.tiktok.com/tag/explore?refer=embed">#explore</a> 
+                                    <a title="reels" target="_blank" href="https://www.tiktok.com/tag/reels?refer=embed">#reels</a> 
+                                    <a title="contentcreator" target="_blank" href="https://www.tiktok.com/tag/contentcreator?refer=embed">#contentcreator</a> 
+                                </p> 
+                                <a target="_blank" title="♬ Ayra Starr x Sarz x Ckay  Afrobeat Amapiano  Guitar vibe Type Beat - Type beats to the world" href="https://www.tiktok.com/music/Ayra-Starr-x-Sarz-x-Ckay-Afrobeat-Amapiano-Guitar-vibe-Type-Beat-7379517805442271249?refer=embed">♬ Ayra Starr x Sarz x Ckay  Afrobeat Amapiano  Guitar vibe Type Beat - Type beats to the world</a> 
+                            </section> 
+                        </blockquote> 
+                    </div>
+                    <div class="video-caption">
+                        <h4 style="color: #ffffff;">The sandwich? 10/10!!!</h4>
+                        <p style="color: #ffffff; opacity: 0.9;">Customer Review</p>
+                    </div>
+                </div>
+
+                <!-- TikTok Video with Caption -->
+                <div class="video-card">
+                    <div class="video-container">
+                        <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@mayschillslagos/video/7564324845610192148" data-video-id="7564324845610192148" data-embed-from="oembed" style="max-width:605px; min-width:325px;"> 
+                            <section> 
+                                <a target="_blank" title="@mayschillslagos" href="https://www.tiktok.com/@mayschillslagos?refer=embed">@mayschillslagos</a> 
+                                <p>
+                                    <a title="viral" target="_blank" href="https://www.tiktok.com/tag/viral?refer=embed">#viral</a> 
+                                    <a title="fyppppppppppppppppppppppp" target="_blank" href="https://www.tiktok.com/tag/fyppppppppppppppppppppppp?refer=embed">#fyppppppppppppppppppppppp</a> 
+                                    <a title="foryoupage" target="_blank" href="https://www.tiktok.com/tag/foryoupage?refer=embed">#foryoupage</a> 
+                                </p> 
+                                <a target="_blank" title="♬ Coco Money - Adekunle Gold" href="https://www.tiktok.com/music/Coco-Money-7520293313866484485?refer=embed">♬ Coco Money - Adekunle Gold</a> 
+                            </section> 
+                        </blockquote> 
+                    </div>
+                    <div class="video-caption">
+                        <h4 style="color: #ffffff;">Fresh lunch from May's Chills Lagos</h4>
+                        <p style="color: #ffffff; opacity: 0.9;">@mayschillslagos</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Carousel dots moved to be outside the track but inside the container -->
+            <div class="carousel-dots">
+                <span class="dot active" data-index="0"></span>
+                <span class="dot" data-index="1"></span>
+                <span class="dot" data-index="2"></span>
+                <span class="dot" data-index="3"></span>
+                <span class="dot" data-index="4"></span>
+            </div>
+        </div>
+
+        <div class="testimonial-cta">
+            <h3 style="color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Share Your May's Chills Story</h3>
+            <p style="color: #ffffff; opacity: 0.95; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">Tag @mayschills in your posts for a chance to be featured!</p>
+        </div>
+    </div>
+
+    <style>
+        .video-testimonials {
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%234a5568" width="1200" height="600"/></svg>');
+            background-size: cover;
+            background-attachment: fixed;
+            padding: 80px 2rem;
+            color: white;
+            text-align: center;
+        }
+
+        .videos-carousel-container {
+            position: relative;
+            max-width: 1200px;
+            margin: 3rem auto;
+            overflow: hidden;
+            touch-action: pan-y;
+        }
+
+        .videos-track {
+            display: flex;
+            gap: 1.5rem;
+            transition: transform 0.5s ease;
+            padding: 10px 0;
+            cursor: grab;
+        }
+
+        .videos-track:active {
+            cursor: grabbing;
+        }
+
+        .video-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            flex: 0 0 350px;
+            min-width: 350px;
+            user-select: none;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .video-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .video-caption {
+            padding: 1.5rem;
+        }
+
+        .video-caption h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        .video-caption p {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ddd;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: #7ed321;
+            transform: scale(1.2);
+        }
+
+        .testimonial-cta {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .testimonial-cta h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #7ed321;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .video-card {
+                flex: 0 0 300px;
+                min-width: 300px;
+            }
+            
+            .video-container {
+                height: 350px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .video-card {
+                flex: 0 0 280px;
+                min-width: 280px;
+            }
+            
+            .video-container {
+                height: 320px;
+            }
+        }
+    </style>
+
+    <script>
+        // Load social media embed scripts
+        function loadSocialEmbeds() {
+            // Instagram
+            const instagramScript = document.createElement('script');
+            instagramScript.src = 'https://www.instagram.com/embed.js';
+            instagramScript.async = true;
+            document.body.appendChild(instagramScript);
+            
+            // TikTok
+            const tiktokScript = document.createElement('script');
+            tiktokScript.src = 'https://www.tiktok.com/embed.js';
+            tiktokScript.async = true;
+            document.body.appendChild(tiktokScript);
+        }
+
+        // Swipeable Video Carousel
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSocialEmbeds();
+            
+            const track = document.querySelector('.videos-track');
+            const videos = document.querySelectorAll('.video-card');
+            const dots = document.querySelectorAll('.dot');
+            
+            let currentIndex = 0;
+            let startX = 0;
+            let currentX = 0;
+            let isDragging = false;
+            const videosToShow = window.innerWidth <= 768 ? 1 : 2;
+            
+            function getVideoWidth() {
+                return videos[0].offsetWidth + 24; // width + gap
+            }
+            
+            function updateCarousel() {
+                const videoWidth = getVideoWidth();
+                const translateX = currentIndex * videoWidth;
+                track.style.transform = `translateX(-${translateX}px)`;
+                
+                // Update dots
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentIndex);
+                });
+            }
+            
+            function getMaxIndex() {
+                const totalVideos = videos.length;
+                return Math.max(0, totalVideos - videosToShow);
+            }
+            
+            // Touch/Mouse events for swiping
+            track.addEventListener('mousedown', startDrag);
+            track.addEventListener('touchstart', startDrag);
+            
+            track.addEventListener('mousemove', drag);
+            track.addEventListener('touchmove', drag);
+            
+            track.addEventListener('mouseup', endDrag);
+            track.addEventListener('touchend', endDrag);
+            track.addEventListener('mouseleave', endDrag);
+            
+            function startDrag(e) {
+                isDragging = true;
+                startX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                currentX = startX;
+                track.style.cursor = 'grabbing';
+                track.style.transition = 'none';
+            }
+            
+            function drag(e) {
+                if (!isDragging) return;
+                e.preventDefault();
+                
+                currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                const diff = currentX - startX;
+                
+                const videoWidth = getVideoWidth();
+                const baseTranslate = currentIndex * videoWidth;
+                const dragTranslate = baseTranslate - (diff / 2);
+                
+                track.style.transform = `translateX(-${Math.max(0, dragTranslate)}px)`;
+            }
+            
+            function endDrag() {
+                if (!isDragging) return;
+                isDragging = false;
+                track.style.cursor = 'grab';
+                track.style.transition = 'transform 0.5s ease';
+                
+                const diff = currentX - startX;
+                const threshold = 50; // Minimum swipe distance
+                
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0) {
+                        // Swipe right - go to previous
+                        const maxIndex = getMaxIndex();
+                        if (currentIndex > 0) {
+                            currentIndex -= 1;
+                        } else {
+                            currentIndex = maxIndex;
+                        }
+                    } else {
+                        // Swipe left - go to next
+                        const maxIndex = getMaxIndex();
+                        if (currentIndex < maxIndex) {
+                            currentIndex += 1;
+                        } else {
+                            currentIndex = 0;
+                        }
+                    }
+                }
+                
+                updateCarousel();
+            }
+            
+            // Dot navigation
+            dots.forEach(dot => {
+                dot.addEventListener('click', function() {
+                    currentIndex = parseInt(this.getAttribute('data-index'));
+                    updateCarousel();
+                });
+            });
+            
+            window.addEventListener('resize', function() {
+                updateCarousel();
+            });
+        });
+    </script>
+</section>
+  
+
+
+
+
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <p>Here at May’s Chills, we don’t just make smoothies, we serve a lifestyle. Our drinks, parfaits, salads, and wraps are made fresh daily with real fruits, real greens, and wholesome ingredients for that perfect balance of flavor and feel-good energy.</p>
+                
+                <br><br>
+                
+       
+
+            
+            
+            
+
+           <div class="footer-section">
+    <h3>Menu Categories</h3>
+    <ul>
+        <li><a href="shop.html" target="_blank">Tropical Smoothies</a></li>
+        <li><a href="shop.html" target="_blank">Fresh Juices</a></li>
+        <li><a href="shop.html" target="_blank">Salads, Wraps & Sandwiches</a></li>
+        <li><a href="shop.html" target="_blank">Detox Blends</a></li>
+        <li><a href="shop.html" target="_blank">Seasonal Specials</a></li>
+    </ul>
+</div>
+                
+                <br><br>
+                
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="shop.html#account" target="_blank">My Account</a></li>
+                    <li><a href="/faq">FAQ</a></li> 
+                   <li><a href="privacy.html">Privacy Policy</a></li>
+                    <a href="terms.html">Terms & Conditions</a>
+                </ul>
+            </div>
+
+           <div class="footer-section" id="contact">
+                <h3>Get In Touch</h3>
+                <ul>
+                   
+                    <li><strong>Phone (Lagos):</strong> 08036815517</li>
+                    <li><strong>Phone (Abuja):</strong> 08064377758</li>
+                    <li><strong>Email:</strong> info@mayschills.com</li>
+                </ul>
+                
+                <br><br>
+                
+                <h3>Business Hours</h3>
+                <ul>
+                    <li><strong>Monday - Friday:</strong> 8:00 AM - 7:00 PM</li>
+                    <li><strong>Saturday:</strong> 10:00 AM - 7:00 PM</li>
+                    
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 May's Chills. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<style>
+    .footer-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 3rem;
+        margin-bottom: 3rem;
+    }
+
+    .footer-section {
+        margin-bottom: 2rem;
+    }
+
+    .footer-section h3 {
+        color: #7ed321;
+        margin-bottom: 1.5rem;
+        font-size: 1.3rem;
+    }
+
+    .footer-section ul {
+        list-style: none;
+    }
+
+    .footer-section ul li {
+        margin-bottom: 0.8rem;
+    }
+
+    .footer-section a {
+        color: #ccc;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+
+    .footer-section a:hover {
+        color: #7ed321;
+    }
+
+    .footer-section p {
+        color: #ccc;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+
+    .footer-section strong {
+        color: #fff;
+    }
+
+    .footer-bottom {
+        text-align: center;
+        padding-top: 2rem;
+        border-top: 1px solid #333;
+        color: #999;
+    }
+
+    .social-icons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .social-icon {
+        width: 40px;
+        height: 40px;
+        background: #333;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-decoration: none;
+        transition: background 0.3s;
+    }
+
+    .social-icon:hover {
+        background: #7ed321;
+    }
+
+    .social-img {
+        width: 20px;
+        height: 20px;
+        filter: brightness(0) invert(1);
+        transition: transform 0.3s;
+    }
+
+    .social-icon:hover .social-img {
+        transform: scale(1.1);
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .footer-content {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        
+        .footer-section {
+            margin-bottom: 1.5rem;
+        }
+    }
+</style>
+
+<script>
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Carousel functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const track = document.querySelector('.carousel-track');
+        const cards = document.querySelectorAll('.product-card');
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+        const dots = document.querySelectorAll('.dot');
+        
+        let currentIndex = 0;
+        const cardWidth = cards[0].offsetWidth + 32; // Width + gap
+        const totalCards = cards.length;
+        
+        // Function to update carousel position
+        function updateCarousel() {
+            track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+            
+            // Update active dot
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentIndex);
+            });
+        }
+        
+        // Next button click
+        nextBtn.addEventListener('click', function() {
+            if (currentIndex < totalCards - 1) {
+                currentIndex++;
+            } else {
+                currentIndex = 0; // Return to first product
+            }
+            updateCarousel();
+        });
+        
+        // Previous button click
+        prevBtn.addEventListener('click', function() {
+            if (currentIndex > 0) {
+                currentIndex--;
+            } else {
+                currentIndex = totalCards - 1; // Go to last product
+            }
+            updateCarousel();
+        });
+        
+        // Dot navigation
+        dots.forEach(dot => {
+            dot.addEventListener('click', function() {
+                currentIndex = parseInt(this.getAttribute('data-index'));
+                updateCarousel();
+            });
+        });
+        
+        // Auto-advance carousel
+        setInterval(function() {
+            if (currentIndex < totalCards - 1) {
+                currentIndex++;
+            } else {
+                currentIndex = 0; // Return to first product
+            }
+            updateCarousel();
+        }, 5000);
+    });
+</script> 
+
+<script>
+    // Benefits Carousel
+document.addEventListener('DOMContentLoaded', function() {
+    const slides = document.querySelectorAll('.benefit-slide');
+    const dots = document.querySelectorAll('.benefit-dot');
+    let currentSlide = 0;
+    
+    function showSlide(index) {
+        // Hide all slides
+        slides.forEach(slide => {
+            slide.classList.remove('active');
+        });
+        
+        // Remove active class from all dots
+        dots.forEach(dot => {
+            dot.classList.remove('active');
+        });
+        
+        // Show current slide
+        slides[index].classList.add('active');
+        dots[index].classList.add('active');
+    }
+    
+    // Dot click navigation
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', function() {
+            currentSlide = index;
+            showSlide(currentSlide);
+        });
+    });
+    
+    // Auto-rotate slides every 4 seconds
+    setInterval(function() {
+        currentSlide = (currentSlide + 1) % slides.length;
+        showSlide(currentSlide);
+    }, 4000);
+    
+    // Initialize first slide
+    showSlide(0);
+});
+// Mobile menu toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const menuIcon = document.querySelector('.menu-icon');
+    const navMenu = document.querySelector('nav ul');
+    const menuSpans = document.querySelectorAll('.menu-icon span');
+    
+    // Toggle menu when menu icon is clicked
+    menuIcon.addEventListener('click', function() {
+        // Toggle menu visibility
+        navMenu.classList.toggle('active');
+        
+        // Animate the menu icon (hamburger to X)
+        menuSpans.forEach(span => {
+            span.classList.toggle('active');
+        });
+        
+        // Prevent scrolling when menu is open
+        document.body.classList.toggle('menu-open');
+    });
+    
+    // Close menu when clicking on a link
+    const navLinks = document.querySelectorAll('nav ul li a');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            navMenu.classList.remove('active');
+            menuSpans.forEach(span => {
+                span.classList.remove('active');
+            });
+            document.body.classList.remove('menu-open');
+        });
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('nav') && navMenu.classList.contains('active')) {
+            navMenu.classList.remove('active');
+            menuSpans.forEach(span => {
+                span.classList.remove('active');
+            });
+            document.body.classList.remove('menu-open');
+        }
+    });
+});
+</script>
+  
+</body>
+</html>

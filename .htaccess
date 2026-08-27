@@ -1,0 +1,21 @@
+<!-- ============================================ -->
+<!-- 9. SERVER CONFIGURATION (.htaccess) -->
+<!-- ============================================ -->
+<!--
+Add this to your .htaccess file for clean URLs:
+
+RewriteEngine On
+RewriteBase /
+
+# Remove .html extension
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([^\.]+)$ $1.html [NC,L]
+
+# Redirect to remove .html if accessed directly
+RewriteCond %{THE_REQUEST} ^GET\ /[^?\s]+\.html
+RewriteRule ^(.*)\.html$ /$1 [R=301,L]
+
+# Set Home.html as index
+DirectoryIndex index.html Home.html
+-->
