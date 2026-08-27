@@ -5947,9 +5947,14 @@ initializePayment(email, amount, reference, metadata = {}) {
                     total: metadata.subtotal + (metadata.deliveryFee || 0),
                     items: cart.filter(item => item.id !== 'delivery_fee').map(item => ({
                         id: item.id,
+                        productId: item.productId || item.id,
                         name: item.name,
+                        basePrice: item.basePrice || item.price,
                         price: item.price,
-                        quantity: item.quantity
+                        quantity: item.quantity,
+                        customizationTotal: item.customizationTotal || 0,
+                        customizations: item.customizations || null,
+                        customizationSummary: item.customizations ? getCustomizationLines(item) : []
                     }))
                 };
                 const webhookSent = await WebhookHandler.sendOrderWithRetry(orderData, response);
@@ -6056,9 +6061,14 @@ async createOrderAfterPayment(transaction, metadata) {
             id: transaction.reference,
             items: cart.filter(item => item.id !== 'delivery_fee').map(item => ({
                 id: item.id,
+                productId: item.productId || item.id,
                 name: item.name,
+                basePrice: item.basePrice || item.price,
                 price: item.price,
-                quantity: item.quantity
+                quantity: item.quantity,
+                customizationTotal: item.customizationTotal || 0,
+                customizations: item.customizations || null,
+                customizationSummary: item.customizations ? getCustomizationLines(item) : []
             })),
             subtotal: subtotal,
             deliveryFee: deliveryFee,
@@ -6146,7 +6156,7 @@ async sendOrderNotificationEmail(order, transaction) {
         const orderItemsHTML = order.items.map(item => 
             `<tr>
                 <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.quantity}</td>
-                <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.name}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.name}${item.customizations ? `<div style="margin-top: 4px; color: #666; font-size: 12px;">${getCustomizationLines(item).map(line => `- ${line}`).join('<br>')}</div>` : ''}</td>
                 <td style="padding: 8px; border-bottom: 1px solid #eee;">₦${item.price.toLocaleString()}</td>
                 <td style="padding: 8px; border-bottom: 1px solid #eee;">₦${(item.price * item.quantity).toLocaleString()}</td>
             </tr>`
@@ -7670,6 +7680,7 @@ function getOrderTypeText(type) {
         let extrasBaseProduct = null;
         let extrasBasePrice = 0;
         let editingCartItemId = null;
+        let extrasQuantity = 1;
 
           // Map extra id -> price for qty calculation
           let extrasDataMap = {};
@@ -10191,6 +10202,7 @@ function showOrderSummaryModal() {
                     <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e8e8e8;">
                         <div style="flex: 1;">
                             <strong>${item.quantity}x</strong> ${item.name}
+                            ${item.customizations ? `<div style="margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.4;">${getCustomizationLines(item).map(line => `- ${line}`).join('<br>')}</div>` : ''}
                         </div>
                         <div style="min-width: 100px; text-align: right;">
                             ₦${(item.price * item.quantity).toLocaleString()}
