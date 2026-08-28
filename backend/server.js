@@ -334,7 +334,7 @@ function buildAnalytics(orders, notes = {}, range = {}) {
         const sorted = [...customer.items.values()].sort((a, b) => b.quantity - a.quantity); const last = customer.orders.at(-1)?.created_at; const first = customer.orders[0]?.created_at; const daysSince = last ? (Date.now() - new Date(last).getTime()) / 86400000 : Infinity;
         let segment = customer.orders.length === 1 ? 'New customer' : 'Returning customer';
         if (customer.spent >= 100000) segment = 'High-value customer'; else if (customer.orders.length >= 5) segment = 'Frequent customer'; else if (daysSince > 60) segment = 'Inactive customer'; else if (daysSince > 30 && customer.orders.length > 1) segment = 'At-risk customer'; else if (customer.orders.length >= 3) segment = 'Regular customer';
-        return { key: customer.key, name: customer.name, phone: customer.phone, email: customer.email, orders: customer.orders.length, spent: customer.spent, averageOrderValue: customer.spent / customer.orders.length, firstOrder: first, lastOrder: last, segment, favoriteProduct: sorted[0]?.name || '—', items: sorted, history: customer.orders.map(order => ({ reference: order.payment_reference, date: order.created_at, total: Number(order.total || 0), status: order.order_status, items: orderItems(order).map(item => ({ name: item.name, quantity: Number(item.quantity || 0) })) })), notes: notes[customer.key] || '' };
+        return { key: customer.key, name: customer.name, phone: customer.phone, email: customer.email, address: customer.orders.at(-1)?.delivery_address || '—', orders: customer.orders.length, spent: customer.spent, averageOrderValue: customer.spent / customer.orders.length, firstOrder: first, lastOrder: last, segment, favoriteProduct: sorted[0]?.name || '—', favoriteItems: sorted.slice(0, 5), orderIds: customer.orders.map(order => order.payment_reference), items: sorted, history: customer.orders.map(order => ({ reference: order.payment_reference, date: order.created_at, total: Number(order.total || 0), status: order.order_status, address: order.delivery_address || '—', items: orderItems(order).map(item => ({ name: item.name, quantity: Number(item.quantity || 0) })) })), notes: notes[customer.key] || '' };
     });
     const products = [...productMap.values()].map(row => ({ key: row.key, id: row.id, name: row.name, units: row.units, revenue: row.revenue, orders: row.orders, averageQuantity: row.units / row.orders, firstSale: row.dates.sort((a, b) => a - b)[0], lastSale: row.dates.sort((a, b) => b - a)[0], customers: [...row.customers.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([key]) => customers.find(customer => customer.key === key)?.name || 'Customer'), alongside: [...row.alongside.values()].sort((a, b) => b.count - a.count).slice(0, 5), bestDays: [...row.days.entries()].sort((a, b) => b[1] - a[1]).slice(0, 2).map(([name]) => name), bestHours: [...row.hours.entries()].sort((a, b) => b[1] - a[1]).slice(0, 2).map(([hour]) => `${hour}:00`), trend: percentChange(row.revenue, previous.products.find(item => item.key === row.key)?.revenue || 0) }));
     const newCustomers = customers.filter(customer => customer.firstOrder && new Date(customer.firstOrder) >= start).length;
@@ -355,7 +355,7 @@ app.get('/api/admin/analytics', async (request, response) => {
     if (!pool) return json(response, 503, { error: 'DATABASE_URL is required' });
     try {
         const [ordersResult, notesResult] = await Promise.all([
-            pool.query("SELECT payment_reference, customer_name, customer_email, delivery_phone, items, total, order_status, payment_status, created_at FROM orders WHERE payment_status = 'paid' ORDER BY created_at ASC LIMIT 10000"),
+            pool.query("SELECT payment_reference, customer_name, customer_email, delivery_phone, delivery_address, items, total, order_status, payment_status, created_at FROM orders WHERE payment_status = 'paid' ORDER BY created_at ASC LIMIT 10000"),
             pool.query('SELECT customer_key, notes FROM customer_notes')
         ]);
         const notes = Object.fromEntries(notesResult.rows.map(row => [row.customer_key, row.notes]));
@@ -376,7 +376,7 @@ app.patch('/api/admin/customers/:key/notes', async (request, response) => {
 app.patch('/api/admin/orders/:reference/status', async (request, response) => {
     if (!verifyAdminToken(request)) return json(response, 401, { error: 'Unauthorized' });
     if (!pool) return json(response, 503, { error: 'DATABASE_URL is required' });
-    const allowed = ['received', 'preparing', 'ready', 'out_for_delivery', 'delivered', 'cancelled'];
+    const allowed = ['received', 'preparing', 'ready', 'out_for_delivery', 'delivered', 'picked_up', 'cancelled'];
     const status = String(request.body?.status || '');
     if (!allowed.includes(status)) return json(response, 400, { error: 'Invalid order status' });
     try {
