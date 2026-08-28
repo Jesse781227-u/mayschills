@@ -7486,7 +7486,7 @@ function getOrderTypeText(type) {
         }
         async function loadMenuAvailability() {
             try {
-                const response = await fetch((window.MAYCHILLS_API_URL || 'https://mayschills-backend.onrender.com') + '/api/availability', { cache: 'no-store' });
+                const response = await fetch((window.MAYCHILLS_API_URL || 'https://mayschillsbackend.onrender.com') + '/api/availability', { cache: 'no-store' });
                 if (!response.ok) return;
                 const data = await response.json();
                 menuAvailability = data.items || {};

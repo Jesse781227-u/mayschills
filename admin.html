@@ -26,7 +26,7 @@
   </main>
   <iframe id="catalog-source" src="shop.html" class="hidden" title="Catalog source"></iframe>
   <script>
-    const API_BASE = window.MAYCHILLS_API_URL || 'https://mayschills-backend.onrender.com'; const API = API_BASE + '/api'; let token = sessionStorage.getItem('maychills_admin_token') || ''; let states = {}; let catalog = null;
+    const API_BASE = window.MAYCHILLS_API_URL || 'https://mayschillsbackend.onrender.com'; const API = API_BASE + '/api'; let token = sessionStorage.getItem('maychills_admin_token') || ''; let states = {}; let catalog = null;
     const $ = id => document.getElementById(id);
     function escapeHTML(value){return String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
     function currentMode(key){const value=states[key];if(!value)return'enabled';if(value.mode==='today'&&value.expiresAt<=Date.now())return'enabled';return value.mode;}
