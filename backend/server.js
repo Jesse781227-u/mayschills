@@ -294,7 +294,8 @@ function buildAnalytics(orders, notes = {}, range = {}) {
     const start = analyticsDate(range.from, new Date(end));
     if (!range.from) start.setDate(start.getDate() - 30);
     const periodOrders = orders.filter(order => new Date(order.created_at) >= start && new Date(order.created_at) <= end);
-    const previousStart = new Date(start); previousStart.setDate(previousStart.getDate() - 30);
+    const periodLength = Math.max(86400000, end.getTime() - start.getTime() + 86400000);
+    const previousStart = new Date(start.getTime() - periodLength);
     const previousOrders = orders.filter(order => new Date(order.created_at) >= previousStart && new Date(order.created_at) < start);
     const summarize = selected => {
         const products = new Map(); let sales = 0; let units = 0; const customers = new Set();
@@ -340,9 +341,10 @@ function buildAnalytics(orders, notes = {}, range = {}) {
     const returningCustomers = customers.filter(customer => customer.orders > 1).length;
     const top = [...products].sort((a, b) => b.units - a.units)[0]; const topRevenue = [...products].sort((a, b) => b.revenue - a.revenue)[0];
     const insights = [];
-    if (top) insights.push(`${top.name} is your best-selling product in the last 30 days.`);
-    if (topRevenue && topRevenue.key !== top?.key) insights.push(`${topRevenue.name} generated the most revenue in the last 30 days.`);
-    if (current.sales && previous.sales) insights.push(`Sales are ${Math.abs(percentChange(current.sales, previous.sales))}% ${current.sales >= previous.sales ? 'higher' : 'lower'} than the previous 30 days.`);
+    const periodLabel = periodLength <= 86400000 ? 'today' : `${Math.round(periodLength / 86400000)} days`;
+    if (top) insights.push(`${top.name} is your best-selling product for ${periodLabel}.`);
+    if (topRevenue && topRevenue.key !== top?.key) insights.push(`${topRevenue.name} generated the most revenue for ${periodLabel}.`);
+    if (current.sales && previous.sales) insights.push(`Sales are ${Math.abs(percentChange(current.sales, previous.sales))}% ${current.sales >= previous.sales ? 'higher' : 'lower'} than the previous matching period.`);
     if (returningCustomers && current.customers) insights.push(`Returning customers represent ${Math.round((returningCustomers / current.customers) * 100)}% of identified customers.`);
     const busiestHour = [...hours.entries()].sort((a, b) => b[1] - a[1])[0]; if (busiestHour) insights.push(`Most orders occur around ${busiestHour[0]}:00–${Number(busiestHour[0]) + 1}:00.`);
     return { period: { from: start, to: end }, summary: { ...current, averageOrderValue: current.orders ? current.sales / current.orders : 0, newCustomers, returningCustomers, salesChange: percentChange(current.sales, previous.sales), orderChange: percentChange(current.orders, previous.orders), uniqueCustomers: current.customers }, daily: [...daily.entries()].filter(([day]) => new Date(day) >= start).map(([date, sales]) => ({ date, sales })), products: products.filter(product => product.orders), customers: customers.sort((a, b) => b.spent - a.spent), insights, previous };
