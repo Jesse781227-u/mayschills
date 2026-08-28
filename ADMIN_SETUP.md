@@ -28,6 +28,8 @@ Add these Render Web Service environment variables:
 - `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`: optional Telegram notification settings
 - `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`: required for browser push notifications. Generate these once with `npx web-push generate-vapid-keys`; keep the private key secret.
 
+Order timing is calculated automatically. Immediate orders receive a preparation target of up to 17 minutes after payment. Scheduled pickups begin preparation 17 minutes before pickup. The in-house delivery batches use 10:00 AM and 3:00 PM dispatch times, with preparation reminders at 9:43 AM and 2:43 PM respectively. The admin dashboard refreshes every minute and shows an action-required alert when preparation should have started but the order is still marked `received` or `preparing`.
+
 The Render backend routes these endpoints:
 
 - `GET /api/availability` — public menu status used by the storefront

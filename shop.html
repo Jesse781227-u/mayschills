@@ -10380,7 +10380,9 @@ function showOrderSummaryModal() {
             deliveryFee: deliveryFee,
             deliveryArea: orderType === 'delivery' ? DeliveryLocationSystem.selectedAreaDisplay : null,
             deliverySlot: orderType === 'delivery' ? DeliveryLocationSystem.slotText : null,
+            deliverySlotKey: orderType === 'delivery' ? DeliveryLocationSystem.selectedSlot : null,
             pickupTime: orderType === 'pickup' ? PickupScheduleSystem.selectedTime : null,
+            pickupTimeValue: orderType === 'pickup' ? PickupScheduleSystem.selectedTime : null,
             orderNotes: (document.getElementById('order-notes') && document.getElementById('order-notes').value.trim()) || null
         };
         

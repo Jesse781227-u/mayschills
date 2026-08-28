@@ -48,6 +48,7 @@
     $('login-form').addEventListener('submit',async e=>{e.preventDefault();$('login-error').textContent='';try{await login($('password').value);}catch(error){$('login-error').textContent='Invalid password or unavailable admin API.';}});
     $('logout').addEventListener('click',()=>{sessionStorage.removeItem('maychills_admin_token');location.reload();});
     $('refresh-orders').addEventListener('click',loadOrders);
+    setInterval(() => { if (token) loadOrders(); }, 60 * 1000);
     if(token)start();
   </script>
 </body>

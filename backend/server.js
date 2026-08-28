@@ -53,6 +53,7 @@ async function initializeDatabase() {
             notification_status TEXT NOT NULL DEFAULT 'pending',
             order_status TEXT NOT NULL DEFAULT 'received',
             requested_fulfillment_at TIMESTAMPTZ,
+            dispatch_at TIMESTAMPTZ,
             ready_target_at TIMESTAMPTZ,
             manager_reminded_at TIMESTAMPTZ,
             customer_reminded_at TIMESTAMPTZ,
@@ -69,6 +70,7 @@ async function initializeDatabase() {
     `);
     await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS order_status TEXT NOT NULL DEFAULT 'received'`);
     await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS requested_fulfillment_at TIMESTAMPTZ`);
+    await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS dispatch_at TIMESTAMPTZ`);
     await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS ready_target_at TIMESTAMPTZ`);
     await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS manager_reminded_at TIMESTAMPTZ`);
     await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_reminded_at TIMESTAMPTZ`);
@@ -245,7 +247,7 @@ app.get('/api/admin/orders', async (request, response) => {
             SELECT id, payment_reference, customer_name, customer_email, delivery_phone,
                    order_type, delivery_address, delivery_area, delivery_slot, order_notes,
                    items, subtotal, delivery_fee, total, payment_status, order_status, notification_status,
-                   requested_fulfillment_at, ready_target_at, manager_reminded_at, customer_reminded_at,
+                   requested_fulfillment_at, dispatch_at, ready_target_at, manager_reminded_at, customer_reminded_at,
                    created_at, notified_at,
                    (order_status IN ('received','preparing') AND ready_target_at IS NOT NULL AND NOW() >= ready_target_at) AS attention_required
             FROM orders ORDER BY created_at DESC LIMIT 100
@@ -392,10 +394,17 @@ function requestedFulfillment(metadata) {
 function scheduleFor(metadata) {
     const requested = requestedFulfillment(metadata);
     const now = Date.now();
-    const readyTarget = requested && requested.getTime() > now + 30 * 60 * 1000
+    let dispatchAt = null;
+    if (metadata.orderType === 'delivery') {
+        if (metadata.deliverySlotKey === 'morning') dispatchAt = lagosTimeToday(10, 0);
+        if (metadata.deliverySlotKey === 'afternoon') dispatchAt = lagosTimeToday(15, 0);
+        if (metadata.deliverySlotKey === 'next_day_morning') dispatchAt = lagosTimeToday(10, 0, 1);
+    }
+    if (dispatchAt && dispatchAt.getTime() <= now) dispatchAt = new Date(now + 17 * 60 * 1000);
+    const preparationStart = dispatchAt || (requested && requested.getTime() > now + 30 * 60 * 1000
         ? new Date(requested.getTime() - 17 * 60 * 1000)
-        : new Date(now + 17 * 60 * 1000);
-    return { requested, readyTarget };
+        : new Date(now + 17 * 60 * 1000));
+    return { requested, dispatchAt, readyTarget: preparationStart };
 }
 
 async function sendOrderPush(order, message) {
@@ -423,7 +432,8 @@ async function sendOrderPush(order, message) {
 async function sendManagerReminder(order) {
     if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) return false;
     const target = order.ready_target_at ? new Date(order.ready_target_at).toLocaleString('en-NG', { timeZone: 'Africa/Lagos' }) : 'now';
-    const message = `<b>Action required: order preparation</b>\n<b>Order:</b> MCH-${String(order.payment_reference).slice(-8)}\n<b>Customer:</b> ${order.customer_name || 'Customer'}\n<b>Requested:</b> ${target}\n<b>Status:</b> ${order.order_status || 'received'}\n\nThe order should be in preparation now. Update its status in the admin panel.`;
+    const dispatch = order.dispatch_at ? new Date(order.dispatch_at).toLocaleString('en-NG', { timeZone: 'Africa/Lagos' }) : 'not batched';
+    const message = `<b>Action required: order preparation</b>\n<b>Order:</b> MCH-${String(order.payment_reference).slice(-8)}\n<b>Customer:</b> ${order.customer_name || 'Customer'}\n<b>Preparation target:</b> ${target}\n<b>Dispatch batch:</b> ${dispatch}\n<b>Status:</b> ${order.order_status || 'received'}\n\nThe order should be in preparation now. Update its status in the admin panel.`;
     const response = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: process.env.TELEGRAM_CHAT_ID, text: message, parse_mode: 'HTML' }) });
     return response.ok;
 }
@@ -449,21 +459,22 @@ async function saveOrder(order) {
         INSERT INTO orders (
             payment_reference, customer_name, customer_email, delivery_phone, order_type,
             delivery_address, delivery_area, delivery_slot, order_notes, items,
-            subtotal, delivery_fee, total, requested_fulfillment_at, ready_target_at
-        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb,$11,$12,$13,$14,$15)
+            subtotal, delivery_fee, total, requested_fulfillment_at, dispatch_at, ready_target_at
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb,$11,$12,$13,$14,$15,$16)
         ON CONFLICT (payment_reference) DO UPDATE SET
             customer_name = EXCLUDED.customer_name,
             customer_email = EXCLUDED.customer_email,
             items = EXCLUDED.items,
             total = EXCLUDED.total,
             requested_fulfillment_at = COALESCE(orders.requested_fulfillment_at, EXCLUDED.requested_fulfillment_at),
+            dispatch_at = COALESCE(orders.dispatch_at, EXCLUDED.dispatch_at),
             ready_target_at = COALESCE(orders.ready_target_at, EXCLUDED.ready_target_at)
         RETURNING *
     `, [
         order.paymentReference, order.customerName, order.customerEmail, order.deliveryPhone,
         order.type, order.deliveryAddress, order.deliveryArea, order.deliverySlot,
         order.orderNotes, JSON.stringify(order.items), order.subtotal, order.deliveryFee, order.total,
-        order.requestedFulfillmentAt, order.readyTargetAt
+        order.requestedFulfillmentAt, order.dispatchAt, order.readyTargetAt
     ]);
     return result.rows[0];
 }
@@ -500,6 +511,7 @@ app.post('/webhook', async (request, response) => {
             pickupTime: metadata.pickupTime,
             orderNotes: metadata.orderNotes,
             requestedFulfillmentAt: schedule.requested,
+            dispatchAt: schedule.dispatchAt,
             readyTargetAt: schedule.readyTarget,
             date: new Date().toISOString()
         };

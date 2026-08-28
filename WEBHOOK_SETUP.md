@@ -14,6 +14,8 @@
 8. Add the email and/or Telegram variables listed below for live notifications.
 9. For browser push notifications, run `npx web-push generate-vapid-keys` from the backend folder and add `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT` to Render. Never expose the private key.
 
+The backend calculates preparation reminders from the selected pickup time or delivery slot. Keep the Render service running so its scheduled notification worker can send manager and customer reminders at the correct time.
+
 ### Step 2: Configure Paystack Webhook
 
 1. Go to **https://dashboard.paystack.com**
