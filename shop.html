@@ -180,6 +180,10 @@
             opacity: 1;
         }
 
+        .card.sold-out { filter: grayscale(1); opacity: .72; }
+        .card.sold-out .add-btn { cursor: not-allowed; font-size: 10px; line-height: 1.1; padding: 8px 6px; }
+        .card.sold-out .price { font-size: 11px; color: #777; text-align: right; }
+
 /* Add to your existing CSS */
 .detox-card {
     -webkit-tap-highlight-color: transparent;
@@ -8479,6 +8483,8 @@ function updateCartItemQuantity(id, change) {
             document.getElementById('ordering-detail-add').innerHTML = productSupportsExtras(product)
                 ? '<i class="hgi-stroke hgi-checkmark-circle-02" aria-hidden="true"></i> Review &amp; Add'
                 : '<i class="hgi-stroke hgi-shopping-cart-01" aria-hidden="true"></i> Add to cart';
+            document.getElementById('ordering-detail-add').disabled = !isMenuItemAvailable(product);
+            if (!isMenuItemAvailable(product)) document.getElementById('ordering-detail-add').textContent = 'Sold out · Restocking';
             setOrderingScreen('detail');
         }
 
@@ -8625,6 +8631,7 @@ function updateCartItemQuantity(id, change) {
             
             products.forEach(product => {
                 const isFavorited = UserManager.isFavorited(product.id);
+                const isAvailable = isMenuItemAvailable(product);
               const priceDisplay = product.onRequest ? 'On Request' : `₦${product.price.toLocaleString()}`;
 const buttonText = product.onRequest ? 'Inquire' : '＋';
 const buttonAction = product.onRequest ? 'inquire' : 'add';
@@ -8646,7 +8653,7 @@ const menuPriceDisplay = product.onRequest
         ? `<span class="sandwich-menu-prices"><span><strong>Single</strong> ₦${Number(product.price).toLocaleString()}</span><span><strong>Double</strong> ₦${Number(product.doublePrice).toLocaleString()}</span></span>`
         : `₦${Number(product.price).toLocaleString()}`;
                 const card = document.createElement('article');
-                card.className = 'card';
+                card.className = `card${isAvailable ? '' : ' sold-out'}`;
                 card.setAttribute('role', 'listitem');
                 card.setAttribute('aria-label', product.name);
                 
@@ -8670,9 +8677,9 @@ const menuPriceDisplay = product.onRequest
                                 data-price="${product.price}" 
                                 data-image="${product.image}"
                                 data-action="${buttonAction}">
-                            ${buttonText}
+                            ${isAvailable ? buttonText : 'Sold out · Restocking'}
                         </button>
-                        <div class="price ${product.onRequest ? 'on-request inquire-price' : ''}">${menuPriceDisplay}</div>
+                        <div class="price ${product.onRequest ? 'on-request inquire-price' : ''}">${isAvailable ? menuPriceDisplay : 'Sold out · Restocking'}</div>
                     </div>
                 `;
                 
@@ -8689,6 +8696,7 @@ const menuPriceDisplay = product.onRequest
 const addBtn = card.querySelector('.add-btn');
 addBtn.addEventListener('click', function(e) {
     e.stopPropagation();
+    if (!isAvailable) { showToast('Sold out · Restocking soon'); return; }
     const id = this.dataset.id;
     const name = this.dataset.name;
     const price = parseFloat(this.dataset.price);
@@ -8845,6 +8853,10 @@ Thank you!`;
             if (product.options && product.options.length) {
                 const startingPrice = Math.min(...product.options.map(option => option.price));
                 document.getElementById('product-modal-price').textContent = `From ₦${startingPrice.toLocaleString()}`;
+                document.getElementById('product-modal-add-btn').style.display = 'none';
+                document.getElementById('product-modal-inquire-btn').style.display = 'none';
+            } else if (!isMenuItemAvailable(product)) {
+                document.getElementById('product-modal-price').textContent = 'Sold out · Restocking';
                 document.getElementById('product-modal-add-btn').style.display = 'none';
                 document.getElementById('product-modal-inquire-btn').style.display = 'none';
             } else if (product.onRequest || product.price == null) {
