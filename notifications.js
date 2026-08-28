@@ -8,7 +8,7 @@
             try { details.reference = JSON.parse(localStorage.getItem('maychills_last_order') || '{}').reference || null; } catch (_) { details.reference = null; }
         }
         if (isIOS && !isStandalone) throw new Error('On iPhone: tap Share → Add to Home Screen, open the new May’s Chills icon, then tap Enable order updates.');
-        if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) throw new Error('Push notifications are not supported in this browser.');
+        if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) throw new Error('Order notifications are not supported in this browser.');
         const config = await fetch(API() + '/api/notifications/config', { cache: 'no-store' }).then(response => response.json());
         if (!config.enabled) throw new Error('Order notifications are not configured yet.');
         if (await Notification.requestPermission() !== 'granted') throw new Error('Notifications were not enabled.');

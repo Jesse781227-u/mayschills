@@ -580,7 +580,7 @@ async function sendOrderPush(order, message) {
     for (const row of result.rows) {
         try {
             await webpush.sendNotification(row.subscription, JSON.stringify({
-                title: "May's Chills order update",
+                title: "Your May's Chills order",
                 body: message,
                 reference: order.paymentReference || order.payment_reference
             }));
