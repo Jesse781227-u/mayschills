@@ -403,13 +403,26 @@ app.patch('/api/admin/orders/:reference/status', async (request, response) => {
         const result = await pool.query('UPDATE orders SET order_status=$1 WHERE payment_reference=$2 RETURNING *', [status, request.params.reference]);
         if (!result.rowCount) return json(response, 404, { error: 'Order not found' });
         const order = result.rows[0];
-        const pushSent = await sendOrderPush(order, `Order update: ${status.replaceAll('_', ' ')}`);
+        const pushSent = await sendOrderPush(order, orderStatusMessage(status, order.customer_name));
         return json(response, 200, { success: true, pushSent });
     } catch (error) {
         console.error('Order status update failed:', error);
         return json(response, 500, { error: 'Unable to update order status' });
     }
 });
+
+function orderStatusMessage(status, customerName = 'there') {
+    const firstName = String(customerName || 'there').trim().split(/\s+/)[0] || 'there';
+    const messages = {
+        received: `Thank you, ${firstName}. We have received your order and it is now in our queue.`,
+        preparing: `Good news, ${firstName} — we are carefully preparing your order now.`,
+        ready: `Your order is ready, ${firstName}. We look forward to serving you at May's Chills.`,
+        out_for_delivery: `Your order is on its way, ${firstName}. Thank you for choosing May's Chills.`,
+        delivered: `Your order has been delivered, ${firstName}. We hope you enjoy every sip and bite!`,
+        cancelled: `Your order has been cancelled, ${firstName}. Please contact us if you need any assistance.`
+    };
+    return messages[status] || `There is a new update regarding your May's Chills order, ${firstName}.`;
+}
 
 function verifyPaystackSignature(request, rawBody) {
     const signature = request.headers['x-paystack-signature'];
@@ -582,7 +595,7 @@ async function processScheduledNotifications() {
             await pool.query('UPDATE orders SET manager_reminded_at=NOW() WHERE payment_reference=$1 AND manager_reminded_at IS NULL', [order.payment_reference]);
         }
         if (!order.customer_reminded_at) {
-            await sendOrderPush(order, 'Preparation for your order should be underway now. We will notify you when it is ready.');
+            await sendOrderPush(order, `Hello ${String(order.customer_name || 'there').trim().split(/\s+/)[0]}, we have started preparing your order. We will let you know as soon as it is ready.`);
             await pool.query('UPDATE orders SET customer_reminded_at=NOW() WHERE payment_reference=$1 AND customer_reminded_at IS NULL', [order.payment_reference]);
         }
     }
@@ -658,7 +671,7 @@ app.post('/webhook', async (request, response) => {
         `, [order.paymentReference]);
         if (claim.rowCount) {
             const [email, telegram] = await Promise.all([sendEmail(order), sendTelegram(order)]);
-            await sendOrderPush(order, 'Your payment was received and your order is now in our queue.');
+            await sendOrderPush(order, `Thank you, ${String(order.customer_name || 'there').trim().split(/\s+/)[0]}. Your payment was received and your order is now in our queue.`);
             const notificationStatus = email || telegram ? 'sent' : 'not_configured';
             await markNotification(notificationStatus, order.paymentReference);
             return json(response, 200, { success: true, emailSent: email, telegramSent: telegram, orderId: order.id });
