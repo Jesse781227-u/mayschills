@@ -107,6 +107,12 @@ async function readAvailability() {
 
 app.get('/health', (_request, response) => json(response, 200, { status: 'ok' }));
 
+app.get('/', (_request, response) => json(response, 200, {
+    name: "May's Chills backend",
+    status: 'ok',
+    health: '/health'
+}));
+
 app.get('/api/availability', async (_request, response) => {
     try {
         return json(response, 200, { items: await readAvailability() });
