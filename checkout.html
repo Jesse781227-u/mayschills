@@ -91,21 +91,25 @@
         populatePickupTimes();
         populateDeliveryTimes();
     }
+    const NIGERIA_TIME_ZONE = 'Africa/Lagos';
+    function lagosParts() { return new Intl.DateTimeFormat('en-CA', { timeZone:NIGERIA_TIME_ZONE, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false }).formatToParts(new Date()).reduce((out, part) => ({ ...out, [part.type]:part.value }), {}); }
+    function lagosDate(year, month, day, hour, minute) { return new Date(Date.UTC(year, month - 1, day, hour - 1, minute, 0, 0)); }
+    function nigeriaTimeLabel(time) { return time.toLocaleTimeString('en-NG', { timeZone:NIGERIA_TIME_ZONE, hour:'numeric', minute:'2-digit' }); }
     function populatePickupTimes() {
         const select = document.getElementById('pickupTime');
-        const now = new Date();
-        const start = new Date(now.getTime() + 30 * 60000);
-        start.setMinutes(Math.ceil(start.getMinutes() / 30) * 30, 0, 0);
+        const now = lagosParts();
+        const start = new Date(lagosDate(Number(now.year), Number(now.month), Number(now.day), Number(now.hour), Number(now.minute)).getTime() + 30 * 60000);
+        start.setUTCMinutes(Math.ceil(start.getUTCMinutes() / 30) * 30, 0, 0);
         const endHour = 18;
         const options = [];
-        for (let time = new Date(start); time.getHours() < endHour; time.setMinutes(time.getMinutes() + 30)) {
-            options.push({ value: time.toISOString(), label: `Today, ${time.toLocaleTimeString([], { hour:'numeric', minute:'2-digit' })}` });
+        for (let time = new Date(start); Number(new Intl.DateTimeFormat('en-US', { timeZone:NIGERIA_TIME_ZONE, hour:'2-digit', hour12:false }).format(time)) < endHour; time.setUTCMinutes(time.getUTCMinutes() + 30)) {
+            options.push({ value: time.toISOString(), label: `Today, ${nigeriaTimeLabel(time)}` });
         }
         if (!options.length) {
-            const tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate() + 1); tomorrow.setHours(10, 0, 0, 0);
+            const tomorrow = new Date(start.getTime() + 24 * 60 * 60000); tomorrow.setUTCHours(9, 0, 0, 0);
             for (let i = 0; i < 16; i += 1) {
                 const time = new Date(tomorrow.getTime() + i * 30 * 60000);
-                options.push({ value: time.toISOString(), label: `Tomorrow, ${time.toLocaleTimeString([], { hour:'numeric', minute:'2-digit' })}` });
+                options.push({ value: time.toISOString(), label: `Tomorrow, ${nigeriaTimeLabel(time)}` });
             }
         }
         select.innerHTML = options.map(option => `<option value="${option.value}">${option.label}</option>`).join('');
@@ -114,7 +118,8 @@
     }
     function populateDeliveryTimes() {
         const select = document.getElementById('deliveryTime');
-        const minutes = new Date().getHours() * 60 + new Date().getMinutes();
+        const now = lagosParts();
+        const minutes = Number(now.hour) * 60 + Number(now.minute);
         const slots = [];
         if (minutes < 10 * 60) slots.push({ value:'morning', label:'Morning — delivery by 1:30 PM today' });
         if (minutes < 15 * 60) slots.push({ value:'afternoon', label:'Afternoon — delivery by 6:00 PM today' });

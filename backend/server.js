@@ -211,14 +211,14 @@ app.post('/api/notifications/subscribe', async (request, response) => {
 app.post('/api/notifications/demo', async (request, response) => {
     if (!pool) return json(response, 503, { error: 'DATABASE_URL is required' });
     const email = String(request.body?.email || '').trim().toLowerCase();
-    const name = String(request.body?.name || 'Push demo customer').trim().slice(0, 120) || 'Push demo customer';
+    const name = String(request.body?.name || 'Notification demo customer').trim().slice(0, 120) || 'Notification demo customer';
     if (!/^\S+@\S+\.\S+$/.test(email)) return json(response, 400, { error: 'A valid email is required for the demo.' });
     try {
         const reference = `DEMO_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
         await pool.query('UPDATE push_subscriptions SET order_reference=$1 WHERE endpoint=$2', [reference, String(request.body?.endpoint || '')]);
         const result = await pool.query(`
             INSERT INTO orders (payment_reference, customer_name, customer_email, delivery_phone, order_type, order_notes, items, subtotal, total, payment_status, order_status, ready_target_at, is_demo)
-            VALUES ($1,$2,$3,'Demo order','pickup','Push notification demo','[{"id":"push-demo","name":"Push notification demo","price":100,"quantity":1}]'::jsonb,100,100,'paid','received',NOW() + INTERVAL '2 hours',TRUE)
+            VALUES ($1,$2,$3,'Demo order','pickup','Notification demo','[{"id":"notification-demo","name":"Notification demo","price":100,"quantity":1}]'::jsonb,100,100,'paid','received',NOW() + INTERVAL '2 hours',TRUE)
             RETURNING payment_reference, customer_name, customer_email, order_status
         `, [reference, name, email]);
         return json(response, 201, { success: true, order: result.rows[0] });
@@ -410,7 +410,7 @@ app.patch('/api/admin/customers/:key/notes', async (request, response) => {
 app.patch('/api/admin/orders/:reference/status', async (request, response) => {
     if (!verifyAdminToken(request)) return json(response, 401, { error: 'Unauthorized' });
     if (!pool) return json(response, 503, { error: 'DATABASE_URL is required' });
-    const allowed = ['received', 'preparing', 'ready', 'out_for_delivery', 'delivered', 'picked_up', 'cancelled'];
+    const allowed = ['received', 'preparing', 'ready', 'in_transit', 'delivered', 'picked_up', 'cancelled'];
     const status = String(request.body?.status || '');
     if (!allowed.includes(status)) return json(response, 400, { error: 'Invalid order status' });
     try {
@@ -431,8 +431,10 @@ function orderStatusMessage(status, customerName = 'there') {
         received: `Thank you, ${firstName}. We have received your order and it is now in our queue.`,
         preparing: `Good news, ${firstName} — we are carefully preparing your order now.`,
         ready: `Your order is ready, ${firstName}. We look forward to serving you at May's Chills.`,
-        out_for_delivery: `Your order is on its way, ${firstName}. Thank you for choosing May's Chills.`,
+        in_transit: `Your order is in transit, ${firstName}. It will be with you shortly.`,
+        out_for_delivery: `Your order is in transit, ${firstName}. It will be with you shortly.`,
         delivered: `Your order has been delivered, ${firstName}. We hope you enjoy every sip and bite!`,
+        picked_up: `Your order has been picked up, ${firstName}. Thank you for choosing May's Chills.`,
         cancelled: `Your order has been cancelled, ${firstName}. Please contact us if you need any assistance.`
     };
     return messages[status] || `There is a new update regarding your May's Chills order, ${firstName}.`;
@@ -602,7 +604,7 @@ async function sendManagerReminder(order) {
 
 async function processScheduledNotifications() {
     if (!pool) return;
-    const due = await pool.query(`SELECT * FROM orders WHERE ready_target_at IS NOT NULL AND order_status NOT IN ('delivered','cancelled') AND NOW() >= ready_target_at`);
+    const due = await pool.query(`SELECT * FROM orders WHERE ready_target_at IS NOT NULL AND order_status NOT IN ('delivered','picked_up','cancelled') AND NOW() >= ready_target_at`);
     for (const order of due.rows) {
         if (!order.manager_reminded_at) {
             await sendManagerReminder(order);

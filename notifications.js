@@ -17,7 +17,7 @@
         const response = await fetch(API() + '/api/notifications/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ subscription, email: details.email || null, name: details.name || null, reference: details.reference || null }) });
         if (!response.ok) throw new Error((await response.json()).error || 'Unable to enable notifications.');
         if (details.demo) {
-            const demoResponse = await fetch(API() + '/api/notifications/demo', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: details.email, name: details.name || 'Push demo customer', endpoint: subscription.endpoint }) });
+            const demoResponse = await fetch(API() + '/api/notifications/demo', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: details.email, name: details.name || 'Notification demo customer', endpoint: subscription.endpoint }) });
             const demoData = await demoResponse.json();
             if (!demoResponse.ok) throw new Error(demoData.error || 'Notifications enabled, but the demo order could not be created.');
             localStorage.setItem('maychills_last_order', JSON.stringify({ reference: demoData.order?.payment_reference, customerEmail: details.email, date: new Date().toISOString() }));
