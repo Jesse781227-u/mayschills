@@ -183,6 +183,9 @@
         .card.sold-out { filter: grayscale(1); opacity: .72; }
         .card.sold-out .add-btn { cursor: not-allowed; font-size: 10px; line-height: 1.1; padding: 8px 6px; }
         .card.sold-out .price { font-size: 11px; color: #777; text-align: right; }
+        .detox-card.sold-out { filter: grayscale(1); opacity: .72; }
+        .detox-card.sold-out .add-btn { cursor: not-allowed; font-size: 11px; }
+        .ordering-featured-card.sold-out, .ordering-popular-card.sold-out { filter: grayscale(1); opacity: .72; }
 
 /* Add to your existing CSS */
 .detox-card {
@@ -7520,9 +7523,6 @@ function getOrderTypeText(type) {
                 if (!response.ok) return;
                 const data = await response.json();
                 menuAvailability = data.items || {};
-                Object.keys(categories).forEach(category => {
-                    categories[category] = categories[category].filter(item => isMenuItemAvailable(item));
-                });
             } catch (error) {
                 console.warn('Availability service unavailable; showing the regular menu.', error);
             }
@@ -8462,6 +8462,7 @@ function updateCartItemQuantity(id, change) {
                     </div>
                 </article>`).join('');
 
+            document.querySelectorAll('[data-ordering-product]').forEach(card => { const product = orderingAllProducts().find(item => String(item.id) === String(card.dataset.orderingProduct)); if (product && !isMenuItemAvailable(product)) card.classList.add('sold-out'); });
             document.querySelectorAll('[data-ordering-product]').forEach(card => card.addEventListener('click', () => {
                 const product = orderingAllProducts().find(item => String(item.id) === String(card.dataset.orderingProduct));
                 if (product) openOrderingDetail(product);
@@ -8682,7 +8683,7 @@ const menuPriceDisplay = product.onRequest
                         <div class="price ${product.onRequest ? 'on-request inquire-price' : ''}">${isAvailable ? menuPriceDisplay : 'Sold out · Restocking'}</div>
                     </div>
                 `;
-                
+
                 container.appendChild(card);
                 
                 // Add click event to card for modal
@@ -8770,8 +8771,9 @@ Thank you!`;
             container.classList.add('detox-products');
             
             plans.forEach(plan => {
+                const planAvailable = isMenuItemAvailable(plan);
                 const card = document.createElement('article');
-                card.className = 'detox-card';
+                card.className = `detox-card${planAvailable ? '' : ' sold-out'}`;
                 card.setAttribute('role', 'listitem');
                 card.setAttribute('aria-label', plan.name);
                 
@@ -8797,6 +8799,8 @@ Thank you!`;
                         `).join('')}
                     </div>
                 `;
+
+                if (!planAvailable) card.querySelectorAll('.add-btn').forEach(button => { button.textContent = 'Sold out · Restocking'; button.disabled = true; });
                 
                 container.appendChild(card);
                 
@@ -8811,6 +8815,7 @@ Thank you!`;
                 card.querySelectorAll('.add-btn').forEach(button => {
                     button.addEventListener('click', function(e) {
                         e.stopPropagation();
+                        if (!planAvailable) { showToast('Sold out · Restocking soon'); return; }
                         const id = this.dataset.id;
                         const name = this.dataset.name;
                         const price = parseFloat(this.dataset.price);

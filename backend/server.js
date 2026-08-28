@@ -12,7 +12,7 @@ const pool = process.env.DATABASE_URL
     : null;
 
 app.use(express.json({
-    limit: '1mb',
+    limit: '5mb',
     verify: (request, _response, buffer) => { request.rawBody = Buffer.from(buffer); }
 }));
 app.use((request, response, next) => {
