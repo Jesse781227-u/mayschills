@@ -6497,6 +6497,7 @@ createBrowserNotification(order) {
         setTimeout(() => {
             modal.classList.add('visible');
         }, 10);
+        window.MayChillsNotifications?.showAfterOrder({ email: metadata.customerEmail, name: metadata.customerName });
         
         // Event listeners
         document.getElementById('view-order-details-payment').addEventListener('click', function() {
@@ -10303,7 +10304,6 @@ function showOrderSummaryModal() {
                 </div>
             </div>
             
-            <div style="padding:12px;margin-top:16px;border-radius:10px;background:#eef8ef;color:var(--green);font-size:13px"><strong>Track your order</strong><br>Enable browser notifications to receive payment and order status updates.<br><button type="button" id="enable-order-notifications" style="margin-top:8px;padding:9px 12px;border:0;border-radius:8px;background:var(--green);color:white;font-weight:700">Enable order updates</button><span id="order-notifications-message" style="display:block;margin-top:6px"></span></div>
             <div style="display: flex; gap: 10px; margin-top: 20px;">
                 <button id="confirm-paystack-payment" style="flex: 1; background: linear-gradient(180deg, var(--green), var(--light-green)); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer;">
                     Pay with Paystack
@@ -10327,14 +10327,6 @@ function showOrderSummaryModal() {
     `;
     
     document.body.appendChild(modal);
-    const notificationButton = modal.querySelector('#enable-order-notifications');
-    notificationButton?.addEventListener('click', async () => {
-        const name = (document.getElementById('customer-name')?.value || UserManager.currentUser?.name || '').trim();
-        const email = UserManager.currentUser?.email || prompt('Enter your email so we can link order updates:') || '';
-        const message = modal.querySelector('#order-notifications-message');
-        try { await window.MayChillsNotifications.enable(notificationButton, { name, email }); if (message) message.textContent = 'You will receive updates for this email.'; }
-        catch (error) { if (message) message.textContent = error.message; }
-    });
     
     // Show modal with animation
     setTimeout(() => {
@@ -10487,7 +10479,7 @@ function showSuccessModal(order) {
         </div>
     `;
     
-    document.body.appendChild(modal);
+        document.body.appendChild(modal);
     
     // Show modal with animation
     setTimeout(() => {

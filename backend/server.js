@@ -51,6 +51,11 @@ async function initializeDatabase() {
             total NUMERIC(12,2) NOT NULL DEFAULT 0,
             payment_status TEXT NOT NULL DEFAULT 'paid',
             notification_status TEXT NOT NULL DEFAULT 'pending',
+            order_status TEXT NOT NULL DEFAULT 'received',
+            requested_fulfillment_at TIMESTAMPTZ,
+            ready_target_at TIMESTAMPTZ,
+            manager_reminded_at TIMESTAMPTZ,
+            customer_reminded_at TIMESTAMPTZ,
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
             notified_at TIMESTAMPTZ
         )
@@ -63,6 +68,10 @@ async function initializeDatabase() {
         )
     `);
     await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS order_status TEXT NOT NULL DEFAULT 'received'`);
+    await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS requested_fulfillment_at TIMESTAMPTZ`);
+    await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS ready_target_at TIMESTAMPTZ`);
+    await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS manager_reminded_at TIMESTAMPTZ`);
+    await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_reminded_at TIMESTAMPTZ`);
     await pool.query(`
         CREATE TABLE IF NOT EXISTS push_subscriptions (
             endpoint TEXT PRIMARY KEY,
@@ -236,7 +245,9 @@ app.get('/api/admin/orders', async (request, response) => {
             SELECT id, payment_reference, customer_name, customer_email, delivery_phone,
                    order_type, delivery_address, delivery_area, delivery_slot, order_notes,
                    items, subtotal, delivery_fee, total, payment_status, order_status, notification_status,
-                   created_at, notified_at
+                   requested_fulfillment_at, ready_target_at, manager_reminded_at, customer_reminded_at,
+                   created_at, notified_at,
+                   (order_status IN ('received','preparing') AND ready_target_at IS NOT NULL AND NOW() >= ready_target_at) AS attention_required
             FROM orders ORDER BY created_at DESC LIMIT 100
         `);
         return json(response, 200, { orders: result.rows });
@@ -351,6 +362,42 @@ async function sendTelegram(order) {
     return response.ok;
 }
 
+function lagosParts(date = new Date()) {
+    return new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Lagos', year: 'numeric', month: '2-digit', day: '2-digit' })
+        .formatToParts(date).reduce((out, part) => ({ ...out, [part.type]: part.value }), {});
+}
+
+function lagosTimeToday(hour, minute, dayOffset = 0) {
+    const parts = lagosParts();
+    return new Date(Date.UTC(Number(parts.year), Number(parts.month) - 1, Number(parts.day) + dayOffset, hour, minute) - 60 * 60 * 1000);
+}
+
+function requestedFulfillment(metadata) {
+    if (metadata.requestedFulfillmentAt && !Number.isNaN(Date.parse(metadata.requestedFulfillmentAt))) return new Date(metadata.requestedFulfillmentAt);
+    const time = String(metadata.pickupTimeValue || metadata.pickupTime || '').match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+    if (time) {
+        let hour = Number(time[1]); const minute = Number(time[2]); const period = String(time[3] || '').toUpperCase();
+        if (period === 'PM' && hour < 12) hour += 12; if (period === 'AM' && hour === '12') hour = 0;
+        let result = lagosTimeToday(hour, minute);
+        if (result.getTime() < Date.now()) result = lagosTimeToday(hour, minute, 1);
+        return result;
+    }
+    const slot = String(metadata.deliverySlotKey || '');
+    if (slot === 'morning') return lagosTimeToday(13, 30);
+    if (slot === 'afternoon') return lagosTimeToday(18, 0);
+    if (slot === 'next_day_morning') return lagosTimeToday(13, 30, 1);
+    return null;
+}
+
+function scheduleFor(metadata) {
+    const requested = requestedFulfillment(metadata);
+    const now = Date.now();
+    const readyTarget = requested && requested.getTime() > now + 30 * 60 * 1000
+        ? new Date(requested.getTime() - 17 * 60 * 1000)
+        : new Date(now + 17 * 60 * 1000);
+    return { requested, readyTarget };
+}
+
 async function sendOrderPush(order, message) {
     if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY || !process.env.VAPID_SUBJECT || !pool) return false;
     webpush.setVapidDetails(process.env.VAPID_SUBJECT, process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
@@ -373,24 +420,50 @@ async function sendOrderPush(order, message) {
     return sent;
 }
 
+async function sendManagerReminder(order) {
+    if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) return false;
+    const target = order.ready_target_at ? new Date(order.ready_target_at).toLocaleString('en-NG', { timeZone: 'Africa/Lagos' }) : 'now';
+    const message = `<b>Action required: order preparation</b>\n<b>Order:</b> MCH-${String(order.payment_reference).slice(-8)}\n<b>Customer:</b> ${order.customer_name || 'Customer'}\n<b>Requested:</b> ${target}\n<b>Status:</b> ${order.order_status || 'received'}\n\nThe order should be in preparation now. Update its status in the admin panel.`;
+    const response = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: process.env.TELEGRAM_CHAT_ID, text: message, parse_mode: 'HTML' }) });
+    return response.ok;
+}
+
+async function processScheduledNotifications() {
+    if (!pool) return;
+    const due = await pool.query(`SELECT * FROM orders WHERE ready_target_at IS NOT NULL AND order_status NOT IN ('delivered','cancelled') AND NOW() >= ready_target_at`);
+    for (const order of due.rows) {
+        if (!order.manager_reminded_at) {
+            await sendManagerReminder(order);
+            await pool.query('UPDATE orders SET manager_reminded_at=NOW() WHERE payment_reference=$1 AND manager_reminded_at IS NULL', [order.payment_reference]);
+        }
+        if (!order.customer_reminded_at) {
+            await sendOrderPush(order, 'Preparation for your order should be underway now. We will notify you when it is ready.');
+            await pool.query('UPDATE orders SET customer_reminded_at=NOW() WHERE payment_reference=$1 AND customer_reminded_at IS NULL', [order.payment_reference]);
+        }
+    }
+}
+
 async function saveOrder(order) {
     if (!pool) throw new Error('DATABASE_URL is required');
     const result = await pool.query(`
         INSERT INTO orders (
             payment_reference, customer_name, customer_email, delivery_phone, order_type,
             delivery_address, delivery_area, delivery_slot, order_notes, items,
-            subtotal, delivery_fee, total
-        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb,$11,$12,$13)
+            subtotal, delivery_fee, total, requested_fulfillment_at, ready_target_at
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb,$11,$12,$13,$14,$15)
         ON CONFLICT (payment_reference) DO UPDATE SET
             customer_name = EXCLUDED.customer_name,
             customer_email = EXCLUDED.customer_email,
             items = EXCLUDED.items,
-            total = EXCLUDED.total
+            total = EXCLUDED.total,
+            requested_fulfillment_at = COALESCE(orders.requested_fulfillment_at, EXCLUDED.requested_fulfillment_at),
+            ready_target_at = COALESCE(orders.ready_target_at, EXCLUDED.ready_target_at)
         RETURNING *
     `, [
         order.paymentReference, order.customerName, order.customerEmail, order.deliveryPhone,
         order.type, order.deliveryAddress, order.deliveryArea, order.deliverySlot,
-        order.orderNotes, JSON.stringify(order.items), order.subtotal, order.deliveryFee, order.total
+        order.orderNotes, JSON.stringify(order.items), order.subtotal, order.deliveryFee, order.total,
+        order.requestedFulfillmentAt, order.readyTargetAt
     ]);
     return result.rows[0];
 }
@@ -409,6 +482,7 @@ app.post('/webhook', async (request, response) => {
         const payment = payload.data || payload;
         const metadata = payment.metadata || {};
         const items = metadata.items || metadata.cartItems || [];
+        const schedule = scheduleFor(metadata);
         const order = {
             id: payment.reference || 'UNKNOWN',
             paymentReference: payment.reference,
@@ -425,6 +499,8 @@ app.post('/webhook', async (request, response) => {
             deliverySlot: metadata.deliverySlot,
             pickupTime: metadata.pickupTime,
             orderNotes: metadata.orderNotes,
+            requestedFulfillmentAt: schedule.requested,
+            readyTargetAt: schedule.readyTarget,
             date: new Date().toISOString()
         };
         await saveOrder(order);
@@ -448,5 +524,5 @@ app.post('/webhook', async (request, response) => {
 });
 
 initializeDatabase()
-    .then(() => app.listen(port, () => console.log(`May's Chills backend listening on ${port}`)))
+    .then(() => app.listen(port, () => { console.log(`May's Chills backend listening on ${port}`); setInterval(() => processScheduledNotifications().catch(error => console.error('Scheduled notification processing failed:', error)), 60 * 1000); }))
     .catch(error => { console.error('Database initialization failed:', error); process.exit(1); });
