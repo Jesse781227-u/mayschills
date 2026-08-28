@@ -7479,10 +7479,27 @@ function getOrderTypeText(type) {
             extras: Object.values(EXTRAS_DATA).flat()
         };
 
+        async function loadCatalogOverrides() {
+            try {
+                const response = await fetch((window.MAYCHILLS_API_URL || 'https://mayschillsbackend.onrender.com') + '/api/catalog', { cache: 'no-store' });
+                if (!response.ok) return;
+                const overrides = (await response.json()).items || {};
+                const products = Object.values(categories).flat().map(item => ({ ...item, ...(overrides[`product:${item.id}`] || {}) }));
+                Object.keys(categories).forEach(category => { categories[category] = []; });
+                products.forEach(item => { (categories[item.category || 'Other'] ||= []).push(item); });
+                Object.keys(EXTRAS_DATA).forEach(group => {
+                    EXTRAS_DATA[group] = EXTRAS_DATA[group].map(item => ({ ...item, ...(overrides[`extra:${item.id}`] || {}) }));
+                });
+                window.MAYCHILLS_CATALOG = { products, extras: Object.values(EXTRAS_DATA).flat() };
+            } catch (error) {
+                console.warn('Catalog overrides unavailable; showing the default catalog.', error);
+            }
+        }
+
         let menuAvailability = {};
         function isMenuItemAvailable(item, type = 'product') {
             const state = menuAvailability[`${type}:${item.id}`];
-            return !state || state.mode === 'forever' || (state.mode === 'today' && state.expiresAt > Date.now());
+            return !state || (state.mode === 'today' && Number(state.expiresAt || 0) <= Date.now());
         }
         async function loadMenuAvailability() {
             try {
@@ -7547,7 +7564,7 @@ function getOrderTypeText(type) {
         };
 
         Object.keys(EXTRAS_DATA).forEach(group => {
-            EXTRAS_DATA[group] = EXTRAS_DATA[group].map(item => ADD_ONS[item.id] || item);
+            EXTRAS_DATA[group] = EXTRAS_DATA[group].map(item => Object.assign({}, ADD_ONS[item.id] || {}, item));
         });
 
         function isIngredientAvailable(id) {
@@ -9707,7 +9724,8 @@ if ("Notification" in window) {
                 showProfileSection('google-login-form');
             });
 
-            // Load server-side availability before rendering the menu.
+            // Load server-side catalog and availability before rendering the menu.
+            await loadCatalogOverrides();
             await loadMenuAvailability();
 
             // Initialize products

@@ -54,6 +54,13 @@ async function initializeDatabase() {
             notified_at TIMESTAMPTZ
         )
     `);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS catalog_overrides (
+            item_key TEXT PRIMARY KEY,
+            item_data JSONB NOT NULL,
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    `);
 }
 
 function json(response, status, body) {
@@ -129,6 +136,35 @@ app.post('/api/admin/login', (request, response) => {
     }
     const token = signAdminToken({ role: 'admin', exp: Date.now() + 8 * 60 * 60 * 1000 });
     return json(response, 200, { token });
+});
+
+app.get('/api/catalog', async (_request, response) => {
+    if (!pool) return json(response, 200, { items: {} });
+    try {
+        const result = await pool.query('SELECT item_key, item_data FROM catalog_overrides');
+        return json(response, 200, { items: Object.fromEntries(result.rows.map(row => [row.item_key, row.item_data])) });
+    } catch (error) {
+        console.error('Catalog read failed:', error);
+        return json(response, 500, { error: 'Unable to read catalog' });
+    }
+});
+
+app.post('/api/catalog', async (request, response) => {
+    if (!verifyAdminToken(request)) return json(response, 401, { error: 'Unauthorized' });
+    if (!pool) return json(response, 503, { error: 'DATABASE_URL is required' });
+    const key = String(request.body?.key || '').trim();
+    const data = request.body?.data;
+    if (!key || !data || typeof data !== 'object' || Array.isArray(data)) return json(response, 400, { error: 'Invalid catalog item' });
+    try {
+        await pool.query(`
+            INSERT INTO catalog_overrides (item_key, item_data, updated_at) VALUES ($1, $2::jsonb, NOW())
+            ON CONFLICT (item_key) DO UPDATE SET item_data = $2::jsonb, updated_at = NOW()
+        `, [key, JSON.stringify(data)]);
+        return json(response, 200, { success: true });
+    } catch (error) {
+        console.error('Catalog update failed:', error);
+        return json(response, 500, { error: 'Unable to update catalog' });
+    }
 });
 
 app.get('/api/admin/login', (_request, response) => json(response, 405, {
