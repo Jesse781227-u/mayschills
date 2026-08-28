@@ -74,16 +74,19 @@ async function initializeDatabase() {
     await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS ready_target_at TIMESTAMPTZ`);
     await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS manager_reminded_at TIMESTAMPTZ`);
     await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_reminded_at TIMESTAMPTZ`);
+    await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS is_demo BOOLEAN NOT NULL DEFAULT FALSE`);
     await pool.query(`
         CREATE TABLE IF NOT EXISTS push_subscriptions (
             endpoint TEXT PRIMARY KEY,
             subscription JSONB NOT NULL,
             customer_email TEXT,
             customer_name TEXT,
+            order_reference TEXT,
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
             updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )
     `);
+    await pool.query(`ALTER TABLE push_subscriptions ADD COLUMN IF NOT EXISTS order_reference TEXT`);
     await pool.query(`
         CREATE TABLE IF NOT EXISTS customer_notes (
             customer_key TEXT PRIMARY KEY,
@@ -169,7 +172,7 @@ app.post('/api/admin/login', (request, response) => {
 });
 
 app.get('/api/notifications/config', (_request, response) => json(response, 200, {
-    enabled: Boolean(process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY),
+    enabled: Boolean(process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY && process.env.VAPID_SUBJECT),
     publicKey: process.env.VAPID_PUBLIC_KEY || null
 }));
 
@@ -180,15 +183,32 @@ app.post('/api/notifications/subscribe', async (request, response) => {
     if (!endpoint || !subscription?.keys?.p256dh || !subscription?.keys?.auth) return json(response, 400, { error: 'Invalid push subscription' });
     try {
         await pool.query(`
-            INSERT INTO push_subscriptions (endpoint, subscription, customer_email, customer_name)
-            VALUES ($1, $2::jsonb, $3, $4)
-            ON CONFLICT (endpoint) DO UPDATE SET subscription=$2::jsonb, customer_email=$3, customer_name=$4, updated_at=NOW()
-        `, [endpoint, JSON.stringify(subscription), request.body?.email || null, request.body?.name || null]);
+            INSERT INTO push_subscriptions (endpoint, subscription, customer_email, customer_name, order_reference)
+            VALUES ($1, $2::jsonb, $3, $4, $5)
+            ON CONFLICT (endpoint) DO UPDATE SET subscription=$2::jsonb, customer_email=$3, customer_name=$4, order_reference=$5, updated_at=NOW()
+        `, [endpoint, JSON.stringify(subscription), request.body?.email || null, request.body?.name || null, request.body?.reference || null]);
         return json(response, 201, { success: true });
     } catch (error) {
         console.error('Push subscription failed:', error);
         return json(response, 500, { error: 'Unable to save notification permission' });
     }
+});
+
+app.post('/api/notifications/demo', async (request, response) => {
+    if (!pool) return json(response, 503, { error: 'DATABASE_URL is required' });
+    const email = String(request.body?.email || '').trim().toLowerCase();
+    const name = String(request.body?.name || 'Push demo customer').trim().slice(0, 120) || 'Push demo customer';
+    if (!/^\S+@\S+\.\S+$/.test(email)) return json(response, 400, { error: 'A valid email is required for the demo.' });
+    try {
+        const reference = `DEMO_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
+        await pool.query('UPDATE push_subscriptions SET order_reference=$1 WHERE endpoint=$2', [reference, String(request.body?.endpoint || '')]);
+        const result = await pool.query(`
+            INSERT INTO orders (payment_reference, customer_name, customer_email, delivery_phone, order_type, order_notes, items, subtotal, total, payment_status, order_status, ready_target_at, is_demo)
+            VALUES ($1,$2,$3,'Demo order','pickup','Push notification demo','[{"id":"push-demo","name":"Push notification demo","price":100,"quantity":1}]'::jsonb,100,100,'paid','received',NOW() + INTERVAL '2 hours',TRUE)
+            RETURNING payment_reference, customer_name, customer_email, order_status
+        `, [reference, name, email]);
+        return json(response, 201, { success: true, order: result.rows[0] });
+    } catch (error) { console.error('Push demo order failed:', error); return json(response, 500, { error: 'Unable to create the demo order' }); }
 });
 
 app.get('/api/catalog', async (_request, response) => {
@@ -251,7 +271,7 @@ app.get('/api/admin/orders', async (request, response) => {
     if (!pool) return json(response, 503, { error: 'DATABASE_URL is required' });
     try {
         const result = await pool.query(`
-            SELECT id, payment_reference, customer_name, customer_email, delivery_phone,
+            SELECT id, payment_reference, customer_name, customer_email, delivery_phone, is_demo,
                    order_type, delivery_address, delivery_area, delivery_slot, order_notes,
                    items, subtotal, delivery_fee, total, payment_status, order_status, notification_status,
                    requested_fulfillment_at, dispatch_at, ready_target_at, manager_reminded_at, customer_reminded_at,
@@ -355,7 +375,7 @@ app.get('/api/admin/analytics', async (request, response) => {
     if (!pool) return json(response, 503, { error: 'DATABASE_URL is required' });
     try {
         const [ordersResult, notesResult] = await Promise.all([
-            pool.query("SELECT payment_reference, customer_name, customer_email, delivery_phone, delivery_address, items, total, order_status, payment_status, created_at FROM orders WHERE payment_status = 'paid' ORDER BY created_at ASC LIMIT 10000"),
+            pool.query("SELECT payment_reference, customer_name, customer_email, delivery_phone, delivery_address, items, total, order_status, payment_status, created_at FROM orders WHERE payment_status = 'paid' AND is_demo = FALSE ORDER BY created_at ASC LIMIT 10000"),
             pool.query('SELECT customer_key, notes FROM customer_notes')
         ]);
         const notes = Object.fromEntries(notesResult.rows.map(row => [row.customer_key, row.notes]));
@@ -525,7 +545,8 @@ async function sendOrderPush(order, message) {
     if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY || !process.env.VAPID_SUBJECT || !pool) return false;
     webpush.setVapidDetails(process.env.VAPID_SUBJECT, process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
     const email = order.customerEmail || order.customer_email;
-    const result = await pool.query('SELECT endpoint, subscription FROM push_subscriptions WHERE customer_email = $1', [email]);
+    const reference = order.paymentReference || order.payment_reference;
+    const result = await pool.query('SELECT endpoint, subscription FROM push_subscriptions WHERE order_reference = $1 OR (order_reference IS NULL AND customer_email = $2)', [reference, email]);
     let sent = false;
     for (const row of result.rows) {
         try {
