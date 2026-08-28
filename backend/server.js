@@ -84,6 +84,13 @@ async function initializeDatabase() {
             updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )
     `);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS customer_notes (
+            customer_key TEXT PRIMARY KEY,
+            notes TEXT NOT NULL DEFAULT '',
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    `);
 }
 
 function json(response, status, body) {
@@ -257,6 +264,111 @@ app.get('/api/admin/orders', async (request, response) => {
         console.error('Orders read failed:', error);
         return json(response, 500, { error: 'Unable to read orders' });
     }
+});
+
+function customerKey(order) {
+    const email = String(order.customer_email || '').trim().toLowerCase();
+    const phone = String(order.delivery_phone || '').replace(/\D/g, '');
+    if (email && email !== 'unknown@example.com') return `email:${email}`;
+    if (phone && phone !== '0') return `phone:${phone}`;
+    return `name:${String(order.customer_name || 'customer').trim().toLowerCase()}`;
+}
+
+function orderItems(order) {
+    return Array.isArray(order.items) ? order.items : [];
+}
+
+function analyticsDate(value, fallback) {
+    const date = value ? new Date(value) : fallback;
+    return Number.isNaN(date.getTime()) ? fallback : date;
+}
+
+function percentChange(current, previous) {
+    if (!previous) return current ? null : 0;
+    return Math.round(((current - previous) / previous) * 100);
+}
+
+function buildAnalytics(orders, notes = {}, range = {}) {
+    const now = new Date();
+    const end = analyticsDate(range.to, now);
+    const start = analyticsDate(range.from, new Date(end));
+    if (!range.from) start.setDate(start.getDate() - 30);
+    const periodOrders = orders.filter(order => new Date(order.created_at) >= start && new Date(order.created_at) <= end);
+    const previousStart = new Date(start); previousStart.setDate(previousStart.getDate() - 30);
+    const previousOrders = orders.filter(order => new Date(order.created_at) >= previousStart && new Date(order.created_at) < start);
+    const summarize = selected => {
+        const products = new Map(); let sales = 0; let units = 0; const customers = new Set();
+        selected.forEach(order => {
+            sales += Number(order.total || 0); customers.add(customerKey(order));
+            orderItems(order).forEach(item => {
+                const key = String(item.id || item.name || 'item');
+                const row = products.get(key) || { key, id: item.id || key, name: item.name || key, units: 0, revenue: 0, orders: 0 };
+                const quantity = Number(item.quantity || 0); row.units += quantity; row.revenue += Number(item.price || 0) * quantity; row.orders += 1; products.set(key, row); units += quantity;
+            });
+        });
+        return { sales, orders: selected.length, units, customers: customers.size, products: [...products.values()] };
+    };
+    const current = summarize(periodOrders); const previous = summarize(previousOrders);
+    const customerMap = new Map(); const productMap = new Map(); const daily = new Map(); const hours = new Map();
+    orders.forEach(order => {
+        const date = new Date(order.created_at); const key = customerKey(order); const inPeriod = date >= start && date <= end;
+        if (!customerMap.has(key)) customerMap.set(key, { key, name: order.customer_name || 'Customer', phone: order.delivery_phone || '', email: order.customer_email || '', orders: [], spent: 0, items: new Map() });
+        const customer = customerMap.get(key); customer.orders.push(order); customer.spent += Number(order.total || 0);
+        orderItems(order).forEach(item => {
+            const itemKey = String(item.id || item.name || 'item'); const quantity = Number(item.quantity || 0);
+            customer.items.set(itemKey, (customer.items.get(itemKey) || { name: item.name || itemKey, quantity: 0 })).quantity += quantity;
+            if (!inPeriod) return;
+            const row = productMap.get(itemKey) || { key: itemKey, id: item.id || itemKey, name: item.name || itemKey, units: 0, revenue: 0, orders: 0, dates: [], customers: new Map(), days: new Map(), hours: new Map(), alongside: new Map() };
+            row.units += quantity; row.revenue += Number(item.price || 0) * quantity; row.orders += 1; row.dates.push(date);
+            row.customers.set(key, (row.customers.get(key) || 0) + quantity);
+            const day = date.toLocaleDateString('en-NG', { weekday: 'long', timeZone: 'Africa/Lagos' }); row.days.set(day, (row.days.get(day) || 0) + quantity);
+            const hour = Number(new Intl.DateTimeFormat('en-US', { hour: 'numeric', hour12: false, timeZone: 'Africa/Lagos' }).format(date)); row.hours.set(hour, (row.hours.get(hour) || 0) + quantity);
+            orderItems(order).forEach(other => { const otherKey = String(other.id || other.name || 'item'); if (otherKey !== itemKey) row.alongside.set(otherKey, { name: other.name || otherKey, count: (row.alongside.get(otherKey)?.count || 0) + 1 }); });
+            productMap.set(itemKey, row);
+        });
+        const dayKey = date.toISOString().slice(0, 10); daily.set(dayKey, (daily.get(dayKey) || 0) + Number(order.total || 0));
+        const hourKey = Number(new Intl.DateTimeFormat('en-US', { hour: 'numeric', hour12: false, timeZone: 'Africa/Lagos' }).format(date)); hours.set(hourKey, (hours.get(hourKey) || 0) + 1);
+    });
+    const customers = [...customerMap.values()].map(customer => {
+        const sorted = [...customer.items.values()].sort((a, b) => b.quantity - a.quantity); const last = customer.orders.at(-1)?.created_at; const first = customer.orders[0]?.created_at; const daysSince = last ? (Date.now() - new Date(last).getTime()) / 86400000 : Infinity;
+        let segment = customer.orders.length === 1 ? 'New customer' : 'Returning customer';
+        if (customer.spent >= 100000) segment = 'High-value customer'; else if (customer.orders.length >= 5) segment = 'Frequent customer'; else if (daysSince > 60) segment = 'Inactive customer'; else if (daysSince > 30 && customer.orders.length > 1) segment = 'At-risk customer'; else if (customer.orders.length >= 3) segment = 'Regular customer';
+        return { key: customer.key, name: customer.name, phone: customer.phone, email: customer.email, orders: customer.orders.length, spent: customer.spent, averageOrderValue: customer.spent / customer.orders.length, firstOrder: first, lastOrder: last, segment, favoriteProduct: sorted[0]?.name || '—', items: sorted, history: customer.orders.map(order => ({ reference: order.payment_reference, date: order.created_at, total: Number(order.total || 0), status: order.order_status, items: orderItems(order).map(item => ({ name: item.name, quantity: Number(item.quantity || 0) })) })), notes: notes[customer.key] || '' };
+    });
+    const products = [...productMap.values()].map(row => ({ key: row.key, id: row.id, name: row.name, units: row.units, revenue: row.revenue, orders: row.orders, averageQuantity: row.units / row.orders, firstSale: row.dates.sort((a, b) => a - b)[0], lastSale: row.dates.sort((a, b) => b - a)[0], customers: [...row.customers.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([key]) => customers.find(customer => customer.key === key)?.name || 'Customer'), alongside: [...row.alongside.values()].sort((a, b) => b.count - a.count).slice(0, 5), bestDays: [...row.days.entries()].sort((a, b) => b[1] - a[1]).slice(0, 2).map(([name]) => name), bestHours: [...row.hours.entries()].sort((a, b) => b[1] - a[1]).slice(0, 2).map(([hour]) => `${hour}:00`), trend: percentChange(row.revenue, previous.products.find(item => item.key === row.key)?.revenue || 0) }));
+    const newCustomers = customers.filter(customer => customer.firstOrder && new Date(customer.firstOrder) >= start).length;
+    const returningCustomers = customers.filter(customer => customer.orders > 1).length;
+    const top = [...products].sort((a, b) => b.units - a.units)[0]; const topRevenue = [...products].sort((a, b) => b.revenue - a.revenue)[0];
+    const insights = [];
+    if (top) insights.push(`${top.name} is your best-selling product in the last 30 days.`);
+    if (topRevenue && topRevenue.key !== top?.key) insights.push(`${topRevenue.name} generated the most revenue in the last 30 days.`);
+    if (current.sales && previous.sales) insights.push(`Sales are ${Math.abs(percentChange(current.sales, previous.sales))}% ${current.sales >= previous.sales ? 'higher' : 'lower'} than the previous 30 days.`);
+    if (returningCustomers && current.customers) insights.push(`Returning customers represent ${Math.round((returningCustomers / current.customers) * 100)}% of identified customers.`);
+    const busiestHour = [...hours.entries()].sort((a, b) => b[1] - a[1])[0]; if (busiestHour) insights.push(`Most orders occur around ${busiestHour[0]}:00–${Number(busiestHour[0]) + 1}:00.`);
+    return { period: { from: start, to: end }, summary: { ...current, averageOrderValue: current.orders ? current.sales / current.orders : 0, newCustomers, returningCustomers, salesChange: percentChange(current.sales, previous.sales), orderChange: percentChange(current.orders, previous.orders), uniqueCustomers: current.customers }, daily: [...daily.entries()].filter(([day]) => new Date(day) >= start).map(([date, sales]) => ({ date, sales })), products: products.filter(product => product.orders), customers: customers.sort((a, b) => b.spent - a.spent), insights, previous };
+}
+
+app.get('/api/admin/analytics', async (request, response) => {
+    if (!verifyAdminToken(request)) return json(response, 401, { error: 'Unauthorized' });
+    if (!pool) return json(response, 503, { error: 'DATABASE_URL is required' });
+    try {
+        const [ordersResult, notesResult] = await Promise.all([
+            pool.query("SELECT payment_reference, customer_name, customer_email, delivery_phone, items, total, order_status, payment_status, created_at FROM orders WHERE payment_status = 'paid' ORDER BY created_at ASC LIMIT 10000"),
+            pool.query('SELECT customer_key, notes FROM customer_notes')
+        ]);
+        const notes = Object.fromEntries(notesResult.rows.map(row => [row.customer_key, row.notes]));
+        const to = request.query.to ? new Date(`${request.query.to}T23:59:59`) : null;
+        const from = request.query.from ? new Date(`${request.query.from}T00:00:00`) : null;
+        return json(response, 200, buildAnalytics(ordersResult.rows.filter(order => order.order_status !== 'cancelled'), notes, { from, to }));
+    } catch (error) { console.error('Analytics read failed:', error); return json(response, 500, { error: 'Unable to calculate analytics' }); }
+});
+
+app.patch('/api/admin/customers/:key/notes', async (request, response) => {
+    if (!verifyAdminToken(request)) return json(response, 401, { error: 'Unauthorized' });
+    if (!pool) return json(response, 503, { error: 'DATABASE_URL is required' });
+    const key = String(request.params.key || ''); const notes = String(request.body?.notes || '').slice(0, 2000);
+    try { await pool.query('INSERT INTO customer_notes (customer_key, notes, updated_at) VALUES ($1,$2,NOW()) ON CONFLICT (customer_key) DO UPDATE SET notes=$2, updated_at=NOW()', [key, notes]); return json(response, 200, { success: true }); }
+    catch (error) { console.error('Customer notes update failed:', error); return json(response, 500, { error: 'Unable to save customer notes' }); }
 });
 
 app.patch('/api/admin/orders/:reference/status', async (request, response) => {
