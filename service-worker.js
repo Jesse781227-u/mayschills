@@ -1,2 +1,2 @@
 self.addEventListener('push', event => { const data = event.data ? event.data.json() : {}; const logo = 'https://i.ibb.co/hJNHPS8T/IMG-20251112-WA0082.jpg'; event.waitUntil(self.registration.showNotification(data.title || "May's Chills", { body: data.body || 'There is a new update regarding your May\'s Chills order.', icon: logo, badge: logo, tag: data.reference ? `maychills-${data.reference}` : 'maychills-order', renotify: true, lang: 'en-NG', data: { reference: data.reference || '' } })); });
-self.addEventListener('notificationclick', event => { event.notification.close(); event.waitUntil(clients.openWindow('/shop.html')); });
+self.addEventListener('notificationclick', event => { event.notification.close(); event.waitUntil(clients.openWindow('/cart.html')); });

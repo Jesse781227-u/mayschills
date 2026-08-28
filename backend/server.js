@@ -162,6 +162,20 @@ app.get('/api/availability', async (_request, response) => {
     }
 });
 
+app.get('/api/orders/:reference/status', async (request, response) => {
+    if (!pool) return json(response, 503, { error: 'DATABASE_URL is required' });
+    try {
+        const result = await pool.query(`
+            SELECT payment_reference, customer_name, order_type, order_status, requested_fulfillment_at,
+                   dispatch_at, ready_target_at, created_at
+            FROM orders WHERE payment_reference = $1 LIMIT 1
+        `, [request.params.reference]);
+        if (!result.rowCount) return json(response, 404, { error: 'Order not found' });
+        const order = result.rows[0];
+        return json(response, 200, { order: { reference: order.payment_reference, customerName: order.customer_name, type: order.order_type, status: order.order_status, requestedFulfillmentAt: order.requested_fulfillment_at, dispatchAt: order.dispatch_at, readyTargetAt: order.ready_target_at, createdAt: order.created_at } });
+    } catch (error) { console.error('Order tracking read failed:', error); return json(response, 500, { error: 'Unable to read order status' }); }
+});
+
 app.post('/api/admin/login', (request, response) => {
     const { password } = request.body || {};
     if (!process.env.ADMIN_PASSWORD || password !== process.env.ADMIN_PASSWORD) {

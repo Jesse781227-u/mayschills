@@ -18,7 +18,9 @@
         if (!response.ok) throw new Error((await response.json()).error || 'Unable to enable notifications.');
         if (details.demo) {
             const demoResponse = await fetch(API() + '/api/notifications/demo', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: details.email, name: details.name || 'Push demo customer', endpoint: subscription.endpoint }) });
-            if (!demoResponse.ok) throw new Error((await demoResponse.json()).error || 'Notifications enabled, but the demo order could not be created.');
+            const demoData = await demoResponse.json();
+            if (!demoResponse.ok) throw new Error(demoData.error || 'Notifications enabled, but the demo order could not be created.');
+            localStorage.setItem('maychills_last_order', JSON.stringify({ reference: demoData.order?.payment_reference, customerEmail: details.email, date: new Date().toISOString() }));
         }
         button.textContent = 'Order updates enabled'; button.disabled = true;
     }

@@ -14,9 +14,6 @@
         .topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; }
         .topbar h1 { margin:0; font-size:24px; }
         .icon-button { width:42px; height:42px; border:0; border-radius:50%; background:var(--white); color:var(--green); box-shadow:0 5px 16px #00000010; font-size:20px; cursor:pointer; }
-        .tabs { display:flex; gap:26px; border-bottom:1px solid #e4e4e4; margin-bottom:18px; }
-        .tab { border:0; background:none; padding:0 0 12px; color:var(--muted); font:500 14px Rubik; cursor:pointer; }
-        .tab.active { color:var(--green); border-bottom:2px solid var(--green); }
         #items { display:grid; gap:12px; }
         .line { display:grid; grid-template-columns:58px 1fr auto; gap:12px; align-items:center; background:var(--white); padding:10px; border-radius:18px; box-shadow:0 7px 22px #00000008; }
         .line img { width:58px; height:58px; border-radius:14px; object-fit:cover; background:#eee; }
@@ -37,6 +34,11 @@
         .checkout { background:linear-gradient(135deg,var(--green),var(--light-green)); color:white; margin-top:8px; }
         .back { background:transparent; color:var(--green); margin-top:8px; }
         .toast { position:fixed; left:50%; bottom:20px; transform:translateX(-50%); background:#222; color:white; padding:11px 16px; border-radius:999px; font-size:13px; }
+        .tracking { background:var(--white); border-radius:18px; padding:15px; margin-bottom:18px; box-shadow:0 7px 22px #00000008; }
+        .tracking h2 { margin:0 0 5px; font-size:16px; color:var(--green); }
+        .tracking p { margin:5px 0; color:var(--muted); font-size:13px; line-height:1.45; }
+        .tracking-status { color:var(--text)!important; font-weight:600; }
+        .tracking-time { font-size:12px!important; }
     </style>
 </head>
 <body>
@@ -46,7 +48,7 @@
         <h1>Your Cart</h1>
         <button class="icon-button" aria-label="Cart"><i class="hgi-stroke hgi-shopping-cart-01"></i></button>
     </div>
-    <div class="tabs"><button class="tab active" type="button">Active</button><button class="tab" type="button">Previous</button></div>
+    <section id="tracking" class="tracking" aria-live="polite" hidden></section>
     <section id="items" aria-live="polite"></section>
     <section class="summary">
         <div class="row"><span>Items</span><strong id="count">0</strong></div>
@@ -62,6 +64,17 @@
     let cart = JSON.parse(localStorage.getItem('maychills_cart') || '[]');
     const save = () => localStorage.setItem('maychills_cart', JSON.stringify(cart));
     const toast = message => { const node = document.createElement('div'); node.className='toast'; node.textContent=message; document.body.appendChild(node); setTimeout(()=>node.remove(),2200); };
+    const API_BASE = window.MAYCHILLS_API_URL || 'https://mayschillsbackend.onrender.com';
+    const statusCopy = { received:'We have received your order and it is in our queue.', preparing:'We are carefully preparing your order now.', ready:'Your order is ready for pickup.', out_for_delivery:'Your order is on its way to you.', delivered:'Your order has been delivered. Enjoy!', cancelled:'This order has been cancelled.' };
+    function renderTracking(order) {
+        const box = document.getElementById('tracking'); if (!order) { box.hidden=true; return; }
+        box.hidden=false; box.innerHTML = `<h2>Track your latest order</h2><p>Order ${String(order.reference).slice(-12)}</p><p class="tracking-status">${statusCopy[order.status] || 'Your order status has been updated.'}</p><p class="tracking-time">Status: ${String(order.status || 'received').replaceAll('_',' ')} · Updated just now</p>`;
+    }
+    async function refreshTracking() {
+        let saved; try { saved = JSON.parse(localStorage.getItem('maychills_last_order') || 'null'); } catch (_) { saved=null; }
+        if (!saved?.reference) return renderTracking(null);
+        try { const response = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(saved.reference)}/status`, { cache:'no-store' }); if (!response.ok) throw new Error('not found'); renderTracking((await response.json()).order); } catch (_) { renderTracking({ reference:saved.reference, status:'received' }); }
+    }
     const ingredientLabels = { chia:'Chia seeds', egg:'Egg', raisins:'Raisins' };
     function customizationLines(item) {
         const customizations = item.customizations || {};
@@ -105,6 +118,8 @@
     document.getElementById('back').onclick = document.getElementById('continue').onclick = () => window.location.href='shop.html';
     document.getElementById('checkout').onclick = () => cart.length ? window.location.href='checkout.html' : toast('Your cart is empty');
     render();
+    refreshTracking();
+    setInterval(refreshTracking, 15000);
 </script>
 </body>
 </html>
