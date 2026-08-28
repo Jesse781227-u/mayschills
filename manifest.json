@@ -1,0 +1,13 @@
+{
+  "name": "May's Chills",
+  "short_name": "May's Chills",
+  "start_url": "/shop.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7fbf7",
+  "theme_color": "#159447",
+  "icons": [
+    { "src": "https://i.ibb.co/hJNHPS8T/IMG-20251112-WA0082.jpg", "sizes": "192x192", "type": "image/jpeg" },
+    { "src": "https://i.ibb.co/hJNHPS8T/IMG-20251112-WA0082.jpg", "sizes": "512x512", "type": "image/jpeg" }
+  ]
+}
