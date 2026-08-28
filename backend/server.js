@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import express from 'express';
 import pg from 'pg';
+import webpush from 'web-push';
 
 const { Pool } = pg;
 const app = express();
@@ -16,7 +17,7 @@ app.use(express.json({
 }));
 app.use((request, response, next) => {
     response.header('Access-Control-Allow-Origin', frontendUrl);
-    response.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    response.header('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
     response.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     if (request.method === 'OPTIONS') return response.sendStatus(204);
     next();
@@ -58,6 +59,17 @@ async function initializeDatabase() {
         CREATE TABLE IF NOT EXISTS catalog_overrides (
             item_key TEXT PRIMARY KEY,
             item_data JSONB NOT NULL,
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    `);
+    await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS order_status TEXT NOT NULL DEFAULT 'received'`);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS push_subscriptions (
+            endpoint TEXT PRIMARY KEY,
+            subscription JSONB NOT NULL,
+            customer_email TEXT,
+            customer_name TEXT,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
             updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )
     `);
@@ -138,6 +150,29 @@ app.post('/api/admin/login', (request, response) => {
     return json(response, 200, { token });
 });
 
+app.get('/api/notifications/config', (_request, response) => json(response, 200, {
+    enabled: Boolean(process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY),
+    publicKey: process.env.VAPID_PUBLIC_KEY || null
+}));
+
+app.post('/api/notifications/subscribe', async (request, response) => {
+    if (!pool) return json(response, 503, { error: 'DATABASE_URL is required' });
+    const subscription = request.body?.subscription;
+    const endpoint = String(subscription?.endpoint || '').trim();
+    if (!endpoint || !subscription?.keys?.p256dh || !subscription?.keys?.auth) return json(response, 400, { error: 'Invalid push subscription' });
+    try {
+        await pool.query(`
+            INSERT INTO push_subscriptions (endpoint, subscription, customer_email, customer_name)
+            VALUES ($1, $2::jsonb, $3, $4)
+            ON CONFLICT (endpoint) DO UPDATE SET subscription=$2::jsonb, customer_email=$3, customer_name=$4, updated_at=NOW()
+        `, [endpoint, JSON.stringify(subscription), request.body?.email || null, request.body?.name || null]);
+        return json(response, 201, { success: true });
+    } catch (error) {
+        console.error('Push subscription failed:', error);
+        return json(response, 500, { error: 'Unable to save notification permission' });
+    }
+});
+
 app.get('/api/catalog', async (_request, response) => {
     if (!pool) return json(response, 200, { items: {} });
     try {
@@ -200,7 +235,7 @@ app.get('/api/admin/orders', async (request, response) => {
         const result = await pool.query(`
             SELECT id, payment_reference, customer_name, customer_email, delivery_phone,
                    order_type, delivery_address, delivery_area, delivery_slot, order_notes,
-                   items, subtotal, delivery_fee, total, payment_status, notification_status,
+                   items, subtotal, delivery_fee, total, payment_status, order_status, notification_status,
                    created_at, notified_at
             FROM orders ORDER BY created_at DESC LIMIT 100
         `);
@@ -208,6 +243,24 @@ app.get('/api/admin/orders', async (request, response) => {
     } catch (error) {
         console.error('Orders read failed:', error);
         return json(response, 500, { error: 'Unable to read orders' });
+    }
+});
+
+app.patch('/api/admin/orders/:reference/status', async (request, response) => {
+    if (!verifyAdminToken(request)) return json(response, 401, { error: 'Unauthorized' });
+    if (!pool) return json(response, 503, { error: 'DATABASE_URL is required' });
+    const allowed = ['received', 'preparing', 'ready', 'out_for_delivery', 'delivered', 'cancelled'];
+    const status = String(request.body?.status || '');
+    if (!allowed.includes(status)) return json(response, 400, { error: 'Invalid order status' });
+    try {
+        const result = await pool.query('UPDATE orders SET order_status=$1 WHERE payment_reference=$2 RETURNING *', [status, request.params.reference]);
+        if (!result.rowCount) return json(response, 404, { error: 'Order not found' });
+        const order = result.rows[0];
+        const pushSent = await sendOrderPush(order, `Order update: ${status.replaceAll('_', ' ')}`);
+        return json(response, 200, { success: true, pushSent });
+    } catch (error) {
+        console.error('Order status update failed:', error);
+        return json(response, 500, { error: 'Unable to update order status' });
     }
 });
 
@@ -298,6 +351,28 @@ async function sendTelegram(order) {
     return response.ok;
 }
 
+async function sendOrderPush(order, message) {
+    if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY || !process.env.VAPID_SUBJECT || !pool) return false;
+    webpush.setVapidDetails(process.env.VAPID_SUBJECT, process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
+    const email = order.customerEmail || order.customer_email;
+    const result = await pool.query('SELECT endpoint, subscription FROM push_subscriptions WHERE customer_email = $1', [email]);
+    let sent = false;
+    for (const row of result.rows) {
+        try {
+            await webpush.sendNotification(row.subscription, JSON.stringify({
+                title: "May's Chills order update",
+                body: message,
+                reference: order.paymentReference || order.payment_reference
+            }));
+            sent = true;
+        } catch (error) {
+            if (error.statusCode === 404 || error.statusCode === 410) await pool.query('DELETE FROM push_subscriptions WHERE endpoint = $1', [row.endpoint]);
+            else console.error('Push notification failed:', error.message);
+        }
+    }
+    return sent;
+}
+
 async function saveOrder(order) {
     if (!pool) throw new Error('DATABASE_URL is required');
     const result = await pool.query(`
@@ -360,6 +435,7 @@ app.post('/webhook', async (request, response) => {
         `, [order.paymentReference]);
         if (claim.rowCount) {
             const [email, telegram] = await Promise.all([sendEmail(order), sendTelegram(order)]);
+            await sendOrderPush(order, 'Your payment was received and your order is now in our queue.');
             const notificationStatus = email || telegram ? 'sent' : 'not_configured';
             await markNotification(notificationStatus, order.paymentReference);
             return json(response, 200, { success: true, emailSent: email, telegramSent: telegram, orderId: order.id });

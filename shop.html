@@ -10,6 +10,7 @@
     
     <!-- Paystack Payment Integration -->
 <script src="https://js.paystack.co/v2/inline.js"></script>
+    <script src="notifications.js"></script>
     <!-- Firebase SDK -->
     <script type="module">
         // Import the functions you need from the SDKs you need
@@ -4906,6 +4907,10 @@
 
 
     <!-- Contact Information -->
+    <div class="form-group">
+        <label class="required">Your Name</label>
+        <input type="text" id="customer-name" placeholder="Your full name" required style="width: 100%; padding: 12px; border: 2px solid #e8e8e8; border-radius: 10px; font-size: 16px; font-family: 'Rubik', sans-serif;">
+    </div>
     <div class="form-group">
         <label class="required">Phone Number for Delivery</label>
         <input type="tel" 
@@ -10295,6 +10300,7 @@ function showOrderSummaryModal() {
                 </div>
             </div>
             
+            <div style="padding:12px;margin-top:16px;border-radius:10px;background:#eef8ef;color:var(--green);font-size:13px"><strong>Track your order</strong><br>Enable browser notifications to receive payment and order status updates.<br><button type="button" id="enable-order-notifications" style="margin-top:8px;padding:9px 12px;border:0;border-radius:8px;background:var(--green);color:white;font-weight:700">Enable order updates</button><span id="order-notifications-message" style="display:block;margin-top:6px"></span></div>
             <div style="display: flex; gap: 10px; margin-top: 20px;">
                 <button id="confirm-paystack-payment" style="flex: 1; background: linear-gradient(180deg, var(--green), var(--light-green)); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer;">
                     Pay with Paystack
@@ -10318,6 +10324,14 @@ function showOrderSummaryModal() {
     `;
     
     document.body.appendChild(modal);
+    const notificationButton = modal.querySelector('#enable-order-notifications');
+    notificationButton?.addEventListener('click', async () => {
+        const name = (document.getElementById('customer-name')?.value || UserManager.currentUser?.name || '').trim();
+        const email = UserManager.currentUser?.email || prompt('Enter your email so we can link order updates:') || '';
+        const message = modal.querySelector('#order-notifications-message');
+        try { await window.MayChillsNotifications.enable(notificationButton, { name, email }); if (message) message.textContent = 'You will receive updates for this email.'; }
+        catch (error) { if (message) message.textContent = error.message; }
+    });
     
     // Show modal with animation
     setTimeout(() => {
@@ -10332,7 +10346,10 @@ function showOrderSummaryModal() {
             return;
         }
 
-        // Collect customer email
+        // Collect customer name and email
+        let customerName = (document.getElementById('customer-name')?.value || '').trim();
+        if (!customerName && UserManager.currentUser) customerName = UserManager.currentUser.name || '';
+        if (!customerName) { showToast('Please enter your name'); return; }
         let customerEmail = '';
         
         if (UserManager.currentUser && UserManager.currentUser.email) {
@@ -10354,7 +10371,7 @@ function showOrderSummaryModal() {
             orderType: orderType,
             deliveryAddress: orderType === 'delivery' ? deliveryAddress : null,
             deliveryPhone: orderType === 'delivery' ? deliveryPhone : null,
-            customerName: UserManager.currentUser ? UserManager.currentUser.name : 'Guest Customer',
+            customerName: customerName,
             customerEmail: customerEmail,
             items: cart.filter(item => item.id !== 'delivery_fee').map(item => ({
                 id: item.id,

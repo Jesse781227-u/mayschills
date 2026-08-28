@@ -12,6 +12,7 @@
 6. Copy the backend URL, for example `https://mayschills-backend.onrender.com`.
 7. Add `PAYSTACK_SECRET`, `ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET`, and `FRONTEND_URL` in Render Environment.
 8. Add the email and/or Telegram variables listed below for live notifications.
+9. For browser push notifications, run `npx web-push generate-vapid-keys` from the backend folder and add `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT` to Render. Never expose the private key.
 
 ### Step 2: Configure Paystack Webhook
 

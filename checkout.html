@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css">
     <script src="https://js.paystack.co/v2/inline.js"></script>
+    <script src="notifications.js"></script>
     <style>
         :root { --green:#009444; --light-green:#8DC63F; --bg:#f6f6f6; --text:#171717; --muted:#8d9398; --white:#fff; }
         * { box-sizing:border-box; }
@@ -48,6 +49,7 @@
         <div style="margin-top:14px"><label for="name">Name</label><input id="name" autocomplete="name" placeholder="Your name" required><label for="email">Email for payment receipt</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com" required><label for="phone">Phone number</label><input id="phone" autocomplete="tel" placeholder="08012345678" required><div id="pickupFields"><label for="pickupTime">Pickup time</label><select id="pickupTime"></select></div><div id="deliveryFields" hidden><label for="area">Delivery area</label><select id="area"><option value="">Loading delivery areas...</option></select><label for="deliveryTime">Delivery time</label><select id="deliveryTime"></select><label for="address">Exact delivery address</label><textarea id="address" placeholder="House number, street and landmarks"></textarea></div><label for="notes">Order note / allergies (optional)</label><textarea id="notes" placeholder="Any special instructions"></textarea><div id="feeNotice" style="color:var(--green);font-size:13px;margin-top:2px"></div></div>
     </section>
     <button class="primary" id="place" type="button">Continue to Payment</button>
+    <section class="card" style="margin-top:14px"><strong>Track your order</strong><p style="font-size:13px;color:var(--muted)">Enable browser notifications for payment and order status updates.</p><button class="secondary" id="enable-order-notifications" type="button">Enable order updates</button><span id="order-notifications-message" style="display:block;font-size:13px;color:var(--green)"></span></section>
     <button class="secondary" id="backCart" type="button">Back to Cart</button>
 </main>
 <script>
@@ -158,6 +160,7 @@
         const payment = new window.PaystackPop();
         payment.newTransaction({ key:paystackKey, email, amount:Math.round(summaryTotal() * 100), currency:'NGN', ref:reference, reference, metadata, onSuccess: response => { localStorage.setItem('maychills_last_order', JSON.stringify({...metadata, total:summaryTotal(), reference:response.reference || reference, date:new Date().toISOString()})); localStorage.removeItem('maychills_cart'); document.querySelector('main').innerHTML='<div class="card" style="margin-top:35vh;text-align:center"><h2>Payment successful</h2><p>Your order has been received.</p><button class="primary" onclick="location.href=\'shop.html\'">Return to menu</button></div>'; }, onCancel: () => { button.disabled=false; button.textContent='Continue to Payment'; }, onError: error => { button.disabled=false; button.textContent='Continue to Payment'; alert(error?.message || 'Payment could not be completed.'); } });
     };
+    document.getElementById('enable-order-notifications').addEventListener('click', async event => { const name = document.getElementById('name').value.trim(); const email = document.getElementById('email').value.trim(); const message = document.getElementById('order-notifications-message'); try { await window.MayChillsNotifications.enable(event.currentTarget, { name, email }); message.textContent = 'You will receive updates for this email.'; } catch (error) { message.textContent = error.message; } });
     loadDeliveryAreas().catch(() => { document.getElementById('area').innerHTML = '<option value="">Unable to load delivery areas</option>'; });
     updateSummary();
 </script>

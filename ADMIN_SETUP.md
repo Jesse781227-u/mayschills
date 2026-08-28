@@ -26,6 +26,7 @@ Add these Render Web Service environment variables:
 - `FRONTEND_URL`: exact deployed frontend origin, for example `https://mayschills.com`
 - `EMAILJS_SERVICE`, `EMAILJS_TEMPLATE`, `EMAILJS_KEY`, `BUSINESS_EMAIL`: optional email notification settings
 - `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`: optional Telegram notification settings
+- `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`: required for browser push notifications. Generate these once with `npx web-push generate-vapid-keys`; keep the private key secret.
 
 The Render backend routes these endpoints:
 
