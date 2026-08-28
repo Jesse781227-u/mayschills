@@ -9665,14 +9665,18 @@ function setupExpressDeliveryClickHandler() {
             // Initial progress update
             updateProgress(5);
 
-            const images = [...document.images].filter(image => {
-                const box = image.getBoundingClientRect();
-                return image.loading !== 'lazy' || (box.top < window.innerHeight && box.bottom > 0);
-            });
+            // Build only the front page before measuring its media readiness.
+            const heroReady = waitForHero();
+            await loadCatalogOverrides();
+            await loadMenuAvailability();
+            initializeProducts('Smoothies');
+            initializeOrderingFlow();
+
+            const images = [...document.querySelectorAll('.loading-logo img, .categories img, #products-container img')];
             const totalMedia = images.length + (heroVideo ? 1 : 0);
             let loadedMedia = 0;
             const track = promise => promise.finally(() => { loadedMedia += 1; updateProgress(5 + (loadedMedia / Math.max(totalMedia, 1)) * 90); });
-            await Promise.all([...images.map(image => track(waitForImage(image))), track(waitForHero())]);
+            await Promise.all([...images.map(image => track(waitForImage(image))), track(heroReady)]);
             completeLoading();
 
             // Initialize Avatar Manager
@@ -9743,14 +9747,6 @@ if ("Notification" in window) {
                 showProfileSection('google-login-form');
             });
 
-            // Load server-side catalog and availability before rendering the menu.
-            await loadCatalogOverrides();
-            await loadMenuAvailability();
-
-            // Initialize products
-            initializeProducts('Smoothies');
-            initializeOrderingFlow();
-            
             // Set up event listeners for navigation
             document.querySelectorAll('.nav-item[data-section]').forEach(item => {
                 item.addEventListener('click', function() {
