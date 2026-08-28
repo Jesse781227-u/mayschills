@@ -9589,24 +9589,27 @@ function setupExpressDeliveryClickHandler() {
             const mainContent = document.getElementById('mainContent');
             const heroVideo = document.getElementById('heroVideo');
 
-            let progress = 0;
-            let videoReady = false;
+            let progress = 5;
+            let loadingComplete = false;
 
-            // Simulate loading progress
-            const loadingInterval = setInterval(() => {
-                if (progress < 90) {
-                    progress += Math.random() * 15;
-                    if (progress > 90) progress = 90;
-                    updateProgress(progress);
-                }
-            }, 200);
+            function waitForImage(image) {
+                if (image.complete && image.naturalWidth > 0) return image.decode ? image.decode().catch(() => {}) : Promise.resolve();
+                return new Promise(resolve => {
+                    const finish = () => { if (image.decode) image.decode().catch(() => {}).finally(resolve); else resolve(); };
+                    image.addEventListener('load', finish, { once: true });
+                    image.addEventListener('error', resolve, { once: true });
+                });
+            }
 
-            // Check video readiness
-            function checkVideoReady() {
-                if (heroVideo && heroVideo.readyState >= 3) {
-                    videoReady = true;
-                    completeLoading();
-                }
+            function waitForHero() {
+                if (!heroVideo) return Promise.resolve();
+                return new Promise(resolve => {
+                    let done = false;
+                    const finish = () => { if (done) return; done = true; heroVideo.removeEventListener('load', finish); resolve(); };
+                    heroVideo.addEventListener('load', finish, { once: true });
+                    // A cross-origin Vimeo iframe exposes its loaded/rendered state through load only.
+                    setTimeout(finish, 30000);
+                });
             }
 
             // Update progress bar
@@ -9615,12 +9618,12 @@ function setupExpressDeliveryClickHandler() {
                 loadingBar.style.width = progress + '%';
             }
 
-            // Complete loading when video is ready
             function completeLoading() {
-                clearInterval(loadingInterval);
+                if (loadingComplete) return;
+                loadingComplete = true;
                 
                 // Quickly complete the progress bar
-                let finalProgress = progress;
+                let finalProgress = Math.max(progress, 95);
                 const finalInterval = setInterval(() => {
                     finalProgress += 2;
                     if (finalProgress >= 100) {
@@ -9642,28 +9645,18 @@ function setupExpressDeliveryClickHandler() {
                 }, 50);
             }
 
-            // Event listeners for video readiness
-            if (heroVideo) {
-                heroVideo.addEventListener('load', checkVideoReady);
-                heroVideo.addEventListener('canplay', checkVideoReady);
-                heroVideo.addEventListener('canplaythrough', checkVideoReady);
-                
-                // Fallback: if video takes too long, proceed anyway
-                setTimeout(() => {
-                    if (!videoReady) {
-                        videoReady = true;
-                        completeLoading();
-                    }
-                }, 10000);
-            } else {
-                setTimeout(() => {
-                    videoReady = true;
-                    completeLoading();
-                }, 1000);
-            }
-
             // Initial progress update
             updateProgress(5);
+
+            const images = [...document.images].filter(image => {
+                const box = image.getBoundingClientRect();
+                return image.loading !== 'lazy' || (box.top < window.innerHeight && box.bottom > 0);
+            });
+            const totalMedia = images.length + (heroVideo ? 1 : 0);
+            let loadedMedia = 0;
+            const track = promise => promise.finally(() => { loadedMedia += 1; updateProgress(5 + (loadedMedia / Math.max(totalMedia, 1)) * 90); });
+            await Promise.all([...images.map(image => track(waitForImage(image))), track(waitForHero())]);
+            completeLoading();
 
             // Initialize Avatar Manager
             AvatarManager.initAvatarModal();
