@@ -32,6 +32,28 @@ async function initializeDatabase() {
             updated_at BIGINT NOT NULL
         )
     `);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS orders (
+            id BIGSERIAL PRIMARY KEY,
+            payment_reference TEXT UNIQUE NOT NULL,
+            customer_name TEXT NOT NULL DEFAULT 'Customer',
+            customer_email TEXT NOT NULL DEFAULT '',
+            delivery_phone TEXT,
+            order_type TEXT NOT NULL DEFAULT 'pickup',
+            delivery_address TEXT,
+            delivery_area TEXT,
+            delivery_slot TEXT,
+            order_notes TEXT,
+            items JSONB NOT NULL DEFAULT '[]'::jsonb,
+            subtotal NUMERIC(12,2) NOT NULL DEFAULT 0,
+            delivery_fee NUMERIC(12,2) NOT NULL DEFAULT 0,
+            total NUMERIC(12,2) NOT NULL DEFAULT 0,
+            payment_status TEXT NOT NULL DEFAULT 'paid',
+            notification_status TEXT NOT NULL DEFAULT 'pending',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            notified_at TIMESTAMPTZ
+        )
+    `);
 }
 
 function json(response, status, body) {
@@ -54,7 +76,7 @@ function verifyAdminToken(request) {
     const [body, signature] = token.split('.');
     if (!body || !signature) return false;
     const expected = crypto.createHmac('sha256', adminSecret()).update(body).digest('base64url');
-    if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return false;
+    if (signature.length !== expected.length || !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return false;
     try {
         const payload = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
         return payload.role === 'admin' && payload.exp > Date.now();
@@ -124,12 +146,30 @@ app.post('/api/availability', async (request, response) => {
     return json(response, 200, { success: true });
 });
 
+app.get('/api/admin/orders', async (request, response) => {
+    if (!verifyAdminToken(request)) return json(response, 401, { error: 'Unauthorized' });
+    if (!pool) return json(response, 503, { error: 'DATABASE_URL is required' });
+    try {
+        const result = await pool.query(`
+            SELECT id, payment_reference, customer_name, customer_email, delivery_phone,
+                   order_type, delivery_address, delivery_area, delivery_slot, order_notes,
+                   items, subtotal, delivery_fee, total, payment_status, notification_status,
+                   created_at, notified_at
+            FROM orders ORDER BY created_at DESC LIMIT 100
+        `);
+        return json(response, 200, { orders: result.rows });
+    } catch (error) {
+        console.error('Orders read failed:', error);
+        return json(response, 500, { error: 'Unable to read orders' });
+    }
+});
+
 function verifyPaystackSignature(request, rawBody) {
     const signature = request.headers['x-paystack-signature'];
     const secret = process.env.PAYSTACK_SECRET;
     if (!signature || !secret) return false;
     const expected = crypto.createHmac('sha512', secret).update(rawBody).digest('hex');
-    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+    return signature.length === expected.length && crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
 }
 
 function formatCustomizationLines(item) {
@@ -211,6 +251,33 @@ async function sendTelegram(order) {
     return response.ok;
 }
 
+async function saveOrder(order) {
+    if (!pool) throw new Error('DATABASE_URL is required');
+    const result = await pool.query(`
+        INSERT INTO orders (
+            payment_reference, customer_name, customer_email, delivery_phone, order_type,
+            delivery_address, delivery_area, delivery_slot, order_notes, items,
+            subtotal, delivery_fee, total
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb,$11,$12,$13)
+        ON CONFLICT (payment_reference) DO UPDATE SET
+            customer_name = EXCLUDED.customer_name,
+            customer_email = EXCLUDED.customer_email,
+            items = EXCLUDED.items,
+            total = EXCLUDED.total
+        RETURNING *
+    `, [
+        order.paymentReference, order.customerName, order.customerEmail, order.deliveryPhone,
+        order.type, order.deliveryAddress, order.deliveryArea, order.deliverySlot,
+        order.orderNotes, JSON.stringify(order.items), order.subtotal, order.deliveryFee, order.total
+    ]);
+    return result.rows[0];
+}
+
+async function markNotification(status, reference) {
+    if (!pool) return;
+    await pool.query('UPDATE orders SET notification_status = $1, notified_at = CASE WHEN $1 = $2 THEN NOW() ELSE notified_at END WHERE payment_reference = $3', [status, 'sent', reference]);
+}
+
 app.post('/webhook', async (request, response) => {
     const rawBody = request.rawBody || Buffer.from(JSON.stringify(request.body || {}));
     if (!verifyPaystackSignature(request, rawBody)) return response.sendStatus(401);
@@ -235,10 +302,22 @@ app.post('/webhook', async (request, response) => {
             deliveryArea: metadata.deliveryArea,
             deliverySlot: metadata.deliverySlot,
             pickupTime: metadata.pickupTime,
+            orderNotes: metadata.orderNotes,
             date: new Date().toISOString()
         };
-        const [email, telegram] = await Promise.all([sendEmail(order), sendTelegram(order)]);
-        return json(response, 200, { success: true, emailSent: email, telegramSent: telegram, orderId: order.id });
+        await saveOrder(order);
+        const claim = await pool.query(`
+            UPDATE orders SET notification_status = 'sending'
+            WHERE payment_reference = $1 AND notification_status IN ('pending', 'not_configured')
+            RETURNING payment_reference
+        `, [order.paymentReference]);
+        if (claim.rowCount) {
+            const [email, telegram] = await Promise.all([sendEmail(order), sendTelegram(order)]);
+            const notificationStatus = email || telegram ? 'sent' : 'not_configured';
+            await markNotification(notificationStatus, order.paymentReference);
+            return json(response, 200, { success: true, emailSent: email, telegramSent: telegram, orderId: order.id });
+        }
+        return json(response, 200, { success: true, duplicate: true, orderId: order.id });
     } catch (error) {
         console.error('Webhook error:', error);
         return json(response, 500, { success: false, error: 'Webhook processing failed' });

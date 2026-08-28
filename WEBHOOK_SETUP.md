@@ -10,6 +10,8 @@
 4. Set **Start Command** to `npm start`.
 5. Add a Render PostgreSQL database and expose its `DATABASE_URL` to the service.
 6. Copy the backend URL, for example `https://mayschills-backend.onrender.com`.
+7. Add `PAYSTACK_SECRET`, `ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET`, and `FRONTEND_URL` in Render Environment.
+8. Add the email and/or Telegram variables listed below for live notifications.
 
 ### Step 2: Configure Paystack Webhook
 
@@ -24,10 +26,10 @@
 
 ### Step 3: Test the Webhook
 
-1. Back in Cloudflare Workers, click your worker
-2. Go to **"Real-time logs"** tab
-3. Make a test payment in your shop
-4. You should see logs appear with:
+1. Open your Render Web Service logs
+2. Make a test payment in your shop
+3. Confirm the backend logs show a successful webhook
+4. You should see:
    - ✅ Email notification sent
    - ✅ Telegram notification sent
 
@@ -43,7 +45,7 @@ const API_BASE = 'https://mayschills-backend.onrender.com';
 
 ## 🔧 Configuration Details
 
-Add these values as Cloudflare Worker secrets or environment variables. Do not put credentials in `cloudflare-worker.js`:
+Add these values as Render Web Service environment variables. Do not put credentials in frontend files:
 
 | Setting | Value |
 |---------|-------|
@@ -86,7 +88,7 @@ Add these values as Cloudflare Worker secrets or environment variables. Do not p
 
 ## 🔐 Security Notes
 
-- ✅ Keep Worker secrets private and configure them in Cloudflare, not in source control
+- ✅ Keep secrets private and configure them in Render, not in source control
 - ✅ Paystack only sends webhooks from verified IPs
 - ✅ Future: Add HMAC signature verification for extra security
 
