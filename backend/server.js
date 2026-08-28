@@ -5,7 +5,7 @@ import pg from 'pg';
 const { Pool } = pg;
 const app = express();
 const port = Number(process.env.PORT || 3000);
-const frontendUrl = process.env.FRONTEND_URL || '*';
+const frontendUrl = (process.env.FRONTEND_URL || '*').trim().replace(/\/$/, '') || '*';
 const pool = process.env.DATABASE_URL
     ? new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } })
     : null;
@@ -130,6 +130,11 @@ app.post('/api/admin/login', (request, response) => {
     const token = signAdminToken({ role: 'admin', exp: Date.now() + 8 * 60 * 60 * 1000 });
     return json(response, 200, { token });
 });
+
+app.get('/api/admin/login', (_request, response) => json(response, 405, {
+    error: 'Login requires POST',
+    message: 'Open admin.html to sign in.'
+}));
 
 app.post('/api/availability', async (request, response) => {
     if (!verifyAdminToken(request)) return json(response, 401, { error: 'Unauthorized' });
