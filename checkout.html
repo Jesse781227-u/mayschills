@@ -63,7 +63,7 @@
     document.getElementById('total').textContent = money(total);
     document.querySelectorAll('[data-type]').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('[data-type]').forEach(item => item.classList.remove('active')); button.classList.add('active'); }));
     document.getElementById('back').onclick = document.getElementById('backCart').onclick = () => window.location.href='cart.html';
-    const paystackKey = 'pk_live_46a7c9b30ca3da53f1691d449397d51bc9e2d6ca';
+    const paystackKey = 'pk_test_2dd7a595bb168c3274db3c0e488fbbb84d28fb06';
     let orderType = 'pickup';
     let deliveryFee = 0;
     let selectedArea = '';

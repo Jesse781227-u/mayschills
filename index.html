@@ -124,8 +124,8 @@ nav .logo img:hover {
             position: relative;
         }
 
-        .hero h1 {
-    font-size: 4.0rem;
+.hero h1 {
+    font-size: 4.6rem;
     margin-bottom: 1.5rem;
     font-weight: 700;
     text-shadow: 
@@ -134,6 +134,57 @@ nav .logo img:hover {
         2px -2px 4px rgba(0,0,0,0.8),
         -2px 2px 4px rgba(0,0,0,0.8),
         0 0 20px rgba(0,0,0,0.5); /* Additional glow effect */
+}
+
+.hero h1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.25em;
+}
+
+.hero-static {
+    color: #fff;
+}
+
+.hero-word {
+    display: inline-block;
+    width: 4ch;
+    color: #feca57;
+    -webkit-text-fill-color: #feca57;
+    text-align: center;
+    filter: drop-shadow(0 5px 10px rgba(254, 202, 87, 0.3));
+    animation: none;
+}
+
+@keyframes heroWordBounce {
+    0% {
+        opacity: 0;
+        transform: translateY(-34px) scale(0.72);
+    }
+    55% {
+        opacity: 1;
+        transform: translateY(8px) scale(1.08);
+    }
+    78% {
+        transform: translateY(-4px) scale(0.98);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.hero-word.word-change {
+    animation: heroWordBounce 0.75s cubic-bezier(0.22, 1.2, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-word,
+    .hero-word.word-change {
+        animation: none;
+    }
+
 }
 
 .hero p {
@@ -688,7 +739,7 @@ nav .logo img:hover {
 
     /* Hero section adjustments */
     .hero h1 {
-        font-size: 2rem; /* Keep as is */
+        font-size: 2.5rem;
     }
     
     .hero {
@@ -769,6 +820,102 @@ body.menu-open {
         
 
 
+    </style>
+    <style>
+        /* Compact animated mobile navigation drawer */
+        @media (max-width: 768px) {
+            nav ul {
+                display: flex;
+                visibility: hidden;
+                opacity: 0;
+                pointer-events: none;
+                position: absolute;
+                top: calc(100% + 0.75rem);
+                left: auto;
+                right: 1rem;
+                width: min(78vw, 320px);
+                max-height: calc(100vh - 6rem);
+                padding: 0.75rem;
+                border-radius: 16px;
+                background: transparent url('https://i.ibb.co/23sgr2ZX/yyyggggg-1.png') center / contain no-repeat;
+                box-shadow: none;
+                backdrop-filter: none;
+                transform: translateX(24px);
+                transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+            }
+
+            nav ul.active {
+                visibility: visible;
+                opacity: 1;
+                pointer-events: auto;
+                transform: translateX(0);
+            }
+
+            nav ul li,
+            nav ul li a {
+                width: 100%;
+            }
+
+            nav ul li a {
+                text-align: left;
+                padding: 0.85rem 1rem;
+                color: #fff;
+                border-bottom-color: rgba(255, 255, 255, 0.22);
+            }
+
+            nav ul li a:hover {
+                color: #b9f17d;
+            }
+
+            footer .footer-content {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 1.5rem 1rem;
+            }
+
+            footer .footer-section {
+                margin-bottom: 0;
+            }
+
+            footer .footer-section:first-child,
+            footer .footer-section#contact {
+                grid-column: 1 / -1;
+            }
+
+            footer .footer-section h3 {
+                font-size: 1rem;
+                margin-bottom: 0.85rem;
+            }
+
+            footer .footer-section ul li {
+                margin-bottom: 0.55rem;
+            }
+
+            footer .footer-section p {
+                margin-bottom: 0;
+            }
+        }
+
+        /* Reveal homepage content as it enters the viewport */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+            will-change: opacity, transform;
+        }
+
+        .scroll-reveal.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .scroll-reveal,
+            .scroll-reveal.is-visible {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -944,7 +1091,7 @@ window.addEventListener("load", () => {
 
     <!-- Hero Section -->
     <section class="hero" id="home">
-        <h1>Good Food. Good Mood. Good You.</h1>
+        <h1><span class="hero-static">Good</span><span class="hero-word word-change" id="hero-word" aria-live="polite">Food</span></h1>
         <p>Fresh smoothies, detox juices, and guilt-free meals that taste as good as they work - we serve all, and we serve fast.</p>
         <div class="hero-buttons">
              <a href="shop.html" target="_blank" class="btn btn-primary">Shop Now</a>
@@ -971,9 +1118,9 @@ window.addEventListener("load", () => {
         </div>
         <div class="product-content">
             <h3>Grilled Chicken Salad</h3>
-            <p class="product-ingredients">Grilled Chicken, Egg, Fresh Vegetables/p>
+            <p class="product-ingredients">Grilled Chicken, Egg, Fresh Vegetables</p>
             <div class="product-rating">⭐⭐⭐⭐⭐</div>
-            <div class="product-price">6,500NGN</div>
+            <div class="product-price">₦7,500</div>
             <span class="btn btn-primary">Go To Shop</span>
         </div>
     </a>
@@ -989,7 +1136,7 @@ window.addEventListener("load", () => {
             <h3>Premium Parfait - 400ml Cup</h3>
             <p class="product-ingredients">Greek Yoghurt, Granola, Fresh Fruits, Honey</p>
             <div class="product-rating">⭐⭐⭐⭐⭐</div>
-            <div class="product-price">6,500NGN</div>
+            <div class="product-price">₦7,500</div>
             <span class="btn btn-primary">Go To Shop</span>
         </div>
     </a>
@@ -1005,7 +1152,7 @@ window.addEventListener("load", () => {
             <h3>Veggie Chicken Wrap</h3>
             <p class="product-ingredients">Chicken, Fresh Vegetables, Tortilla</p>
             <div class="product-rating">⭐⭐⭐⭐⭐</div>
-            <div class="product-price">5,500NGN</div>
+            <div class="product-price">₦7,000</div>
             <span class="btn btn-primary">Go To Shop</span>
         </div>
     </a>
@@ -1021,7 +1168,7 @@ window.addEventListener("load", () => {
             <h3>Juice Only Detox Plan</h3>
             <p class="product-ingredients">Detox Juices</p>
             <div class="product-rating">⭐⭐⭐⭐⭐</div>
-            <div class="product-price">From 22,500NGN</div>
+            <div class="product-price">From ₦23,000</div>
             <span class="btn btn-primary">Go To Shop</span>
         </div>
     </a>
@@ -1037,7 +1184,7 @@ window.addEventListener("load", () => {
             <h3>Beauty Booster</h3>
             <p class="product-ingredients">Mulberry, Yoghurt, Strawberry, Banana</p>
             <div class="product-rating">⭐⭐⭐⭐⭐</div>
-            <div class="product-price">4,500NGN</div>
+            <div class="product-price">₦4,500</div>
             <span class="btn btn-primary">Go To Shop</span>
         </div>
     </a>
@@ -1672,24 +1819,24 @@ window.addEventListener("load", () => {
                         </div>
                         <div class="plan-price">
                             <span class="price-from">From</span>
-                            <span class="price-amount">22,500NGN</span>
+                            <span class="price-amount">₦23,000</span>
                         </div>
                         <div class="plan-features">
                             <div class="feature-item">
                                 <span class="feature-duration">1 Day</span>
-                                <span class="feature-price">67,000NGN</span>
+                                <span class="feature-price">₦23,000</span>
                             </div>
                             <div class="feature-item">
                                 <span class="feature-duration">3 Days</span>
-                                <span class="feature-price">110,000NGN</span>
+                                <span class="feature-price">₦68,000</span>
                             </div>
                             <div class="feature-item">
                                 <span class="feature-duration">5 Days</span>
-                                <span class="feature-price">153,000NGN</span>
+                                <span class="feature-price">₦112,000</span>
                             </div>
                             <div class="feature-item">
                                 <span class="feature-duration">7 Days</span>
-                                <span class="feature-price">N134,000</span>
+                                <span class="feature-price">₦156,000</span>
                             </div>
                         </div>
                         <div class="plan-description">
@@ -1712,24 +1859,24 @@ window.addEventListener("load", () => {
                         </div>
                         <div class="plan-price">
                             <span class="price-from">From</span>
-                            <span class="price-amount">15,500NGN</span>
+                            <span class="price-amount">₦16,500</span>
                         </div>
                         <div class="plan-features">
                             <div class="feature-item">
                                 <span class="feature-duration">1 Day</span>
-                                <span class="feature-price">15,500NGN</span>
+                                <span class="feature-price">₦16,500</span>
                             </div>
                             <div class="feature-item">
                                 <span class="feature-duration">3 Days</span>
-                                <span class="feature-price">46,000NGN</span>
+                                <span class="feature-price">₦49,000</span>
                             </div>
                             <div class="feature-item">
                                 <span class="feature-duration">5 Days</span>
-                                <span class="feature-price">76,000NGN</span>
+                                <span class="feature-price">₦76,000</span>
                             </div>
                             <div class="feature-item">
                                 <span class="feature-duration">7 Days</span>
-                                <span class="feature-price">106,000NGN</span>
+                                <span class="feature-price">₦106,000</span>
                             </div>
                         </div>
                         <div class="plan-description">
@@ -1751,24 +1898,24 @@ window.addEventListener("load", () => {
                         </div>
                         <div class="plan-price">
                             <span class="price-from">From</span>
-                            <span class="price-amount">19,500NGN</span>
+                            <span class="price-amount">₦19,500</span>
                         </div>
                         <div class="plan-features">
                             <div class="feature-item">
                                 <span class="feature-duration">1 Day</span>
-                                <span class="feature-price">19,500NGN</span>
+                                <span class="feature-price">₦19,500</span>
                             </div>
                             <div class="feature-item">
                                 <span class="feature-duration">3 Days</span>
-                                <span class="feature-price">58,000NGN</span>
+                                <span class="feature-price">₦58,000</span>
                             </div>
                             <div class="feature-item">
                                 <span class="feature-duration">5 Days</span>
-                                <span class="feature-price">96,000NGN</span>
+                                <span class="feature-price">₦96,000</span>
                             </div>
                             <div class="feature-item">
                                 <span class="feature-duration">7 Days</span>
-                                <span class="feature-price">133,000NGN</span>
+                                <span class="feature-price">₦133,000</span>
                             </div>
                         </div>
                         <div class="plan-description">
@@ -1790,24 +1937,26 @@ window.addEventListener("load", () => {
                         </div>
                         <div class="plan-price">
                             <span class="price-from">From</span>
-                            <span class="price-amount">22,500NGN</span>
+                            <span class="price-amount">₦22,500</span>
                         </div>
                         <div class="plan-features">
                             <div class="feature-item">
                                 <span class="feature-duration">1 Day</span>
-                                <span class="feature-price">22,500NGN</span>
+                                <span class="feature-price">₦22,500</span>
                             </div>
                             <div class="feature-item">
                                 <span class="feature-duration">3 Days</span>
-                                <span class="feature-price">69,000NGN</span>
+                                <span class="feature-price">₦69,000</span>
                             </div>
                             <div class="feature-item">
                                 <span class="feature-duration">5 Days</span>
-                                <span class="feature-price">114,000NGN</span>
+                                <span class="feature-price">₦114,000</span>
                             </div>
-                           
+                            <div class="feature-item">
+                                <span class="feature-duration">7 Days</span>
+                                <span class="feature-price">₦159,000</span>
                             </div>
-                        </div>
+                            </div>
                        
                     </a>
                 </div>
@@ -4253,13 +4402,7 @@ window.addEventListener("load", () => {
             <div class="footer-section">
                 <p>Here at May’s Chills, we don’t just make smoothies, we serve a lifestyle. Our drinks, parfaits, salads, and wraps are made fresh daily with real fruits, real greens, and wholesome ingredients for that perfect balance of flavor and feel-good energy.</p>
                 
-                <br><br>
-                
-       
-
-            
-            
-            
+            </div>
 
            <div class="footer-section">
     <h3>Menu Categories</h3>
@@ -4271,15 +4414,13 @@ window.addEventListener("load", () => {
         <li><a href="shop.html" target="_blank">Seasonal Specials</a></li>
     </ul>
 </div>
-                
-                <br><br>
-                
+            <div class="footer-section">
                 <h3>Quick Links</h3>
                 <ul>
                     <li><a href="shop.html#account" target="_blank">My Account</a></li>
                     <li><a href="/faq">FAQ</a></li> 
                    <li><a href="privacy.html">Privacy Policy</a></li>
-                    <a href="terms.html">Terms & Conditions</a>
+                    <li><a href="terms.html">Terms & Conditions</a></li>
                 </ul>
             </div>
 
@@ -4533,6 +4674,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const menuIcon = document.querySelector('.menu-icon');
     const navMenu = document.querySelector('nav ul');
     const menuSpans = document.querySelectorAll('.menu-icon span');
+
+    menuIcon.setAttribute('role', 'button');
+    menuIcon.setAttribute('tabindex', '0');
+    menuIcon.setAttribute('aria-label', 'Toggle navigation menu');
+    menuIcon.setAttribute('aria-expanded', 'false');
+
+    function closeMobileMenu() {
+        navMenu.classList.remove('active');
+        menuSpans.forEach(span => span.classList.remove('active'));
+        document.body.classList.remove('menu-open');
+        menuIcon.setAttribute('aria-expanded', 'false');
+    }
     
     // Toggle menu when menu icon is clicked
     menuIcon.addEventListener('click', function() {
@@ -4546,32 +4699,91 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Prevent scrolling when menu is open
         document.body.classList.toggle('menu-open');
+        menuIcon.setAttribute('aria-expanded', navMenu.classList.contains('active') ? 'true' : 'false');
+    });
+
+    menuIcon.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            menuIcon.click();
+        }
     });
     
     // Close menu when clicking on a link
     const navLinks = document.querySelectorAll('nav ul li a');
-    navLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            navMenu.classList.remove('active');
-            menuSpans.forEach(span => {
-                span.classList.remove('active');
-            });
-            document.body.classList.remove('menu-open');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+            closeMobileMenu();
         });
     });
     
     // Close menu when clicking outside
     document.addEventListener('click', function(event) {
         if (!event.target.closest('nav') && navMenu.classList.contains('active')) {
-            navMenu.classList.remove('active');
-            menuSpans.forEach(span => {
-                span.classList.remove('active');
-            });
-            document.body.classList.remove('menu-open');
+            closeMobileMenu();
         }
     });
 });
 </script>
   
+<script>
+    // Cycle the hero headline word with a longer pause on You
+    document.addEventListener('DOMContentLoaded', function() {
+        const heroWord = document.getElementById('hero-word');
+        const words = [
+            { text: 'Food', duration: 2000 },
+            { text: 'Mood', duration: 2000 },
+            { text: 'You', duration: 4000 }
+        ];
+        let wordIndex = 1;
+
+        if (!heroWord) return;
+
+        function showNextWord() {
+            const word = words[wordIndex];
+            heroWord.classList.remove('word-change');
+            void heroWord.offsetWidth;
+            heroWord.textContent = word.text;
+            heroWord.classList.add('word-change');
+
+            wordIndex = (wordIndex + 1) % words.length;
+            setTimeout(showNextWord, word.duration);
+        }
+
+        setTimeout(showNextWord, words[0].duration);
+    });
+</script>
+
+<script>
+    // Scroll-triggered reveals for homepage sections and cards
+    document.addEventListener('DOMContentLoaded', function() {
+        const revealTargets = document.querySelectorAll(
+            'section:not(.hero), footer, .section-header, .product-card, .plan-card, .location-card, .content-box, .image-box'
+        );
+
+        revealTargets.forEach((element, index) => {
+            element.classList.add('scroll-reveal');
+            if (element.matches('.product-card, .plan-card, .location-card')) {
+                element.style.transitionDelay = `${(index % 4) * 80}ms`;
+            }
+        });
+
+        if (!('IntersectionObserver' in window)) {
+            revealTargets.forEach(element => element.classList.add('is-visible'));
+            return;
+        }
+
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+
+        revealTargets.forEach(element => revealObserver.observe(element));
+    });
+</script>
 </body>
 </html>
