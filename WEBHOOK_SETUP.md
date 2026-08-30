@@ -60,6 +60,28 @@ Add these values as Render Web Service environment variables. Do not put credent
 | **Telegram Chat ID** | `TELEGRAM_CHAT_ID` |
 | **Paystack Secret Key** | `PAYSTACK_SECRET` |
 
+### Uber Direct delivery pricing
+
+Add these Render environment variables from the Uber Direct Developer Dashboard. Keep the client secret server-side:
+
+| Setting | Value |
+|---------|-------|
+| **Uber Client ID** | `UBER_CLIENT_ID` |
+| **Uber Client Secret** | `UBER_CLIENT_SECRET` |
+| **Uber Customer ID** | `UBER_CUSTOMER_ID` |
+| **Store pickup address** | `UBER_PICKUP_ADDRESS` (optional JSON override; defaults to Mayschills, 16 Adeola Raji Avenue, Atunrase Estate, Lagos, Nigeria) |
+| **Drop-off city** | `UBER_DROP_OFF_CITY` (optional, defaults to Lagos) |
+| **Drop-off state** | `UBER_DROP_OFF_STATE` (optional, defaults to Lagos) |
+| **Drop-off country** | `UBER_DROP_OFF_COUNTRY` (optional, defaults to NG) |
+
+Example `UBER_PICKUP_ADDRESS` value:
+
+```json
+{"street_address":["Mayschills","16 Adeola Raji Avenue","Atunrase Estate"],"city":"Lagos","state":"Lagos","country":"NG"}
+```
+
+The checkout calls `POST /api/delivery/quote` after the customer enters an address. Uber Direct uses OAuth client credentials and returns the quote fee in the account currency. Uber’s Direct API access and production delivery availability may require approval; test credentials use Uber’s sandbox.
+
 ---
 
 ## 🧪 Testing

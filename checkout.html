@@ -49,7 +49,7 @@
     <section class="card">
         <h2>Order type</h2>
         <div class="choices"><button class="choice active" data-type="pickup" type="button">Pick up</button><button class="choice" data-type="delivery" type="button">Delivery</button></div>
-        <div style="margin-top:14px"><label for="name">Name</label><input id="name" autocomplete="name" placeholder="Your name" required><label for="email">Email for payment receipt</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com" required><label for="phone">Phone number</label><input id="phone" autocomplete="tel" placeholder="08012345678" required><div id="pickupFields"><label for="pickupTime">Pickup time</label><select id="pickupTime"></select></div><div id="deliveryFields" hidden><label for="area">Delivery area</label><select id="area"><option value="">Loading delivery areas...</option></select><label for="deliveryTime">Delivery time</label><select id="deliveryTime"></select><label for="address">Exact delivery address</label><textarea id="address" placeholder="House number, street and landmarks"></textarea></div><label for="notes">Order note / allergies (optional)</label><textarea id="notes" placeholder="Any special instructions"></textarea><div id="feeNotice" style="color:var(--green);font-size:13px;margin-top:2px"></div></div>
+        <div style="margin-top:14px"><label for="name">Name</label><input id="name" autocomplete="name" placeholder="Your name" required><label for="email">Email for payment receipt</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com" required><label for="phone">Phone number</label><input id="phone" autocomplete="tel" placeholder="08012345678" required><div id="pickupFields"><label for="pickupTime">Pickup time</label><select id="pickupTime"></select></div><div id="deliveryFields" hidden><label for="area">Delivery area</label><select id="area"><option value="">Loading delivery areas...</option></select><label for="deliveryTime">Delivery time</label><select id="deliveryTime"></select><label for="address">Exact delivery address</label><textarea id="address" placeholder="House number, street and landmarks"></textarea><button class="secondary" id="getQuote" type="button">Check Uber courier price</button><div id="quoteNotice" style="color:var(--muted);font-size:13px;margin-top:2px"></div></div><label for="notes">Order note / allergies (optional)</label><textarea id="notes" placeholder="Any special instructions"></textarea><div id="feeNotice" style="color:var(--green);font-size:13px;margin-top:2px"></div></div>
     </section>
     <button class="primary" id="place" type="button">Continue to Payment</button>
     <button class="secondary" id="backCart" type="button">Back to Cart</button>
@@ -66,6 +66,7 @@
     const paystackKey = 'pk_test_2dd7a595bb168c3274db3c0e488fbbb84d28fb06';
     let orderType = 'pickup';
     let deliveryFee = 0;
+    let uberQuoteId = null;
     let selectedArea = '';
     let selectedTime = '';
     const format = value => `₦${Number(value || 0).toLocaleString()}`;
@@ -85,7 +86,9 @@
             const option = select.options[select.selectedIndex];
             selectedArea = option.dataset.label || '';
             const match = selectedArea.match(/([0-9][0-9,]*)\s*$/);
-            deliveryFee = match ? Number(match[1].replace(/,/g, '')) : 0;
+            deliveryFee = 0;
+            uberQuoteId = null;
+            document.getElementById('quoteNotice').textContent = selectedArea ? 'Check the Uber courier price for this address.' : '';
             updateSummary();
         };
         populatePickupTimes();
@@ -137,6 +140,33 @@
         selectedTime = orderType === 'delivery' ? document.getElementById('deliveryTime').value : document.getElementById('pickupTime').value;
         updateSummary();
     }));
+    document.getElementById('getQuote').onclick = async () => {
+        const address = document.getElementById('address').value.trim();
+        const area = document.getElementById('area').value;
+        const quoteButton = document.getElementById('getQuote');
+        if (!area || !address) return alert('Please select your area and enter your exact address first.');
+        quoteButton.disabled = true;
+        quoteButton.textContent = 'Checking Uber price...';
+        document.getElementById('quoteNotice').textContent = '';
+        try {
+            const response = await fetch((window.MAYCHILLS_API_URL || 'https://mayschillsbackend.onrender.com') + '/api/delivery/quote', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address, area, name: document.getElementById('name').value.trim(), phone: document.getElementById('phone').value.trim() })
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'Uber could not price this delivery.');
+            deliveryFee = Number(result.fee || 0);
+            uberQuoteId = result.quoteId;
+            document.getElementById('quoteNotice').textContent = `Uber courier price: ${format(deliveryFee)}${result.duration ? ` · About ${result.duration} minutes` : ''}`;
+            updateSummary();
+        } catch (error) {
+            deliveryFee = 0; uberQuoteId = null; updateSummary();
+            document.getElementById('quoteNotice').textContent = error.message;
+        } finally {
+            quoteButton.disabled = false;
+            quoteButton.textContent = 'Check Uber courier price';
+        }
+    };
     document.getElementById('place').onclick = async event => {
         const button = event.currentTarget;
         const name = document.getElementById('name').value.trim();
@@ -163,7 +193,7 @@
         if (!window.PaystackPop) return alert('Payment is still loading. Please try again.');
         button.disabled = true; button.textContent = 'Opening Paystack...';
         const reference = 'MCH_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
-        const metadata = { orderType, customerName:name, customerEmail:email, deliveryPhone:phone, deliveryAddress:orderType === 'delivery' ? address : null, deliveryArea:orderType === 'delivery' ? selectedArea : null, deliveryFee:orderType === 'delivery' ? deliveryFee : 0, deliverySlot:orderType === 'delivery' ? document.getElementById('deliveryTime').selectedOptions[0].textContent : null, deliverySlotKey:orderType === 'delivery' ? document.getElementById('deliveryTime').value : null, pickupTime:orderType === 'pickup' ? document.getElementById('pickupTime').selectedOptions[0].textContent : null, pickupTimeValue:orderType === 'pickup' ? document.getElementById('pickupTime').value : null, requestedFulfillmentAt:orderType === 'pickup' ? document.getElementById('pickupTime').value : null, orderNotes:document.getElementById('notes').value.trim(), items:items.map(item => ({ id:item.id, name:item.name, price:Number(item.price), quantity:Number(item.quantity) })), subtotal:total };
+        const metadata = { orderType, customerName:name, customerEmail:email, deliveryPhone:phone, deliveryAddress:orderType === 'delivery' ? address : null, deliveryArea:orderType === 'delivery' ? selectedArea : null, deliveryFee:orderType === 'delivery' ? deliveryFee : 0, uberQuoteId:orderType === 'delivery' ? uberQuoteId : null, deliverySlot:orderType === 'delivery' ? document.getElementById('deliveryTime').selectedOptions[0].textContent : null, deliverySlotKey:orderType === 'delivery' ? document.getElementById('deliveryTime').value : null, pickupTime:orderType === 'pickup' ? document.getElementById('pickupTime').selectedOptions[0].textContent : null, pickupTimeValue:orderType === 'pickup' ? document.getElementById('pickupTime').value : null, requestedFulfillmentAt:orderType === 'pickup' ? document.getElementById('pickupTime').value : null, orderNotes:document.getElementById('notes').value.trim(), items:items.map(item => ({ id:item.id, name:item.name, price:Number(item.price), quantity:Number(item.quantity) })), subtotal:total };
         const payment = new window.PaystackPop();
         payment.newTransaction({ key:paystackKey, email, amount:Math.round(summaryTotal() * 100), currency:'NGN', ref:reference, reference, metadata, onSuccess: response => { localStorage.setItem('maychills_last_order', JSON.stringify({...metadata, total:summaryTotal(), reference:response.reference || reference, date:new Date().toISOString()})); localStorage.removeItem('maychills_cart'); document.querySelector('main').innerHTML='<div class="card" style="margin-top:35vh;text-align:center"><h2>Payment successful</h2><p>Your order has been received.</p><button class="primary" onclick="location.href=\'shop.html\'">Return to menu</button></div>'; window.MayChillsNotifications?.showAfterOrder({ email, name }); }, onCancel: () => { button.disabled=false; button.textContent='Continue to Payment'; }, onError: error => { button.disabled=false; button.textContent='Continue to Payment'; alert(error?.message || 'Payment could not be completed.'); } });
     };

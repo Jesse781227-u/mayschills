@@ -10,6 +10,14 @@ const frontendUrl = (process.env.FRONTEND_URL || '*').trim().replace(/\/$/, '') 
 const pool = process.env.DATABASE_URL
     ? new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } })
     : null;
+let uberToken = null;
+let uberTokenExpiresAt = 0;
+const defaultUberPickupAddress = JSON.stringify({
+    street_address: ['Mayschills', '16 Adeola Raji Avenue', 'Atunrase Estate'],
+    city: 'Lagos',
+    state: 'Lagos',
+    country: 'NG'
+});
 
 app.use(express.json({
     limit: '5mb',
@@ -159,6 +167,83 @@ app.get('/api/availability', async (_request, response) => {
     } catch (error) {
         console.error('Availability read failed:', error);
         return json(response, 500, { error: 'Unable to read availability' });
+    }
+});
+
+function uberConfigured() {
+    return Boolean(process.env.UBER_CLIENT_ID && process.env.UBER_CLIENT_SECRET && process.env.UBER_CUSTOMER_ID);
+}
+
+function parseUberAddress(value, fieldName) {
+    try {
+        const address = typeof value === 'string' ? JSON.parse(value) : value;
+        if (!address || typeof address !== 'object' || !Array.isArray(address.street_address) || !address.street_address.length) throw new Error('missing street_address');
+        return address;
+    } catch {
+        throw new Error(`${fieldName} must be valid JSON with a street_address array`);
+    }
+}
+
+async function getUberAccessToken() {
+    if (uberToken && uberTokenExpiresAt > Date.now() + 60_000) return uberToken;
+    const body = new URLSearchParams({
+        client_id: process.env.UBER_CLIENT_ID,
+        client_secret: process.env.UBER_CLIENT_SECRET,
+        grant_type: 'client_credentials',
+        scope: 'eats.deliveries'
+    });
+    const tokenResponse = await fetch('https://auth.uber.com/oauth/v2/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body
+    });
+    const tokenData = await tokenResponse.json().catch(() => ({}));
+    if (!tokenResponse.ok || !tokenData.access_token) {
+        console.error('Uber OAuth failed:', tokenResponse.status, tokenData.error || tokenData.message || 'Unknown error');
+        throw new Error('Uber authentication failed');
+    }
+    uberToken = tokenData.access_token;
+    uberTokenExpiresAt = Date.now() + Number(tokenData.expires_in || 3600) * 1000;
+    return uberToken;
+}
+
+app.post('/api/delivery/quote', async (request, response) => {
+    if (!uberConfigured()) return json(response, 503, { error: 'Uber delivery pricing is not configured yet.' });
+    const { address, area, name, phone } = request.body || {};
+    if (!String(address || '').trim()) return json(response, 400, { error: 'A delivery address is required.' });
+    try {
+        const pickupAddress = parseUberAddress(process.env.UBER_PICKUP_ADDRESS || defaultUberPickupAddress, 'UBER_PICKUP_ADDRESS');
+        const dropoffAddress = {
+            street_address: [String(address).trim(), String(area || '').trim()].filter(Boolean),
+            city: process.env.UBER_DROP_OFF_CITY || 'Lagos',
+            state: process.env.UBER_DROP_OFF_STATE || 'Lagos',
+            country: process.env.UBER_DROP_OFF_COUNTRY || 'NG'
+        };
+        const token = await getUberAccessToken();
+        const quoteResponse = await fetch(`https://api.uber.com/v1/customers/${encodeURIComponent(process.env.UBER_CUSTOMER_ID)}/delivery_quotes`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                pickup_address: JSON.stringify(pickupAddress),
+                dropoff_address: JSON.stringify(dropoffAddress)
+            })
+        });
+        const quote = await quoteResponse.json().catch(() => ({}));
+        if (!quoteResponse.ok || !quote.id || quote.fee === undefined) {
+            console.error('Uber quote failed:', quoteResponse.status, quote.message || quote.errors || quote);
+            return json(response, 502, { error: quote.message || 'Uber could not price this delivery.' });
+        }
+        return json(response, 200, {
+            quoteId: quote.id,
+            fee: Number(quote.fee) / 100,
+            currency: quote.currency || 'NGN',
+            expires: quote.expires || null,
+            duration: quote.duration || null,
+            dropoffEta: quote.dropoff_eta || null
+        });
+    } catch (error) {
+        console.error('Uber quote error:', error.message);
+        return json(response, 502, { error: error.message || 'Unable to get an Uber delivery quote.' });
     }
 });
 
