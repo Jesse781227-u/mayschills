@@ -658,12 +658,13 @@ app.post('/webhook', async (request, response) => {
         const metadata = payment.metadata || {};
         const items = metadata.items || metadata.cartItems || [];
         const schedule = scheduleFor(metadata);
+        const customerName = [payment.customer?.first_name, payment.customer?.last_name].filter(Boolean).join(' ') || metadata.customerName || 'Customer';
         const order = {
             id: payment.reference || 'UNKNOWN',
             paymentReference: payment.reference,
-            customerEmail: payment.customer?.email || 'unknown@example.com',
-            customerName: payment.customer?.first_name || 'Customer',
-            deliveryPhone: payment.customer?.phone || 'N/A',
+            customerEmail: payment.customer?.email || metadata.customerEmail || 'unknown@example.com',
+            customerName,
+            deliveryPhone: payment.customer?.phone || metadata.deliveryPhone || 'N/A',
             items: Array.isArray(items) ? items : [],
             subtotal: Number(metadata.subtotal || 0),
             deliveryFee: Number(metadata.deliveryFee || 0),

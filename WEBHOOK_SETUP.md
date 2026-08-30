@@ -9,7 +9,7 @@
 3. Set **Build Command** to `npm install`.
 4. Set **Start Command** to `npm start`.
 5. Add a Render PostgreSQL database and expose its `DATABASE_URL` to the service.
-6. Copy the backend URL, for example `https://mayschills-backend.onrender.com`.
+6. Copy the backend URL, for example `https://mayschillsbackend.onrender.com`.
 7. Add `PAYSTACK_SECRET`, `ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET`, and `FRONTEND_URL` in Render Environment.
 8. Add the email and/or Telegram variables listed below for live notifications.
 9. For browser push notifications, run `npx web-push generate-vapid-keys` from the backend folder and add `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT` to Render. Never expose the private key.
@@ -22,7 +22,7 @@ The backend calculates preparation reminders from the selected pickup time or de
 2. Click **Settings → Webhooks** (or API Keys & Webhooks)
 3. In the **Webhook URL** field, paste:
    ```
-   https://mayschills-backend.onrender.com/webhook
+   https://mayschillsbackend.onrender.com/webhook
    ```
 4. Select Events: Check only **`charge.success`**
 5. Click **Save**
@@ -41,7 +41,7 @@ The backend calculates preparation reminders from the selected pickup time or de
 Set the backend URL fallback in `admin.html`, `shop.html`, and `checkout.html` to your actual Render backend URL:
 
 ```javascript
-const API_BASE = 'https://mayschills-backend.onrender.com';
+const API_BASE = 'https://mayschillsbackend.onrender.com';
 ```
 
 ---
