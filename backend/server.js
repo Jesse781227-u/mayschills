@@ -316,6 +316,14 @@ function normalizePhone(value) {
     return String(value || '').replace(/\D/g, '');
 }
 
+function uniqueValues(values) {
+    const cleaned = (Array.isArray(values) ? values : [values])
+        .map(value => String(value || '').trim())
+        .filter(Boolean)
+        .filter((value, index, list) => list.indexOf(value) === index);
+    return cleaned;
+}
+
 function customerKey(order) {
     const email = normalizeEmail(order.customer_email);
     const phone = normalizePhone(order.delivery_phone);
@@ -377,6 +385,7 @@ function buildAnalytics(orders, notes = {}, range = {}) {
     const customerMap = new Map(); const productMap = new Map(); const daily = new Map(); const hours = new Map();
     orders.forEach(order => {
         const date = new Date(order.created_at); const inPeriod = date >= start && date <= end;
+        const normalizedName = String(order.customer_name || 'Customer').trim();
         let key = customerKey(order);
         let customer = customerMap.get(key);
         const existingMatches = [...customerMap.values()].filter(candidate => identityMatch(candidate.orders[0] || {}, order));
@@ -384,18 +393,36 @@ function buildAnalytics(orders, notes = {}, range = {}) {
             const match = existingMatches[0];
             key = match.key;
             customer = match;
-            if (match.needsConfirmation !== true && match.name && normalizeCustomerName(match.name) === normalizeCustomerName(order.customer_name || '')) {
+            if (match.needsConfirmation !== true && match.name && normalizeCustomerName(match.name) === normalizeCustomerName(normalizedName)) {
                 match.needsConfirmation = true;
             }
         }
         if (!customer) {
-            customer = { key, name: order.customer_name || 'Customer', phone: order.delivery_phone || '', email: order.customer_email || '', orders: [], spent: 0, items: new Map(), needsConfirmation: false };
+            customer = {
+                key,
+                name: normalizedName || 'Customer',
+                phone: order.delivery_phone || '',
+                email: order.customer_email || '',
+                addresses: [],
+                emails: [],
+                phones: [],
+                orders: [],
+                spent: 0,
+                items: new Map(),
+                needsConfirmation: false
+            };
             customerMap.set(key, customer);
         }
         customer.orders.push(order); customer.spent += Number(order.total || 0);
+        customer.addresses = uniqueValues([...customer.addresses, order.delivery_address || '']);
+        customer.emails = uniqueValues([...customer.emails, order.customer_email || '']);
+        customer.phones = uniqueValues([...customer.phones, order.delivery_phone || '']);
         if (order.delivery_phone && customer.phone !== order.delivery_phone) customer.phone = order.delivery_phone;
         if (order.customer_email && customer.email !== order.customer_email) customer.email = order.customer_email;
-        if ((order.customer_name || 'Customer') && customer.name !== order.customer_name) customer.name = order.customer_name || 'Customer';
+        if ((normalizedName || 'Customer') && customer.name !== normalizedName) customer.name = normalizedName || 'Customer';
+        if (customer.orders.length > 1 && normalizeCustomerName(customer.name) && customer.orders.some(candidate => normalizeCustomerName(candidate.customer_name || '') === normalizeCustomerName(customer.name) && (candidate.customer_email && candidate.customer_email !== customer.email || candidate.delivery_phone && candidate.delivery_phone !== customer.phone))) {
+            customer.needsConfirmation = true;
+        }
         orderItems(order).forEach(item => {
             const itemKey = String(item.id || item.name || 'item'); const quantity = Number(item.quantity || 0);
             customer.items.set(itemKey, (customer.items.get(itemKey) || { name: item.name || itemKey, quantity: 0 })).quantity += quantity;
@@ -413,10 +440,13 @@ function buildAnalytics(orders, notes = {}, range = {}) {
     });
     const customers = [...customerMap.values()].map(customer => {
         const sorted = [...customer.items.values()].sort((a, b) => b.quantity - a.quantity); const last = customer.orders.at(-1)?.created_at; const first = customer.orders[0]?.created_at; const daysSince = last ? (Date.now() - new Date(last).getTime()) / 86400000 : Infinity;
+        const addresses = uniqueValues(customer.addresses || []);
+        const emails = uniqueValues(customer.emails || []);
+        const phones = uniqueValues(customer.phones || []);
         let segment = customer.orders.length === 1 ? 'New customer' : 'Returning customer';
         if (customer.spent >= 100000) segment = 'High-value customer'; else if (customer.orders.length >= 5) segment = 'Frequent customer'; else if (daysSince > 60) segment = 'Inactive customer'; else if (daysSince > 30 && customer.orders.length > 1) segment = 'At-risk customer'; else if (customer.orders.length >= 3) segment = 'Regular customer';
-        const needsConfirmation = Boolean(customer.needsConfirmation || (customer.orders.length > 1 && normalizeCustomerName(customer.name) && customer.orders.some(order => normalizeCustomerName(order.customer_name || '') === normalizeCustomerName(customer.name) && order.customer_email && order.delivery_phone && order.customer_email !== customer.email && order.delivery_phone !== customer.phone)));
-        return { key: customer.key, name: customer.name, phone: customer.phone, email: customer.email, address: customer.orders.at(-1)?.delivery_address || '—', orders: customer.orders.length, spent: customer.spent, averageOrderValue: customer.spent / customer.orders.length, firstOrder: first, lastOrder: last, segment: needsConfirmation ? 'Needs confirmation' : segment, needsConfirmation, favoriteProduct: sorted[0]?.name || '—', favoriteItems: sorted.slice(0, 5), orderIds: customer.orders.map(order => order.payment_reference), items: sorted, history: customer.orders.map(order => ({ reference: order.payment_reference, date: order.created_at, total: Number(order.total || 0), status: order.order_status, address: order.delivery_address || '—', items: orderItems(order).map(item => ({ name: item.name, quantity: Number(item.quantity || 0) })) })), notes: notes[customer.key] || '' };
+        const needsConfirmation = Boolean(customer.needsConfirmation || addresses.length > 1 || emails.length > 1 || phones.length > 1 || (customer.orders.length > 1 && normalizeCustomerName(customer.name) && customer.orders.some(order => normalizeCustomerName(order.customer_name || '') === normalizeCustomerName(customer.name) && order.customer_email && order.delivery_phone && order.customer_email !== customer.email && order.delivery_phone !== customer.phone)));
+        return { key: customer.key, name: customer.name, phone: customer.phone, email: customer.email, address: addresses[0] || customer.orders.at(-1)?.delivery_address || '—', addresses, emails, phones, orders: customer.orders.length, spent: customer.spent, averageOrderValue: customer.spent / customer.orders.length, firstOrder: first, lastOrder: last, segment: needsConfirmation ? 'Needs confirmation' : segment, needsConfirmation, favoriteProduct: sorted[0]?.name || '—', favoriteItems: sorted.slice(0, 5), orderIds: customer.orders.map(order => order.payment_reference), items: sorted, history: customer.orders.map(order => ({ reference: order.payment_reference, date: order.created_at, total: Number(order.total || 0), status: order.order_status, address: order.delivery_address || '—', items: orderItems(order).map(item => ({ name: item.name, quantity: Number(item.quantity || 0) })) })), notes: notes[customer.key] || '' };
     });
     const products = [...productMap.values()].map(row => ({ key: row.key, id: row.id, name: row.name, units: row.units, revenue: row.revenue, orders: row.orders, averageQuantity: row.units / row.orders, firstSale: row.dates.sort((a, b) => a - b)[0], lastSale: row.dates.sort((a, b) => b - a)[0], customers: [...row.customers.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([key]) => customers.find(customer => customer.key === key)?.name || 'Customer'), alongside: [...row.alongside.values()].sort((a, b) => b.count - a.count).slice(0, 5), bestDays: [...row.days.entries()].sort((a, b) => b[1] - a[1]).slice(0, 2).map(([name]) => name), bestHours: [...row.hours.entries()].sort((a, b) => b[1] - a[1]).slice(0, 2).map(([hour]) => `${hour}:00`), trend: percentChange(row.revenue, previous.products.find(item => item.key === row.key)?.revenue || 0) }));
     const newCustomers = customers.filter(customer => customer.firstOrder && new Date(customer.firstOrder) >= start).length;
