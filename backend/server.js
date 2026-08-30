@@ -507,17 +507,28 @@ async function sendEmail(order) {
 
 async function sendTelegram(order) {
     if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) return false;
+    const extraDetails = order.type === 'delivery'
+        ? [
+            `<b>Area:</b> ${order.deliveryArea || 'N/A'}`,
+            `<b>Address:</b> ${order.deliveryAddress || 'N/A'}`
+        ]
+        : [
+            `<b>Pickup time:</b> ${order.pickupTime || order.deliverySlot || 'Not specified'}`
+        ];
+    const note = order.orderNotes || order.order_notes ? `\n<b>Note:</b> ${order.orderNotes || order.order_notes}` : '';
     const message = [
         "<b>New Paid Order - May's Chills</b>",
         `<b>Order:</b> MCH-${String(order.id).slice(-8)}`,
         `<b>Customer:</b> ${order.customerName || 'Guest Customer'}`,
         `<b>Phone:</b> ${order.deliveryPhone || 'N/A'}`,
+        ...extraDetails,
         '', '<b>Items</b>', buildItemsText(order.items), '',
         `<b>Subtotal:</b> NGN${Number(order.subtotal || 0).toLocaleString()}`,
         `<b>Delivery:</b> NGN${Number(order.deliveryFee || 0).toLocaleString()}`,
         `<b>Total:</b> NGN${Number(order.total || 0).toLocaleString()}`,
         `<b>Fulfilment:</b> ${order.type || 'N/A'}`,
-        `<b>Time:</b> ${order.deliverySlot || order.pickupTime || 'Not specified'}`
+        `<b>Time:</b> ${order.deliverySlot || order.pickupTime || 'Not specified'}`,
+        note
     ].join('\n');
     const response = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
         method: 'POST',
@@ -597,7 +608,10 @@ async function sendManagerReminder(order) {
     if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) return false;
     const target = order.ready_target_at ? new Date(order.ready_target_at).toLocaleString('en-NG', { timeZone: 'Africa/Lagos' }) : 'now';
     const dispatch = order.dispatch_at ? new Date(order.dispatch_at).toLocaleString('en-NG', { timeZone: 'Africa/Lagos' }) : 'not batched';
-    const message = `<b>Action required: order preparation</b>\n<b>Order:</b> MCH-${String(order.payment_reference).slice(-8)}\n<b>Customer:</b> ${order.customer_name || 'Customer'}\n<b>Preparation target:</b> ${target}\n<b>Dispatch batch:</b> ${dispatch}\n<b>Status:</b> ${order.order_status || 'received'}\n\nThe order should be in preparation now. Update its status in the admin panel.`;
+    const deliveryInfo = order.order_type === 'delivery'
+        ? `\n<b>Delivery area:</b> ${order.delivery_area || 'N/A'}\n<b>Delivery address:</b> ${order.delivery_address || 'N/A'}`
+        : `\n<b>Pickup time:</b> ${order.delivery_slot || order.requested_fulfillment_at ? new Date(order.delivery_slot || order.requested_fulfillment_at).toLocaleString('en-NG', { timeZone: 'Africa/Lagos' }) : 'Not specified'}`;
+    const message = `<b>Action required: order preparation</b>\n<b>Order:</b> MCH-${String(order.payment_reference).slice(-8)}\n<b>Customer:</b> ${order.customer_name || 'Customer'}\n<b>Phone:</b> ${order.delivery_phone || 'N/A'}${deliveryInfo}\n<b>Preparation target:</b> ${target}\n<b>Dispatch batch:</b> ${dispatch}\n<b>Status:</b> ${order.order_status || 'received'}\n\nThe order should be in preparation now. Update its status in the admin panel.`;
     const response = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: process.env.TELEGRAM_CHAT_ID, text: message, parse_mode: 'HTML' }) });
     return response.ok;
 }
