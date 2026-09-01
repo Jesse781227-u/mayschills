@@ -2704,6 +2704,143 @@
             line-height: 1.7;
         }
 
+        .ordering-salad-config {
+            margin-top: 22px;
+        }
+
+        .ordering-salad-config-heading {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+            color: var(--brand-text);
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .ordering-salad-config-heading small {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .ordering-salad-options {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .ordering-salad-option {
+            position: relative;
+            min-height: 112px;
+            padding: 13px 10px 10px;
+            border: 1.5px solid rgba(23, 53, 40, 0.12);
+            border-radius: 16px;
+            color: var(--brand-text);
+            background: var(--white);
+            text-align: left;
+            cursor: pointer;
+            transition: border-color .2s ease, background .2s ease, transform .2s ease, box-shadow .2s ease;
+        }
+
+        .ordering-salad-option:hover {
+            transform: translateY(-2px);
+            border-color: rgba(0, 148, 68, 0.4);
+        }
+
+        .ordering-salad-option.selected {
+            border-color: var(--brand-primary);
+            background: rgba(0, 148, 68, 0.07);
+            box-shadow: 0 8px 18px rgba(0, 148, 68, 0.12);
+        }
+
+        .ordering-salad-option-icon {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 20px;
+        }
+
+        .ordering-salad-option-name {
+            display: block;
+            padding-right: 12px;
+            font-size: 12px;
+            line-height: 1.25;
+        }
+
+        .ordering-salad-option-price {
+            display: block;
+            margin-top: 7px;
+            color: var(--brand-primary);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .ordering-salad-option-badge {
+            position: absolute;
+            top: 7px;
+            left: 8px;
+            color: var(--brand-primary);
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+        }
+
+        .ordering-salad-option-badge + .ordering-salad-option-icon {
+            margin-top: 8px;
+        }
+
+        .ordering-salad-option-check {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 20px;
+            height: 20px;
+            display: none;
+            place-items: center;
+            border-radius: 50%;
+            color: var(--white);
+            background: var(--brand-primary);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .ordering-salad-option.selected .ordering-salad-option-check {
+            display: grid;
+        }
+
+        @media (max-width: 430px) {
+            .ordering-salad-options {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 5px;
+                padding: 2px 0 6px;
+            }
+
+            .ordering-salad-option {
+                min-height: 106px;
+                padding: 12px 6px 8px;
+                border-radius: 13px;
+            }
+
+            .ordering-salad-option-icon {
+                font-size: 17px;
+            }
+
+            .ordering-salad-option-name {
+                font-size: 10px;
+            }
+
+            .ordering-salad-option-price {
+                font-size: 11px;
+            }
+
+            .ordering-salad-option-badge {
+                left: 6px;
+                font-size: 7px;
+            }
+        }
+
         .ordering-detail-cta {
             display: grid;
             grid-template-columns: 48px 1fr;
@@ -4453,6 +4590,13 @@
                 </div>
                 <div class="ordering-detail-price" id="ordering-detail-price"></div>
                 <p class="ordering-detail-description" id="ordering-detail-description"></p>
+                <div class="ordering-salad-config" id="ordering-salad-config" hidden>
+                    <div class="ordering-salad-config-heading">
+                        <span>How would you like it?</span>
+                        <small>Choose one</small>
+                    </div>
+                    <div class="ordering-salad-options" id="ordering-salad-options"></div>
+                </div>
                 <div class="ordering-detail-cta">
                     <button class="ordering-icon-btn" id="ordering-detail-favorite" type="button" aria-label="Add item to favorites"><i class="hgi-stroke hgi-heart-add-01" aria-hidden="true"></i></button>
                     <button class="ordering-pill-btn" id="ordering-detail-add" type="button"><i class="hgi-stroke hgi-shopping-cart-01" aria-hidden="true"></i> Add to cart</button>
@@ -7292,14 +7436,22 @@ function getOrderTypeText(type) {
                 ingredients: 'Asun, Cashew Nut, Fresh Vegetables',
                 description: 'Nutty and satisfying with your preferred add-on option.',
                 image: 'https://www.iconsdb.com/icons/preview/white/circle-xxl.png',
+                category: 'Salads & Parfait'
+            },
+            {
+                id: 507,
+                name: 'SPICY SHRIMPS & BEEFSTEAK COMBO SALAD',
+                price: 15000,
+                ingredients: 'Spicy Shrimps, Beefsteak, Fresh Vegetables',
+                description: 'Spicy shrimps and beefsteak combo salad with your preferred add-on option.',
+                image: 'https://i.ibb.co/5xMcvpLN/IMG-20251214-173454-343.jpg',
                 category: 'Salads & Parfait',
                 variantOptions: [
-                    { label: 'With Egg', price: 10500, default: true },
-                    { label: 'With Avocado', price: 11000 },
-                    { label: 'With Avocado & Egg', price: 11500 }
+                    { label: 'With Egg', price: 15000, default: true },
+                    { label: 'With Avocado', price: 16000 },
+                    { label: 'With Avocado & Egg', price: 16500 }
                 ]
             },
-            { id: 507, name: 'SPICY SHRIMPS & BEEFSTEAK COMBO SALAD', price: 15000, ingredients: 'Spicy Shrimps, Beefsteak, Fresh Vegetables', description: 'Spicy shrimps and beefsteak combo salad', image: 'https://i.ibb.co/5xMcvpLN/IMG-20251214-173454-343.jpg', category: 'Salads & Parfait' },
             { id: 508, name: 'CHICKEN, SHRIMPS & BEEFSTEAK SALAD (TRIPLE PROTEIN SALAD)', price: 17000, ingredients: 'Chicken, Shrimps, Beefsteak, Fresh Vegetables', description: 'Triple protein salad with chicken, shrimps and beefsteak', image: 'https://i.ibb.co/jc9Knpd/IMG-20251214-172816-762.jpg', category: 'Salads & Parfait' },
             { id: 509, name: 'VEGETABLE ONLY SALAD (NO PROTEIN)', price: 8000, ingredients: 'Lettuce, Cabbage, Carrots, Apple, Grapes, Fresh Vegetables (No Protein)', description: 'Fresh vegetable salad without protein', image: 'https://i.ibb.co/Ld7pdn1n/IMG-20251121-WA0055.jpg', category: 'Salads & Parfait' },
             { id: 510, name: 'PREMIUM PARFAIT - 2 LITRE BOWL', price: 33000, ingredients: 'Greek Yogurt, Granola, Fresh Fruits, Honey', description: 'Layered yogurt parfait in a 2 litre bowl', image: 'https://i.ibb.co/tSQxPKB/IMG-20251214-173504-247.jpg', category: 'Salads & Parfait' },
@@ -8037,6 +8189,7 @@ function getOrderTypeText(type) {
                 lines.push(`Protein: ${customizations.choices.protein.split('+').map(id => INGREDIENTS[id]?.label || id).join(' + ')}`);
             }
             if (customizations.choices?.chickenStyle) lines.push(`Chicken: ${customizations.choices.chickenStyle}`);
+            if (customizations.choices?.saladOption) lines.push(`Preparation: ${customizations.choices.saladOption}`);
             if (customizations.choices?.toppings && customizations.choices.toppings !== 'DEFAULT') {
                 const labels = { COCONUT_ONLY: 'Coconut only', GRANOLA_ONLY: 'Granola only', EXTRA_COCONUT: 'Extra coconut', LESS_COCONUT: 'Less coconut' };
                 lines.push(`Toppings: ${labels[customizations.choices.toppings] || customizations.choices.toppings}`);
@@ -8497,10 +8650,9 @@ function updateCartItemQuantity(id, change) {
 
             if (currentProduct.variantOptions && currentProduct.variantOptions.length) {
                 const selectedVariant = currentProduct.variantOptions.find(option => option.label === currentProductVariant) || currentProduct.variantOptions.find(option => option.default) || currentProduct.variantOptions[0];
-                const cartName = `${currentProduct.name} — ${selectedVariant.label}`;
-                const cartId = `${currentProduct.id}_${String(selectedVariant.label).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`;
-                addToCart(cartId, cartName, selectedVariant.price, currentProduct.image);
-                showToast(`${cartName} added to cart!`);
+                const customizations = { type: 'salad', choices: { saladOption: selectedVariant.label } };
+                addToCart(currentProduct.id, currentProduct.name, selectedVariant.price, currentProduct.image, { productId: currentProduct.id, customizations, basePrice: selectedVariant.price });
+                showToast(`${currentProduct.name} — ${selectedVariant.label} added to cart!`);
                 closeProductModal();
                 return;
             }
@@ -8536,6 +8688,12 @@ function updateCartItemQuantity(id, change) {
                 return Math.min(...product.options.map(option => option.price));
             }
             return Number(product.price || 0);
+        }
+
+        // Add an image URL to each salad option when the preparation photos are ready.
+        // Example: { label: 'With Egg', price: 8000, image: 'images/salad-egg.jpg' }
+        function getSaladOptionImage(product, option) {
+            return option?.image || product?.variantImages?.[option?.label] || product?.image;
         }
 
         function orderingAllProducts() {
@@ -8633,16 +8791,51 @@ function updateCartItemQuantity(id, change) {
                 document.getElementById('ordering-detail-price').textContent = product.onRequest ? 'On request' : `₦${orderingPrice(product).toLocaleString()}`;
             }
             document.getElementById('ordering-detail-description').textContent = product.description || product.ingredients || 'Freshly prepared with quality ingredients.';
+            const saladConfig = document.getElementById('ordering-salad-config');
+            const saladOptions = document.getElementById('ordering-salad-options');
+            if (product.variantOptions && product.variantOptions.length) {
+                const defaultVariant = product.variantOptions.find(option => option.default) || product.variantOptions[0];
+                currentProductVariant = defaultVariant.label;
+                document.getElementById('ordering-detail-image').src = getSaladOptionImage(product, defaultVariant);
+                saladConfig.hidden = false;
+                saladOptions.innerHTML = product.variantOptions.map(option => {
+                    const icon = option.label.includes('Avocado') ? (option.label.includes('Egg') ? '🥚🥑' : '🥑') : '🥚';
+                    return `<button class="ordering-salad-option ${option.label === currentProductVariant ? 'selected' : ''}" type="button" data-ordering-variant="${option.label}">
+                        ${option.default ? '<span class="ordering-salad-option-badge">Most popular</span>' : ''}
+                        <span class="ordering-salad-option-icon" aria-hidden="true">${icon}</span>
+                        <span class="ordering-salad-option-name">${option.label}</span>
+                        <span class="ordering-salad-option-price">₦${option.price.toLocaleString()}</span>
+                        <span class="ordering-salad-option-check" aria-hidden="true">✓</span>
+                    </button>`;
+                }).join('');
+                saladOptions.querySelectorAll('[data-ordering-variant]').forEach(button => button.addEventListener('click', () => {
+                    currentProductVariant = button.dataset.orderingVariant;
+                    saladOptions.querySelectorAll('.ordering-salad-option').forEach(option => option.classList.toggle('selected', option === button));
+                    updateOrderingSaladPrice();
+                }));
+            } else {
+                saladConfig.hidden = true;
+                saladOptions.innerHTML = '';
+            }
             if (isSandwich(product)) {
                 document.getElementById('ordering-detail-price').innerHTML = `<span class="sandwich-menu-prices"><span><strong>Single</strong> â‚¦${product.price.toLocaleString()}</span><span><strong>Double</strong> â‚¦${product.doublePrice.toLocaleString()}</span></span>`;
             }
             document.getElementById('ordering-quantity').textContent = orderingQuantity;
-            document.getElementById('ordering-detail-add').innerHTML = productSupportsExtras(product)
+            document.getElementById('ordering-detail-add').innerHTML = product.variantOptions?.length || productSupportsExtras(product)
                 ? '<i class="hgi-stroke hgi-checkmark-circle-02" aria-hidden="true"></i> Review &amp; Add'
                 : '<i class="hgi-stroke hgi-shopping-cart-01" aria-hidden="true"></i> Add to cart';
             document.getElementById('ordering-detail-add').disabled = !isMenuItemAvailable(product);
             if (!isMenuItemAvailable(product)) document.getElementById('ordering-detail-add').textContent = 'Sold out · Restocking';
+            if (product.variantOptions?.length && isMenuItemAvailable(product)) updateOrderingSaladPrice();
             setOrderingScreen('detail');
+        }
+
+        function updateOrderingSaladPrice() {
+            if (!orderingProduct?.variantOptions?.length) return;
+            const selectedVariant = orderingProduct.variantOptions.find(option => option.label === currentProductVariant) || orderingProduct.variantOptions[0];
+            document.getElementById('ordering-detail-image').src = getSaladOptionImage(orderingProduct, selectedVariant);
+            document.getElementById('ordering-detail-price').textContent = `₦${selectedVariant.price.toLocaleString()}`;
+            document.getElementById('ordering-detail-add').innerHTML = `<i class="hgi-stroke hgi-checkmark-circle-02" aria-hidden="true"></i> Review &amp; Add · ₦${selectedVariant.price.toLocaleString()}`;
         }
 
         function renderOrderingCart() {
@@ -8734,9 +8927,8 @@ function updateCartItemQuantity(id, change) {
                 if (!orderingProduct) return;
                 if (orderingProduct.variantOptions && orderingProduct.variantOptions.length) {
                     const selectedVariant = orderingProduct.variantOptions.find(option => option.label === currentProductVariant) || orderingProduct.variantOptions.find(option => option.default) || orderingProduct.variantOptions[0];
-                    const cartName = `${orderingProduct.name} — ${selectedVariant.label}`;
-                    const cartId = `${orderingProduct.id}_${String(selectedVariant.label).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`;
-                    for (let count = 0; count < orderingQuantity; count += 1) addToCart(cartId, cartName, selectedVariant.price, orderingProduct.image);
+                    const customizations = { type: 'salad', choices: { saladOption: selectedVariant.label } };
+                    for (let count = 0; count < orderingQuantity; count += 1) addToCart(orderingProduct.id, orderingProduct.name, selectedVariant.price, orderingProduct.image, { productId: orderingProduct.id, customizations, basePrice: selectedVariant.price });
                     setOrderingScreen('cart');
                     return;
                 }
@@ -8892,7 +9084,9 @@ Thank you!`;
         showToast(`Opening WhatsApp to inquire about ${name}`);
     } else {
         const productObj = [...saladsParfait, ...sandwichesWraps].find(p => p.id == id);
-        if (productObj && isSandwich(productObj)) {
+        if (productObj && productObj.variantOptions?.length) {
+            openOrderingDetail(productObj);
+        } else if (productObj && isSandwich(productObj)) {
             openSizePicker(productObj);
         } else if (productObj && productSupportsExtras(productObj)) {
             openExtrasModal(productObj);
