@@ -7141,7 +7141,7 @@ function getOrderTypeText(type) {
 
         // Complete product data with ALL products
         const smoothies = [
-            { id: 1, number: "01", name: "GREEN GLOW (01)", price: 100, ingredients: "Avocado, Banana, Kiwi, Green Grapes", description: "Vibrant green smoothie for glowing skin", image: "https://i.ibb.co/SDm4SJTW/16.png", category: "Smoothies" },
+            { id: 1, number: "01", name: "GREEN GLOW (01)", price: 4500, ingredients: "Avocado, Banana, Kiwi, Green Grapes", description: "Vibrant green smoothie for glowing skin", image: "https://i.ibb.co/SDm4SJTW/16.png", category: "Smoothies" },
             { id: 2, number: "02", name: "BEETS BY MAY (02)", price: 4000, ingredients: "Watermelon, Beetroot, Strawberry, Yogurt", description: "Vibrant red blend with earthy sweetness", image: "https://i.ibb.co/QFytnQGw/27.png", category: "Smoothies" },
             { id: 3, number: "03", name: "PEARFECT (03)", price: 4500, ingredients: "Pear, Oats, Banana, Ginger", description: "Perfectly balanced pear and oat blend", image: "https://i.ibb.co/813KT69/26.png", category: "Smoothies" },
             { id: 4, number: "04", name: "ISLAND DREAM (04)", price: 4000, ingredients: "Papaya, Carrot, Pineapple, Ginger, Turmeric", description: "Caribbean-inspired blend with anti-inflammatory benefits", image: "https://i.ibb.co/Cpj8s0ZJ/17.png", category: "Smoothies" },
@@ -7164,34 +7164,34 @@ function getOrderTypeText(type) {
         ];
 
         const juices = [
-            { id: 100, code: "J1", name: "GREEN GODDESS (J1)", price: 3500, ingredients: "Pineapple, Ginger, Pumpkin leaves", description: "Mild green juice with tropical flavors", image: "https://i.ibb.co/n56Cz4M/3.png", category: "Juices" },
-            { id: 101, code: "J2", name: "TWISTED O.J (J2)", price: 3500, ingredients: "Orange, Apple, Lemon", description: "Sweet citrus twist on classic orange juice", image: "https://i.ibb.co/8nXmXvNt/1.png", category: "Juices" },
-            { id: 102, code: "J3", name: "BLOODY MELON (J3)", price: 3500, ingredients: "Watermelon, Apple, Beetroot, Grapes, Mint Leaves", description: "Vibrant red juice with minty freshness", image: "https://i.ibb.co/NgCbJGvs/J1-Green-goddess.png", category: "Juices" },
-            { id: 103, code: "J4", name: "XTREME (J4)", price: 4000, ingredients: "Celery, Cucumber, Orange, Lettuce, Mint Leaves", description: "Extreme green detox with citrus notes", image: "https://i.ibb.co/9m32zkTt/9.png", category: "Juices" },
-            { id: 104, code: "J5", name: "GLOW UP (J5)", price: 3500, ingredients: "Pineapple, Ginger, Carrot", description: "Radiant skin blend with carrot and ginger", image: "https://i.ibb.co/DJsLDpB/7.png", category: "Juices" },
-            { id: 105, code: "J6", name: "HARDCORE (-BLASTER) (J6)", price: 5000, ingredients: "Select Veggies, Ginger, Turmeric, Cayenne Pepper and Others", description: "Intense detox and metabolism booster", image: "https://i.ibb.co/q36F8WgW/13.png", category: "Juices" },
-            { id: 106, code: "J7", name: "PINK PARTY (J7)", price: 3500, ingredients: "Watermelon, Pineapple, Strawberry", description: "Sweet pink party in a bottle", image: "https://i.ibb.co/0RmRfX8M/15.png", category: "Juices" },
-            { id: 107, code: "J8", name: "BLUE IVY (J8)", price: 4000, ingredients: "Sugarcane Juice, Cucumber, Lemon, Mint Leaves, Ginger & Blue Spirulina", description: "Vibrant blue juice with refreshing flavors", image: "https://i.ibb.co/v4pHCPP4/14.png", category: "Juices" },
-            { id: 108, code: "J9", name: "WILD CAYENNE (J9)", price: 3500, ingredients: "Orange, Ginger, Turmeric, Cayenne Pepper", description: "Spicy detox with anti-inflammatory benefits", image: "https://i.ibb.co/wNysGy4s/12.png", category: "Juices" },
-            { id: 109, code: "J10", name: "RADIANCE (J10)", price: 4000, ingredients: "Dragon Fruit, Watermelon, Grapes, Strawberry, Sugarcane Juice", description: "Beautiful blend for glowing radiance", image: "https://i.ibb.co/WWmrwgWG/6.png", category: "Juices" },
-            { id: 110, code: "J11", name: "GREENERGY (J11)", price: 4500, ingredients: "Kale, Parsley, Cucumber, Sugarcane Juice, Ginger", description: "Green energy boost with natural sweetness", image: "https://i.ibb.co/K31N8b4/4.png", category: "Juices" },
-            { id: 111, code: "J12", name: "SOULSHINE (J12)", price: 3500, ingredients: "Pineapple and Orange", description: "Sweet tropical sunshine for the soul", image: "https://i.ibb.co/p6NxcwXf/2.png", category: "Juices" },
-            { id: 112, code: "J13", name: "ALPHABEET (J13)", price: 5000, ingredients: "Red Apple, Beetroot, Carrot, Lemon, Ginger", description: "ABC of nutrition with beet and carrot", image: "https://i.ibb.co/7t1qrGwK/5.png", category: "Juices" },
-            { id: 113, code: "J14", name: "MINT CONDITION (J14)", price: 3500, ingredients: "Apple, Cucumber, Pineapple, Mint Leaves", description: "Refreshing minty blend in perfect condition", image: "https://i.ibb.co/S70jXMXP/8.png", category: "Juices" },
-            { id: 114, code: "J COAL", name: "BLACK MAMBA", price: 4000, ingredients: "Apple, Sugarcane Juice, Lemon, Ginger, Activated Charcoal", description: "Detoxifying black juice with activated charcoal", image: "https://i.ibb.co/wNHX6H5m/10.png", category: "Juices" },
-            { id: 200, name: "TIGERNUT MILK", price: 3500, ingredients: "Tigernut, Coconut, Dates & Cinnamon", description: "Creamy plant-based milk with natural sweetness", image: "https://i.ibb.co/twK4dwfH/16-1.png", category: "Juices" },
-            { id: 201, name: "OAT MILK", price: 3500, ingredients: "OATs, Dates & Cinnamon", description: "Smooth and creamy oat milk", image: "https://i.ibb.co/n8gn5rhv/17-1.png", category: "Juices" },
-            { id: 300, name: "TECHY SUNRISE", price: 7000, ingredients: "Orange, Pineapple & Tequila", description: "Boozy tropical sunrise with tequila", image: "https://i.ibb.co/4RhhQP3L/16.png", category: "Juices" },
-            { id: 301, name: "MINT MAGIC", price: 7000, ingredients: "Watermelon, Apple, Grapes, Mint Leaves & Vodka", description: "Refreshing minty cocktail with vodka", image: "https://i.ibb.co/SXGYWnv5/17.png", category: "Juices" },
+            { id: 100, code: "J1", name: "GREEN GODDESS (J1)", price: 4000, ingredients: "Pineapple, Ginger, Pumpkin leaves", description: "Mild green juice with tropical flavors", image: "https://i.ibb.co/n56Cz4M/3.png", category: "Juices" },
+            { id: 101, code: "J2", name: "TWISTED O.J (J2)", price: 4000, ingredients: "Orange, Apple, Lemon", description: "Sweet citrus twist on classic orange juice", image: "https://i.ibb.co/8nXmXvNt/1.png", category: "Juices" },
+            { id: 102, code: "J3", name: "BLOODY MELON (J3)", price: 4000, ingredients: "Watermelon, Apple, Beetroot, Grapes, Mint Leaves", description: "Vibrant red juice with minty freshness", image: "https://i.ibb.co/NgCbJGvs/J1-Green-goddess.png", category: "Juices" },
+            { id: 103, code: "J4", name: "XTREME (J4)", price: 4500, ingredients: "Celery, Cucumber, Orange, Lettuce, Mint Leaves", description: "Extreme green detox with citrus notes", image: "https://i.ibb.co/9m32zkTt/9.png", category: "Juices" },
+            { id: 104, code: "J5", name: "GLOW UP (J5)", price: 4000, ingredients: "Pineapple, Ginger, Carrot", description: "Radiant skin blend with carrot and ginger", image: "https://i.ibb.co/DJsLDpB/7.png", category: "Juices" },
+            { id: 105, code: "J6", name: "HARDCORE (-BLASTER) (J6)", price: 5500, ingredients: "Select Veggies, Ginger, Turmeric, Cayenne Pepper and Others", description: "Intense detox and metabolism booster", image: "https://i.ibb.co/q36F8WgW/13.png", category: "Juices" },
+            { id: 106, code: "J7", name: "PINK PARTY (J7)", price: 4000, ingredients: "Watermelon, Pineapple, Strawberry, Lemon", description: "Sweet pink party in a bottle", image: "https://i.ibb.co/0RmRfX8M/15.png", category: "Juices" },
+            { id: 107, code: "J8", name: "BLUE IVY (J8)", price: 4500, ingredients: "Sugarcane Juice, Cucumber, Lemon, Mint Leaves, Ginger & Blue Spirulina", description: "Vibrant blue juice with refreshing flavors", image: "https://i.ibb.co/v4pHCPP4/14.png", category: "Juices" },
+            { id: 108, code: "J9", name: "WILD CAYENNE (J9)", price: 4500, ingredients: "Orange, Ginger, Turmeric, Cayenne Pepper", description: "Spicy detox with anti-inflammatory benefits", image: "https://i.ibb.co/wNysGy4s/12.png", category: "Juices" },
+            { id: 109, code: "J10", name: "RADIANCE (J10)", price: 4500, ingredients: "Dragon Fruit, Watermelon, Grapes, Strawberry, Sugarcane Juice", description: "Beautiful blend for glowing radiance", image: "https://i.ibb.co/WWmrwgWG/6.png", category: "Juices" },
+            { id: 110, code: "J11", name: "GREENERGY (J11)", price: 5000, ingredients: "Kale, Parsley, Cucumber, Sugarcane Juice, Ginger", description: "Green energy boost with natural sweetness", image: "https://i.ibb.co/K31N8b4/4.png", category: "Juices" },
+            { id: 111, code: "J12", name: "SOULSHINE (J12)", price: 4000, ingredients: "Pineapple and Orange", description: "Sweet tropical sunshine for the soul", image: "https://i.ibb.co/p6NxcwXf/2.png", category: "Juices" },
+            { id: 112, code: "J13", name: "ALPHABEET (J13)", price: 5500, ingredients: "Red Apple, Beetroot, Carrot, Lemon, Ginger", description: "ABC of nutrition with beet and carrot", image: "https://i.ibb.co/7t1qrGwK/5.png", category: "Juices" },
+            { id: 113, code: "J14", name: "MINT CONDITION (J14)", price: 4000, ingredients: "Apple, Cucumber, Pineapple, Mint Leaves", description: "Refreshing minty blend in perfect condition", image: "https://i.ibb.co/S70jXMXP/8.png", category: "Juices" },
+            { id: 114, code: "J COAL", name: "BLACK MAMBA", price: 4500, ingredients: "Apple, Sugarcane Juice, Lemon, Ginger, Activated Charcoal", description: "Detoxifying black juice with activated charcoal", image: "https://i.ibb.co/wNHX6H5m/10.png", category: "Juices" },
+            { id: 200, name: "TIGERNUT MILK", price: 4000, ingredients: "Tigernut, Coconut, Dates & Cinnamon", description: "Creamy plant-based milk with natural sweetness", image: "https://i.ibb.co/twK4dwfH/16-1.png", category: "Juices" },
+            { id: 201, name: "OAT MILK", price: 4000, ingredients: "OATs, Dates & Cinnamon", description: "Smooth and creamy oat milk", image: "https://i.ibb.co/n8gn5rhv/17-1.png", category: "Juices" },
+            { id: 300, name: "TECHY SUNRISE", price: 7500, ingredients: "Orange, Pineapple & Tequila", description: "Boozy tropical sunrise with tequila", image: "https://i.ibb.co/4RhhQP3L/16.png", category: "Juices" },
+            { id: 301, name: "MINT MAGIC", price: 7500, ingredients: "Watermelon, Apple, Grapes, Mint Leaves & Vodka", description: "Refreshing minty cocktail with vodka", image: "https://i.ibb.co/SXGYWnv5/17.png", category: "Juices" },
             { id: 115, name: "BLOOD TONIC", price: 0, ingredients: "Custom blend - please inquire", description: "Healing juice available on request", image: "https://www.iconsdb.com/icons/preview/white/circle-xxl.png", onRequest: true, category: "Juices" },
             { id: 116, name: "FIBROID SHRINKING JUICE", price: 0, ingredients: "Custom blend - please inquire", description: "Therapeutic juice available on request", image: "https://www.iconsdb.com/icons/preview/white/circle-xxl.png", onRequest: true, category: "Juices" }
         ];
 
         const granolaYogurt = [
-            { id: 400, name: "GREEK YOGHURT - 500ml", price: 5000, ingredients: "Unsweetened Greek Yogurt", description: "Creamy, protein-rich unsweetened Greek yogurt", image: "https://i.ibb.co/1cmpR27/IMG-3979.jpg", category: "Granola & Yogurt" },
-            { id: 401, name: "GREEK YOGHURT - 1.2 Litres", price: 10500, ingredients: "Unsweetened Greek Yogurt", description: "Creamy, protein-rich unsweetened Greek yogurt", image: "https://i.ibb.co/Z6kmpXxL/IMG-3986.jpg", category: "Granola & Yogurt" },
-            { id: 402, name: "GREEK YOGHURT - 2 Litres", price: 19000, ingredients: "Unsweetened Greek Yogurt", description: "Creamy, protein-rich unsweetened Greek yogurt", image: "https://i.ibb.co/G4M2mz2W/IMG-3982.jpg", category: "Granola & Yogurt" },
-            { id: 403, name: "GREEK YOGHURT - 5 Litres", price: 43000, ingredients: "Unsweetened Greek Yogurt", description: "Creamy, protein-rich unsweetened Greek yogurt", image: "https://i.ibb.co/G4M2mz2W/IMG-3982.jpg", category: "Granola & Yogurt" },
+            { id: 400, name: "GREEK YOGHURT - 500ml", price: 5500, ingredients: "Unsweetened Greek Yogurt", description: "Creamy, protein-rich unsweetened Greek yogurt", image: "https://i.ibb.co/1cmpR27/IMG-3979.jpg", category: "Granola & Yogurt" },
+            { id: 401, name: "GREEK YOGHURT - 1.2 Litres", price: 12000, ingredients: "Unsweetened Greek Yogurt", description: "Creamy, protein-rich unsweetened Greek yogurt", image: "https://i.ibb.co/Z6kmpXxL/IMG-3986.jpg", category: "Granola & Yogurt" },
+            { id: 402, name: "GREEK YOGHURT - 2 Litres", price: 21000, ingredients: "Unsweetened Greek Yogurt", description: "Creamy, protein-rich unsweetened Greek yogurt", image: "https://i.ibb.co/G4M2mz2W/IMG-3982.jpg", category: "Granola & Yogurt" },
+            { id: 403, name: "GREEK YOGHURT - 5 Litres", price: 46000, ingredients: "Unsweetened Greek Yogurt", description: "Creamy, protein-rich unsweetened Greek yogurt", image: "https://i.ibb.co/G4M2mz2W/IMG-3982.jpg", category: "Granola & Yogurt" },
             { id: 404, name: "GRANOLA - 1Kg", price: 22000, ingredients: "Homemade granola mix", description: "Crunchy homemade granola perfect with yogurt", image: "https://i.ibb.co/gLxYhp01/IMG-3978.jpg", category: "Granola & Yogurt" },
             { id: 405, name: "GRANOLA - 350g", price: 7500, ingredients: "Homemade granola mix", description: "Crunchy homemade granola perfect with yogurt", image: "https://i.ibb.co/N2fL86Z6/IMG-5489.jpg", category: "Granola & Yogurt" },
             { id: 406, name: "GRANOLA - 100g", price: 2500, ingredients: "Homemade granola mix", description: "Crunchy homemade granola perfect with yogurt", image: "https://i.ibb.co/3K3xMwB/IMG-5486.jpg", category: "Granola & Yogurt" },
@@ -7202,51 +7202,93 @@ function getOrderTypeText(type) {
             {
                 id: 500,
                 name: 'SHREDDED SPICY CHICKEN SALAD',
-                price: 7500,
+                price: 8000,
                 ingredients: 'Shredded Spicy Chicken, Fresh Vegetables',
                 description: 'Fresh shredded chicken salad with your preferred add-on option.',
                 image: 'https://i.ibb.co/8ghMYH6D/IMG-20251214-172854-924.jpg',
                 category: 'Salads & Parfait',
                 variantOptions: [
-                    { label: 'With Egg', price: 7500, default: true },
-                    { label: 'With Avocado', price: 8000 },
-                    { label: 'With Avocado & Egg', price: 8500 }
+                    { label: 'With Egg', price: 8000, default: true },
+                    { label: 'With Avocado', price: 9000 },
+                    { label: 'With Avocado & Egg', price: 9500 }
                 ]
             },
             {
                 id: 501,
                 name: 'GRILLED CHICKEN SALAD',
-                price: 7500,
+                price: 9000,
                 ingredients: 'Grilled Chicken, Fresh Vegetables',
                 description: 'A fresh grilled chicken salad with your preferred add-on option.',
                 image: 'https://i.ibb.co/NntWJ35r/IMG-20251214-172816-208.jpg',
                 category: 'Salads & Parfait',
                 variantOptions: [
-                    { label: 'With Egg', price: 7500, default: true },
-                    { label: 'With Avocado', price: 8000 },
-                    { label: 'With Avocado & Egg', price: 8500 }
+                    { label: 'With Egg', price: 9000, default: true },
+                    { label: 'With Avocado', price: 10000 },
+                    { label: 'With Avocado & Egg', price: 10500 }
                 ]
             },
             {
                 id: 502,
                 name: 'BEEFSTEAK SALAD',
-                price: 7500,
+                price: 8000,
                 ingredients: 'Beefsteak, Fresh Vegetables',
                 description: 'A hearty beefsteak salad with your preferred add-on option.',
                 image: 'https://i.ibb.co/rRyq5FDt/IMG-20251214-172850-682.jpg',
                 category: 'Salads & Parfait',
                 variantOptions: [
-                    { label: 'With Egg', price: 7500, default: true },
-                    { label: 'With Avocado', price: 8000 },
-                    { label: 'With Avocado & Egg', price: 8500 }
+                    { label: 'With Egg', price: 8000, default: true },
+                    { label: 'With Avocado', price: 9000 },
+                    { label: 'With Avocado & Egg', price: 9500 }
                 ]
             },
             {
                 id: 503,
                 name: 'SPICY SHRIMPS SALAD',
-                price: 10500,
+                price: 12000,
                 ingredients: 'Spicy Shrimps, Fresh Vegetables',
                 description: 'Spicy shrimps salad with your preferred add-on option.',
+                image: 'https://www.iconsdb.com/icons/preview/white/circle-xxl.png',
+                category: 'Salads & Parfait',
+                variantOptions: [
+                    { label: 'With Egg', price: 12000, default: true },
+                    { label: 'With Avocado', price: 13000 },
+                    { label: 'With Avocado & Egg', price: 13500 }
+                ]
+            },
+            {
+                id: 504,
+                name: 'SPICY SHRIMPS & CHICKEN COMBO SALAD',
+                price: 15000,
+                ingredients: 'Spicy Shrimps, Chicken, Fresh Vegetables',
+                description: 'A satisfying combo salad with your preferred add-on option.',
+                image: 'https://www.iconsdb.com/icons/preview/white/circle-xxl.png',
+                category: 'Salads & Parfait',
+                variantOptions: [
+                    { label: 'With Egg', price: 15000, default: true },
+                    { label: 'With Avocado', price: 16000 },
+                    { label: 'With Avocado & Egg', price: 16500 }
+                ]
+            },
+            {
+                id: 505,
+                name: 'SPICY CHICKEN & BEEFSTEAK COMBO SALAD',
+                price: 12000,
+                ingredients: 'Spicy Chicken, Beefsteak, Fresh Vegetables',
+                description: 'A double-protein salad with your preferred add-on option.',
+                image: 'https://www.iconsdb.com/icons/preview/white/circle-xxl.png',
+                category: 'Salads & Parfait',
+                variantOptions: [
+                    { label: 'With Egg', price: 12000, default: true },
+                    { label: 'With Avocado', price: 13000 },
+                    { label: 'With Avocado & Egg', price: 13500 }
+                ]
+            },
+            {
+                id: 506,
+                name: 'NUTTY ASUN SALAD',
+                price: 10500,
+                ingredients: 'Asun, Cashew Nut, Fresh Vegetables',
+                description: 'Nutty and satisfying with your preferred add-on option.',
                 image: 'https://www.iconsdb.com/icons/preview/white/circle-xxl.png',
                 category: 'Salads & Parfait',
                 variantOptions: [
@@ -7255,55 +7297,13 @@ function getOrderTypeText(type) {
                     { label: 'With Avocado & Egg', price: 11500 }
                 ]
             },
-            {
-                id: 504,
-                name: 'SPICY SHRIMPS & CHICKEN COMBO SALAD',
-                price: 12000,
-                ingredients: 'Spicy Shrimps, Chicken, Fresh Vegetables',
-                description: 'A satisfying combo salad with your preferred add-on option.',
-                image: 'https://www.iconsdb.com/icons/preview/white/circle-xxl.png',
-                category: 'Salads & Parfait',
-                variantOptions: [
-                    { label: 'With Egg', price: 12000, default: true },
-                    { label: 'With Avocado', price: 12500 },
-                    { label: 'With Avocado & Egg', price: 13000 }
-                ]
-            },
-            {
-                id: 505,
-                name: 'SPICY CHICKEN & BEEFSTEAK COMBO SALAD',
-                price: 10000,
-                ingredients: 'Spicy Chicken, Beefsteak, Fresh Vegetables',
-                description: 'A double-protein salad with your preferred add-on option.',
-                image: 'https://www.iconsdb.com/icons/preview/white/circle-xxl.png',
-                category: 'Salads & Parfait',
-                variantOptions: [
-                    { label: 'With Egg', price: 10000, default: true },
-                    { label: 'With Avocado', price: 10500 },
-                    { label: 'With Avocado & Egg', price: 11000 }
-                ]
-            },
-            {
-                id: 506,
-                name: 'NUTTY ASUN SALAD',
-                price: 9500,
-                ingredients: 'Asun, Cashew Nut, Fresh Vegetables',
-                description: 'Nutty and satisfying with your preferred add-on option.',
-                image: 'https://www.iconsdb.com/icons/preview/white/circle-xxl.png',
-                category: 'Salads & Parfait',
-                variantOptions: [
-                    { label: 'With Egg', price: 9500, default: true },
-                    { label: 'With Avocado', price: 10000 },
-                    { label: 'With Avocado & Egg', price: 10500 }
-                ]
-            },
-            { id: 507, name: 'SPICY SHRIMPS & BEEFSTEAK COMBO SALAD', price: 12000, ingredients: 'Spicy Shrimps, Beefsteak, Fresh Vegetables', description: 'Spicy shrimps and beefsteak combo salad', image: 'https://i.ibb.co/5xMcvpLN/IMG-20251214-173454-343.jpg', category: 'Salads & Parfait' },
-            { id: 508, name: 'CHICKEN, SHRIMPS & BEEFSTEAK SALAD (TRIPLE PROTEIN SALAD)', price: 14000, ingredients: 'Chicken, Shrimps, Beefsteak, Fresh Vegetables', description: 'Triple protein salad with chicken, shrimps and beefsteak', image: 'https://i.ibb.co/jc9Knpd/IMG-20251214-172816-762.jpg', category: 'Salads & Parfait' },
-            { id: 509, name: 'VEGETABLE ONLY SALAD (NO PROTEIN)', price: 7500, ingredients: 'Lettuce, Cabbage, Carrots, Apple, Grapes, Fresh Vegetables (No Protein)', description: 'Fresh vegetable salad without protein', image: 'https://i.ibb.co/Ld7pdn1n/IMG-20251121-WA0055.jpg', category: 'Salads & Parfait' },
-            { id: 510, name: 'PREMIUM PARFAIT - 2 LITRE BOWL', price: 32000, ingredients: 'Greek Yogurt, Granola, Fresh Fruits, Honey', description: 'Layered yogurt parfait in a 2 litre bowl', image: 'https://i.ibb.co/tSQxPKB/IMG-20251214-173504-247.jpg', category: 'Salads & Parfait' },
-            { id: 511, name: 'PREMIUM PARFAIT - 400ml CUP', price: 7500, ingredients: 'Greek Yogurt, Granola, Fresh Fruits, Honey', description: 'Layered yogurt parfait in 400ml cup', image: 'https://i.ibb.co/qM4FtQFq/IMG-20251214-172855-010.jpg', category: 'Salads & Parfait' },
-            { id: 512, name: 'PREMIUM PARFAIT - 550ml BOWL', price: 8500, ingredients: 'Greek Yogurt, Granola, Fresh Fruits, Honey', description: 'Layered yogurt parfait in 550ml bowl', image: 'https://i.ibb.co/mCcnCm8M/IMG-20251112-WA0089.jpg', category: 'Salads & Parfait' },
-            { id: 513, name: 'PREMIUM PARFAIT - 1 LITRE BOWL', price: 16500, ingredients: 'Greek Yogurt, Granola, Fresh Fruits, Honey', description: 'Layered yogurt parfait in 1 litre bowl', image: 'https://i.ibb.co/tSQxPKB/IMG-20251214-173504-247.jpg', category: 'Salads & Parfait' }
+            { id: 507, name: 'SPICY SHRIMPS & BEEFSTEAK COMBO SALAD', price: 15000, ingredients: 'Spicy Shrimps, Beefsteak, Fresh Vegetables', description: 'Spicy shrimps and beefsteak combo salad', image: 'https://i.ibb.co/5xMcvpLN/IMG-20251214-173454-343.jpg', category: 'Salads & Parfait' },
+            { id: 508, name: 'CHICKEN, SHRIMPS & BEEFSTEAK SALAD (TRIPLE PROTEIN SALAD)', price: 17000, ingredients: 'Chicken, Shrimps, Beefsteak, Fresh Vegetables', description: 'Triple protein salad with chicken, shrimps and beefsteak', image: 'https://i.ibb.co/jc9Knpd/IMG-20251214-172816-762.jpg', category: 'Salads & Parfait' },
+            { id: 509, name: 'VEGETABLE ONLY SALAD (NO PROTEIN)', price: 8000, ingredients: 'Lettuce, Cabbage, Carrots, Apple, Grapes, Fresh Vegetables (No Protein)', description: 'Fresh vegetable salad without protein', image: 'https://i.ibb.co/Ld7pdn1n/IMG-20251121-WA0055.jpg', category: 'Salads & Parfait' },
+            { id: 510, name: 'PREMIUM PARFAIT - 2 LITRE BOWL', price: 33000, ingredients: 'Greek Yogurt, Granola, Fresh Fruits, Honey', description: 'Layered yogurt parfait in a 2 litre bowl', image: 'https://i.ibb.co/tSQxPKB/IMG-20251214-173504-247.jpg', category: 'Salads & Parfait' },
+            { id: 511, name: 'PREMIUM PARFAIT - 400ml CUP', price: 8000, ingredients: 'Greek Yogurt, Granola, Fresh Fruits, Honey', description: 'Layered yogurt parfait in 400ml cup', image: 'https://i.ibb.co/qM4FtQFq/IMG-20251214-172855-010.jpg', category: 'Salads & Parfait' },
+            { id: 512, name: 'PREMIUM PARFAIT - 550ml BOWL', price: 9000, ingredients: 'Greek Yogurt, Granola, Fresh Fruits, Honey', description: 'Layered yogurt parfait in 550ml bowl', image: 'https://i.ibb.co/mCcnCm8M/IMG-20251112-WA0089.jpg', category: 'Salads & Parfait' },
+            { id: 513, name: 'PREMIUM PARFAIT - 1 LITRE BOWL', price: 17000, ingredients: 'Greek Yogurt, Granola, Fresh Fruits, Honey', description: 'Layered yogurt parfait in 1 litre bowl', image: 'https://i.ibb.co/tSQxPKB/IMG-20251214-173504-247.jpg', category: 'Salads & Parfait' }
         ];
 
         const sandwichesWraps = [
@@ -7327,10 +7327,10 @@ function getOrderTypeText(type) {
                 image: "https://i.ibb.co/p6nDQcbp/IMG-3967.jpg",
                 category: "Detox",
                 options: [
-                    { duration: "1 DAY", price: 16500 },
-                    { duration: "3 DAYS", price: 49000 },
-                    { duration: "5 DAYS", price: 76000 },
-                    { duration: "7 DAYS", price: 106000 }
+                    { duration: "1 DAY", price: 18500 },
+                    { duration: "3 DAYS", price: 54000 },
+                    { duration: "5 DAYS", price: 90000 },
+                    { duration: "7 DAYS", price: 125000 }
                 ]
             },
             {
@@ -7340,10 +7340,10 @@ function getOrderTypeText(type) {
                 image: "https://i.ibb.co/gZvyPCKC/IMG-3965.jpg",
                 category: "Detox",
                 options: [
-                    { duration: "1 DAY", price: 23000 },
-                    { duration: "3 DAYS", price: 68000 },
-                    { duration: "5 DAYS", price: 112000 },
-                    { duration: "7 DAYS", price: 156000 }
+                    { duration: "1 DAY", price: 26000 },
+                    { duration: "3 DAYS", price: 75000 },
+                    { duration: "5 DAYS", price: 125000 },
+                    { duration: "7 DAYS", price: 173000 }
                 ]
             },
             {
@@ -7353,10 +7353,10 @@ function getOrderTypeText(type) {
                 image: "https://i.ibb.co/CpvQNMj1/571098384-18423089074109247-7757058062439157513-n.jpg",
                 category: "Detox",
                 options: [
-                    { duration: "1 DAY", price: 19500 },
-                    { duration: "3 DAYS", price: 58000 },
-                    { duration: "5 DAYS", price: 96000 },
-                    { duration: "7 DAYS", price: 133000 }
+                    { duration: "1 DAY", price: 21000 },
+                    { duration: "3 DAYS", price: 64000 },
+                    { duration: "5 DAYS", price: 106000 },
+                    { duration: "7 DAYS", price: 148000 }
                 ]
             },
             {
@@ -7366,10 +7366,10 @@ function getOrderTypeText(type) {
                 image: "https://i.ibb.co/ZtPRvL5/IMG-3971.jpg",
                 category: "Detox",
                 options: [
-                    { duration: "1 DAY", price: 22500 },
-                    { duration: "3 DAYS", price: 69000 },
-                    { duration: "5 DAYS", price: 114000 },
-                    { duration: "7 DAYS", price: 159000 }
+                    { duration: "1 DAY", price: 26000 },
+                    { duration: "3 DAYS", price: 83000 },
+                    { duration: "5 DAYS", price: 136000 },
+                    { duration: "7 DAYS", price: 190500 }
                 ]
             }
         ];
