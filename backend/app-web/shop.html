@@ -1572,6 +1572,56 @@
             margin: 16px 0;
         }
 
+        .product-modal-variant-picker {
+            margin-top: 8px;
+            border: 1px solid rgba(30, 70, 45, 0.12);
+            background: rgba(141, 198, 63, 0.05);
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .product-modal-variant-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .product-modal-variant-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 8px;
+        }
+
+        .product-modal-variant-btn {
+            width: 100%;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: var(--white);
+            color: var(--black);
+            border-radius: 10px;
+            padding: 10px 12px;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .product-modal-variant-btn:hover {
+            border-color: rgba(0, 148, 68, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .product-modal-variant-btn.selected {
+            border-color: var(--green);
+            background: rgba(141, 198, 63, 0.08);
+            box-shadow: 0 8px 18px rgba(0, 148, 68, 0.14);
+        }
+
         .product-modal-add-btn,
         .product-modal-inquire-btn {
             flex: 1;
@@ -7149,25 +7199,112 @@ function getOrderTypeText(type) {
           ];
 
         const saladsParfait = [
-            { id: 500, name: "SHREDDED SWEETSPICY CHICKEN SALAD (WITH EGG)", price: 7500, ingredients: "Shredded SweetSpicy Chicken, Egg, Fresh Vegetables", description: "Shredded SweetSpicy chicken salad served with egg", image: "https://i.ibb.co/8ghMYH6D/IMG-20251214-172854-924.jpg", category: "Salads & Parfait" },
-            { id: 501, name: "GRILLED CHICKEN SALAD (WITH EGG)", price: 7500, ingredients: "Grilled Chicken, Egg, Fresh Vegetables", description: "Grilled chicken salad served with egg", image: "https://i.ibb.co/NntWJ35r/IMG-20251214-172816-208.jpg", category: "Salads & Parfait" },
-            { id: 502, name: "BEEFSTEAK SALAD (WITH EGG)", price: 7500, ingredients: "Beefsteak, Egg, Fresh Vegetables", description: "Beefsteak salad served with egg", image: "https://i.ibb.co/rRyq5FDt/IMG-20251214-172850-682.jpg", category: "Salads & Parfait" },
-            { id: 503, name: "SHREDDED SWEETSPICY CHICKEN SALAD WITH AVOCADO", price: 8000, ingredients: "Shredded SweetSpicy Chicken, Avocado, Fresh Vegetables", description: "Shredded SweetSpicy chicken salad with avocado", image: "https://www.iconsdb.com/icons/preview/white/circle-xxl.png", category: "Salads & Parfait" },
-            { id: 504, name: "GRILLED CHICKEN SALAD WITH AVOCADO", price: 8000, ingredients: "Grilled Chicken, Avocado, Fresh Vegetables", description: "Grilled chicken salad with avocado", image: "https://www.iconsdb.com/icons/preview/white/circle-xxl.png", category: "Salads & Parfait" },
-            { id: 505, name: "SPICY CHICKEN SALAD WITH AVOCADO AND EGGS", price: 8500, ingredients: "Spicy Chicken, Avocado, Eggs, Fresh Vegetables", description: "Spicy chicken salad with avocado and eggs", image: "https://www.iconsdb.com/icons/preview/white/circle-xxl.png", category: "Salads & Parfait" },
-            { id: 506, name: "GRILLED CHICKEN SALAD WITH AVOCADO AND EGGS", price: 8500, ingredients: "Grilled Chicken, Avocado, Eggs, Fresh Vegetables", description: "Grilled chicken salad with avocado and eggs", image: "https://www.iconsdb.com/icons/preview/white/circle-xxl.png", category: "Salads & Parfait" },
-            { id: 507, name: "SPICY SHRIMPS SALAD (WITH EGG)", price: 10500, ingredients: "Spicy Shrimps, Egg, Fresh Vegetables", description: "Spicy shrimps salad served with egg", image: "https://www.iconsdb.com/icons/preview/white/circle-xxl.png", category: "Salads & Parfait" },
-            { id: 508, name: "SPICY SHRIMPS & CHICKEN COMBO SALAD (WITH EGG)", price: 12000, ingredients: "Spicy Shrimps, Chicken, Egg, Fresh Vegetables", description: "Spicy shrimps and chicken combo salad with egg", image: "https://www.iconsdb.com/icons/preview/white/circle-xxl.png", category: "Salads & Parfait" },
-            { id: 509, name: "SPICY SHRIMPS & BEEFSTEAK COMBO SALAD", price: 12000, ingredients: "Spicy Shrimps, Beefsteak, Fresh Vegetables", description: "Spicy shrimps and beefsteak combo salad", image: "https://i.ibb.co/5xMcvpLN/IMG-20251214-173454-343.jpg", category: "Salads & Parfait" },
-            { id: 516, name: "SPICY CHICKEN & BEEFSTEAK COMBO SALAD (WITH EGG)", price: 10000, ingredients: "Spicy Chicken, Beefsteak, Egg, Fresh Vegetables", description: "Spicy chicken and beefsteak combo salad with egg", image: "https://www.iconsdb.com/icons/preview/white/circle-xxl.png", category: "Salads & Parfait" },
-            { id: 515, name: "CHICKEN, SHRIMPS & BEEFSTEAK SALAD (TRIPLE PROTEIN SALAD)", price: 14000, ingredients: "Chicken, Shrimps, Beefsteak, Egg, Fresh Vegetables", description: "Triple protein salad with chicken, shrimps and beefsteak", image: "https://i.ibb.co/jc9Knpd/IMG-20251214-172816-762.jpg", category: "Salads & Parfait" },
-            { id: 510, name: "VEGETABLE ONLY SALAD (NO PROTEIN)", price: 7500, ingredients: "Lettuce, Cabbage, Carrots, Apple, Grapes, Fresh Vegetables (No Protein)", description: "Fresh vegetable salad without protein", image: "https://i.ibb.co/Ld7pdn1n/IMG-20251121-WA0055.jpg", category: "Salads & Parfait" },
-            { id: 517, name: "PREMIUM PARFAIT - 2 LITRE BOWL", price: 32000, ingredients: "Greek Yogurt, Granola, Fresh Fruits, Honey", description: "Layered yogurt parfait in a 2 litre bowl", image: "https://i.ibb.co/tSQxPKB/IMG-20251214-173504-247.jpg", category: "Salads & Parfait" },
-            { id: 514, name: "NUTTY ASUN SALAD (WITH EGG & CASHEW NUT)", price: 9500, ingredients: "Asun, Egg, Cashew Nut, Fresh Vegetables", description: "Nutty Asun salad served with egg and cashew nut", image: "https://www.iconsdb.com/icons/preview/white/circle-xxl.png", category: "Salads & Parfait" },
-            { id: 511, name: "PREMIUM PARFAIT - 400ml CUP", price: 7500, ingredients: "Greek Yogurt, Granola, Fresh Fruits, Honey", description: "Layered yogurt parfait in 400ml cup", image: "https://i.ibb.co/qM4FtQFq/IMG-20251214-172855-010.jpg", category: "Salads & Parfait" },
-            { id: 512, name: "PREMIUM PARFAIT - 550ml BOWL", price: 8500, ingredients: "Greek Yogurt, Granola, Fresh Fruits, Honey", description: "Layered yogurt parfait in 550ml bowl", image: "https://i.ibb.co/mCcnCm8M/IMG-20251112-WA0089.jpg", category: "Salads & Parfait" },
-            { id: 513, name: "PREMIUM PARFAIT - 1 LITRE BOWL", price: 16500, ingredients: "Greek Yogurt, Granola, Fresh Fruits, Honey", description: "Layered yogurt parfait in 1 litre bowl", image: "https://i.ibb.co/tSQxPKB/IMG-20251214-173504-247.jpg", category: "Salads & Parfait" },
-            ];
+            {
+                id: 500,
+                name: 'SHREDDED SPICY CHICKEN SALAD',
+                price: 7500,
+                ingredients: 'Shredded Spicy Chicken, Fresh Vegetables',
+                description: 'Fresh shredded chicken salad with your preferred add-on option.',
+                image: 'https://i.ibb.co/8ghMYH6D/IMG-20251214-172854-924.jpg',
+                category: 'Salads & Parfait',
+                variantOptions: [
+                    { label: 'With Egg', price: 7500, default: true },
+                    { label: 'With Avocado', price: 8000 },
+                    { label: 'With Avocado & Egg', price: 8500 }
+                ]
+            },
+            {
+                id: 501,
+                name: 'GRILLED CHICKEN SALAD',
+                price: 7500,
+                ingredients: 'Grilled Chicken, Fresh Vegetables',
+                description: 'A fresh grilled chicken salad with your preferred add-on option.',
+                image: 'https://i.ibb.co/NntWJ35r/IMG-20251214-172816-208.jpg',
+                category: 'Salads & Parfait',
+                variantOptions: [
+                    { label: 'With Egg', price: 7500, default: true },
+                    { label: 'With Avocado', price: 8000 },
+                    { label: 'With Avocado & Egg', price: 8500 }
+                ]
+            },
+            {
+                id: 502,
+                name: 'BEEFSTEAK SALAD',
+                price: 7500,
+                ingredients: 'Beefsteak, Fresh Vegetables',
+                description: 'A hearty beefsteak salad with your preferred add-on option.',
+                image: 'https://i.ibb.co/rRyq5FDt/IMG-20251214-172850-682.jpg',
+                category: 'Salads & Parfait',
+                variantOptions: [
+                    { label: 'With Egg', price: 7500, default: true },
+                    { label: 'With Avocado', price: 8000 },
+                    { label: 'With Avocado & Egg', price: 8500 }
+                ]
+            },
+            {
+                id: 503,
+                name: 'SPICY SHRIMPS SALAD',
+                price: 10500,
+                ingredients: 'Spicy Shrimps, Fresh Vegetables',
+                description: 'Spicy shrimps salad with your preferred add-on option.',
+                image: 'https://www.iconsdb.com/icons/preview/white/circle-xxl.png',
+                category: 'Salads & Parfait',
+                variantOptions: [
+                    { label: 'With Egg', price: 10500, default: true },
+                    { label: 'With Avocado', price: 11000 },
+                    { label: 'With Avocado & Egg', price: 11500 }
+                ]
+            },
+            {
+                id: 504,
+                name: 'SPICY SHRIMPS & CHICKEN COMBO SALAD',
+                price: 12000,
+                ingredients: 'Spicy Shrimps, Chicken, Fresh Vegetables',
+                description: 'A satisfying combo salad with your preferred add-on option.',
+                image: 'https://www.iconsdb.com/icons/preview/white/circle-xxl.png',
+                category: 'Salads & Parfait',
+                variantOptions: [
+                    { label: 'With Egg', price: 12000, default: true },
+                    { label: 'With Avocado', price: 12500 },
+                    { label: 'With Avocado & Egg', price: 13000 }
+                ]
+            },
+            {
+                id: 505,
+                name: 'SPICY CHICKEN & BEEFSTEAK COMBO SALAD',
+                price: 10000,
+                ingredients: 'Spicy Chicken, Beefsteak, Fresh Vegetables',
+                description: 'A double-protein salad with your preferred add-on option.',
+                image: 'https://www.iconsdb.com/icons/preview/white/circle-xxl.png',
+                category: 'Salads & Parfait',
+                variantOptions: [
+                    { label: 'With Egg', price: 10000, default: true },
+                    { label: 'With Avocado', price: 10500 },
+                    { label: 'With Avocado & Egg', price: 11000 }
+                ]
+            },
+            {
+                id: 506,
+                name: 'NUTTY ASUN SALAD',
+                price: 9500,
+                ingredients: 'Asun, Cashew Nut, Fresh Vegetables',
+                description: 'Nutty and satisfying with your preferred add-on option.',
+                image: 'https://www.iconsdb.com/icons/preview/white/circle-xxl.png',
+                category: 'Salads & Parfait',
+                variantOptions: [
+                    { label: 'With Egg', price: 9500, default: true },
+                    { label: 'With Avocado', price: 10000 },
+                    { label: 'With Avocado & Egg', price: 10500 }
+                ]
+            },
+            { id: 507, name: 'SPICY SHRIMPS & BEEFSTEAK COMBO SALAD', price: 12000, ingredients: 'Spicy Shrimps, Beefsteak, Fresh Vegetables', description: 'Spicy shrimps and beefsteak combo salad', image: 'https://i.ibb.co/5xMcvpLN/IMG-20251214-173454-343.jpg', category: 'Salads & Parfait' },
+            { id: 508, name: 'CHICKEN, SHRIMPS & BEEFSTEAK SALAD (TRIPLE PROTEIN SALAD)', price: 14000, ingredients: 'Chicken, Shrimps, Beefsteak, Fresh Vegetables', description: 'Triple protein salad with chicken, shrimps and beefsteak', image: 'https://i.ibb.co/jc9Knpd/IMG-20251214-172816-762.jpg', category: 'Salads & Parfait' },
+            { id: 509, name: 'VEGETABLE ONLY SALAD (NO PROTEIN)', price: 7500, ingredients: 'Lettuce, Cabbage, Carrots, Apple, Grapes, Fresh Vegetables (No Protein)', description: 'Fresh vegetable salad without protein', image: 'https://i.ibb.co/Ld7pdn1n/IMG-20251121-WA0055.jpg', category: 'Salads & Parfait' },
+            { id: 510, name: 'PREMIUM PARFAIT - 2 LITRE BOWL', price: 32000, ingredients: 'Greek Yogurt, Granola, Fresh Fruits, Honey', description: 'Layered yogurt parfait in a 2 litre bowl', image: 'https://i.ibb.co/tSQxPKB/IMG-20251214-173504-247.jpg', category: 'Salads & Parfait' },
+            { id: 511, name: 'PREMIUM PARFAIT - 400ml CUP', price: 7500, ingredients: 'Greek Yogurt, Granola, Fresh Fruits, Honey', description: 'Layered yogurt parfait in 400ml cup', image: 'https://i.ibb.co/qM4FtQFq/IMG-20251214-172855-010.jpg', category: 'Salads & Parfait' },
+            { id: 512, name: 'PREMIUM PARFAIT - 550ml BOWL', price: 8500, ingredients: 'Greek Yogurt, Granola, Fresh Fruits, Honey', description: 'Layered yogurt parfait in 550ml bowl', image: 'https://i.ibb.co/mCcnCm8M/IMG-20251112-WA0089.jpg', category: 'Salads & Parfait' },
+            { id: 513, name: 'PREMIUM PARFAIT - 1 LITRE BOWL', price: 16500, ingredients: 'Greek Yogurt, Granola, Fresh Fruits, Honey', description: 'Layered yogurt parfait in 1 litre bowl', image: 'https://i.ibb.co/tSQxPKB/IMG-20251214-173504-247.jpg', category: 'Salads & Parfait' }
+        ];
 
         const sandwichesWraps = [
             { id: 600, name: "VEGGIE CHICKEN WRAP", price: 7000, ingredients: "Chicken, Fresh Vegetables, Tortilla", description: "Chicken wrap with fresh veggies in tortilla", image: "https://i.ibb.co/1f5FK259/IMG-20251219-130436-348.jpg", category: "Sandwiches & Wraps" },
@@ -8353,18 +8490,28 @@ function updateCartItemQuantity(id, change) {
         }
         
         function addFromModal() {
-            if (currentProduct) {
-                if (isSandwich(currentProduct)) {
-                    closeProductModal();
-                    setTimeout(() => openSizePicker(currentProduct), 300);
-                } else if (productSupportsExtras(currentProduct)) {
-                    closeProductModal();
-                    setTimeout(() => openExtrasModal(currentProduct), 300);
-                } else {
-                    addToCart(currentProduct.id, currentProduct.name, currentProduct.price, currentProduct.image);
-                    showToast(`${currentProduct.name} added to cart!`);
-                    closeProductModal();
-                }
+            if (!currentProduct) return;
+
+            if (currentProduct.variantOptions && currentProduct.variantOptions.length) {
+                const selectedVariant = currentProduct.variantOptions.find(option => option.label === currentProductVariant) || currentProduct.variantOptions.find(option => option.default) || currentProduct.variantOptions[0];
+                const cartName = `${currentProduct.name} — ${selectedVariant.label}`;
+                const cartId = `${currentProduct.id}_${String(selectedVariant.label).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`;
+                addToCart(cartId, cartName, selectedVariant.price, currentProduct.image);
+                showToast(`${cartName} added to cart!`);
+                closeProductModal();
+                return;
+            }
+
+            if (isSandwich(currentProduct)) {
+                closeProductModal();
+                setTimeout(() => openSizePicker(currentProduct), 300);
+            } else if (productSupportsExtras(currentProduct)) {
+                closeProductModal();
+                setTimeout(() => openExtrasModal(currentProduct), 300);
+            } else {
+                addToCart(currentProduct.id, currentProduct.name, currentProduct.price, currentProduct.image);
+                showToast(`${currentProduct.name} added to cart!`);
+                closeProductModal();
             }
         }
 
@@ -8475,7 +8622,13 @@ function updateCartItemQuantity(id, change) {
             document.getElementById('ordering-detail-image').src = product.image;
             document.getElementById('ordering-detail-image').alt = product.name;
             document.getElementById('ordering-detail-name').textContent = product.name;
-            document.getElementById('ordering-detail-price').textContent = product.onRequest ? 'On request' : `₦${orderingPrice(product).toLocaleString()}`;
+            if (product.variantOptions && product.variantOptions.length) {
+                const defaultVariant = product.variantOptions.find(option => option.default) || product.variantOptions[0];
+                currentProductVariant = defaultVariant.label;
+                document.getElementById('ordering-detail-price').textContent = `₦${defaultVariant.price.toLocaleString()}`;
+            } else {
+                document.getElementById('ordering-detail-price').textContent = product.onRequest ? 'On request' : `₦${orderingPrice(product).toLocaleString()}`;
+            }
             document.getElementById('ordering-detail-description').textContent = product.description || product.ingredients || 'Freshly prepared with quality ingredients.';
             if (isSandwich(product)) {
                 document.getElementById('ordering-detail-price').innerHTML = `<span class="sandwich-menu-prices"><span><strong>Single</strong> â‚¦${product.price.toLocaleString()}</span><span><strong>Double</strong> â‚¦${product.doublePrice.toLocaleString()}</span></span>`;
@@ -8575,7 +8728,16 @@ function updateCartItemQuantity(id, change) {
             document.getElementById('ordering-quantity-minus').addEventListener('click', () => { orderingQuantity = Math.max(1, orderingQuantity - 1); document.getElementById('ordering-quantity').textContent = orderingQuantity; });
             document.getElementById('ordering-quantity-plus').addEventListener('click', () => { orderingQuantity += 1; document.getElementById('ordering-quantity').textContent = orderingQuantity; });
             document.getElementById('ordering-detail-add').addEventListener('click', () => {
-                if (!orderingProduct || orderingProduct.onRequest || orderingProduct.options) return openProductModal(orderingProduct);
+                if (!orderingProduct) return;
+                if (orderingProduct.variantOptions && orderingProduct.variantOptions.length) {
+                    const selectedVariant = orderingProduct.variantOptions.find(option => option.label === currentProductVariant) || orderingProduct.variantOptions.find(option => option.default) || orderingProduct.variantOptions[0];
+                    const cartName = `${orderingProduct.name} — ${selectedVariant.label}`;
+                    const cartId = `${orderingProduct.id}_${String(selectedVariant.label).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`;
+                    for (let count = 0; count < orderingQuantity; count += 1) addToCart(cartId, cartName, selectedVariant.price, orderingProduct.image);
+                    setOrderingScreen('cart');
+                    return;
+                }
+                if (orderingProduct.onRequest || orderingProduct.options) return openProductModal(orderingProduct);
                 if (isSandwich(orderingProduct)) return openSizePicker(orderingProduct);
                 if (productSupportsExtras(orderingProduct)) return openExtrasModal(orderingProduct);
                 for (let count = 0; count < orderingQuantity; count += 1) addToCart(orderingProduct.id, orderingProduct.name, orderingProduct.price, orderingProduct.image);
@@ -8831,6 +8993,7 @@ Thank you!`;
         // Enhanced product modal with pairing suggestions
         function openProductModal(product) {
             currentProduct = product;
+            currentProductVariant = null;
             
             // Set product ID for reviews
             ReviewSystem.currentProductId = product.id;
@@ -8848,6 +9011,40 @@ Thank you!`;
                 .map(tag => `<span class="product-modal-tag"><i class="hgi-stroke hgi-checkmark-circle-02" aria-hidden="true"></i>${tag}</span>`)
                 .join('');
 
+            const variantPicker = document.getElementById('product-modal-variant-picker');
+            if (product.variantOptions && product.variantOptions.length) {
+                const defaultVariant = product.variantOptions.find(option => option.default) || product.variantOptions[0];
+                currentProductVariant = defaultVariant.label;
+                variantPicker.style.display = 'block';
+                variantPicker.innerHTML = `
+                    <div class="product-modal-variant-header">
+                        <span>Choose your salad option</span>
+                        <strong>${defaultVariant.label}</strong>
+                    </div>
+                    <div class="product-modal-variant-options">
+                        ${product.variantOptions.map(option => `
+                            <button type="button" class="product-modal-variant-btn ${option.label === currentProductVariant ? 'selected' : ''}" data-variant-label="${option.label}" data-variant-price="${option.price}">
+                                <span>${option.label}</span>
+                                <strong>₦${option.price.toLocaleString()}</strong>
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+                variantPicker.querySelectorAll('.product-modal-variant-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        currentProductVariant = button.dataset.variantLabel;
+                        variantPicker.querySelectorAll('.product-modal-variant-btn').forEach(item => item.classList.toggle('selected', item.dataset.variantLabel === currentProductVariant));
+                        const selectedVariant = product.variantOptions.find(option => option.label === currentProductVariant) || product.variantOptions[0];
+                        document.getElementById('product-modal-price').textContent = `₦${selectedVariant.price.toLocaleString()}`;
+                        variantPicker.querySelector('.product-modal-variant-header strong').textContent = selectedVariant.label;
+                    });
+                });
+            } else {
+                currentProductVariant = null;
+                variantPicker.style.display = 'none';
+                variantPicker.innerHTML = '';
+            }
+
             document.getElementById('seller-name').textContent = "MAY'S CHILLS";
             document.getElementById('seller-avatar').src = 'https://i.ibb.co/yFgsqx49/IMG-20251112-WA0082.jpg';
             document.getElementById('seller-avatar').alt = "MAY'S CHILLS";
@@ -8855,7 +9052,12 @@ Thank you!`;
             document.getElementById('seller-rating-value').textContent = 'Trusted kitchen';
             document.getElementById('product-modal-favorite').innerHTML = `<i class="hgi-stroke ${UserManager.isFavorited(product.id) ? 'hgi-favourite' : 'hgi-heart-add-01'} modal-icon" aria-hidden="true"></i>`;
             
-            if (product.options && product.options.length) {
+            if (product.variantOptions && product.variantOptions.length) {
+                const selectedVariant = product.variantOptions.find(option => option.label === currentProductVariant) || product.variantOptions.find(option => option.default) || product.variantOptions[0];
+                document.getElementById('product-modal-price').textContent = `₦${selectedVariant.price.toLocaleString()}`;
+                document.getElementById('product-modal-add-btn').style.display = 'block';
+                document.getElementById('product-modal-inquire-btn').style.display = 'none';
+            } else if (product.options && product.options.length) {
                 const startingPrice = Math.min(...product.options.map(option => option.price));
                 document.getElementById('product-modal-price').textContent = `From ₦${startingPrice.toLocaleString()}`;
                 document.getElementById('product-modal-add-btn').style.display = 'none';
