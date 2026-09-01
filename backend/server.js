@@ -102,6 +102,15 @@ async function initializeDatabase() {
             updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )
     `);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS customer_match_decisions (
+            customer_key_a TEXT NOT NULL,
+            customer_key_b TEXT NOT NULL,
+            decision TEXT NOT NULL CHECK (decision IN ('same', 'different')),
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            PRIMARY KEY (customer_key_a, customer_key_b)
+        )
+    `);
 }
 
 function json(response, status, body) {
@@ -423,12 +432,13 @@ function identityMatch(orderA, orderB) {
     const emailB = normalizeEmail(orderB.customer_email || orderB.customerEmail);
     const phoneA = normalizePhone(orderA.delivery_phone || orderA.deliveryPhone);
     const phoneB = normalizePhone(orderB.delivery_phone || orderB.deliveryPhone);
-    const nameA = normalizeCustomerName(orderA.customer_name || orderA.customerName || '');
-    const nameB = normalizeCustomerName(orderB.customer_name || orderB.customerName || '');
     if (emailA && emailB && emailA === emailB) return true;
     if (phoneA && phoneB && phoneA === phoneB) return true;
-    if (nameA && nameB && nameA === nameB) return true;
     return false;
+}
+
+function customerPairKey(left, right) {
+    return [String(left || ''), String(right || '')].sort().join('|');
 }
 
 function orderItems(order) {
@@ -445,7 +455,7 @@ function percentChange(current, previous) {
     return Math.round(((current - previous) / previous) * 100);
 }
 
-function buildAnalytics(orders, notes = {}, range = {}) {
+function buildAnalytics(orders, notes = {}, decisions = {}, range = {}) {
     const now = new Date();
     const end = analyticsDate(range.to, now);
     const start = analyticsDate(range.from, new Date(end));
@@ -467,21 +477,17 @@ function buildAnalytics(orders, notes = {}, range = {}) {
         return { sales, orders: selected.length, units, customers: customers.size, products: [...products.values()] };
     };
     const current = summarize(periodOrders); const previous = summarize(previousOrders);
+    const baseKeys = [...new Set(orders.map(customerKey))];
+    const parent = new Map(baseKeys.map(key => [key, key]));
+    const findRoot = key => { let root = parent.get(key) || key; while (parent.get(root) !== root) root = parent.get(root); let current = key; while (parent.get(current) !== current) { const next = parent.get(current); parent.set(current, root); current = next; } return root; };
+    const union = (left, right) => { const leftRoot = findRoot(left); const rightRoot = findRoot(right); if (leftRoot !== rightRoot) parent.set(rightRoot, leftRoot); };
+    Object.entries(decisions).forEach(([pair, decision]) => { if (decision !== 'same') return; const [left, right] = pair.split('|'); if (parent.has(left) && parent.has(right)) union(left, right); });
     const customerMap = new Map(); const productMap = new Map(); const daily = new Map(); const hours = new Map();
     orders.forEach(order => {
         const date = new Date(order.created_at); const inPeriod = date >= start && date <= end;
         const normalizedName = String(order.customer_name || 'Customer').trim();
-        let key = customerKey(order);
+        let key = findRoot(customerKey(order));
         let customer = customerMap.get(key);
-        const existingMatches = [...customerMap.values()].filter(candidate => identityMatch(candidate.orders[0] || {}, order));
-        if (!customer && existingMatches.length) {
-            const match = existingMatches[0];
-            key = match.key;
-            customer = match;
-            if (match.needsConfirmation !== true && match.name && normalizeCustomerName(match.name) === normalizeCustomerName(normalizedName)) {
-                match.needsConfirmation = true;
-            }
-        }
         if (!customer) {
             customer = {
                 key,
@@ -505,9 +511,6 @@ function buildAnalytics(orders, notes = {}, range = {}) {
         if (order.delivery_phone && customer.phone !== order.delivery_phone) customer.phone = order.delivery_phone;
         if (order.customer_email && customer.email !== order.customer_email) customer.email = order.customer_email;
         if ((normalizedName || 'Customer') && customer.name !== normalizedName) customer.name = normalizedName || 'Customer';
-        if (customer.orders.length > 1 && normalizeCustomerName(customer.name) && customer.orders.some(candidate => normalizeCustomerName(candidate.customer_name || '') === normalizeCustomerName(customer.name) && (candidate.customer_email && candidate.customer_email !== customer.email || candidate.delivery_phone && candidate.delivery_phone !== customer.phone))) {
-            customer.needsConfirmation = true;
-        }
         orderItems(order).forEach(item => {
             const itemKey = String(item.id || item.name || 'item'); const quantity = Number(item.quantity || 0);
             customer.items.set(itemKey, (customer.items.get(itemKey) || { name: item.name || itemKey, quantity: 0 })).quantity += quantity;
@@ -523,14 +526,21 @@ function buildAnalytics(orders, notes = {}, range = {}) {
         const dayKey = date.toISOString().slice(0, 10); daily.set(dayKey, (daily.get(dayKey) || 0) + Number(order.total || 0));
         const hourKey = Number(new Intl.DateTimeFormat('en-US', { hour: 'numeric', hour12: false, timeZone: 'Africa/Lagos' }).format(date)); hours.set(hourKey, (hours.get(hourKey) || 0) + 1);
     });
-    const customers = [...customerMap.values()].map(customer => {
+    const groupedCustomers = [...customerMap.values()];
+    groupedCustomers.forEach((customer, index) => groupedCustomers.slice(index + 1).forEach(other => {
+        if (normalizeCustomerName(customer.name) && normalizeCustomerName(customer.name) === normalizeCustomerName(other.name) && decisions[customerPairKey(customer.key, other.key)] !== 'different') {
+            customer.needsConfirmation = true;
+            other.needsConfirmation = true;
+        }
+    }));
+    const customers = groupedCustomers.map(customer => {
         const sorted = [...customer.items.values()].sort((a, b) => b.quantity - a.quantity); const last = customer.orders.at(-1)?.created_at; const first = customer.orders[0]?.created_at; const daysSince = last ? (Date.now() - new Date(last).getTime()) / 86400000 : Infinity;
         const addresses = uniqueValues(customer.addresses || []);
         const emails = uniqueValues(customer.emails || []);
         const phones = uniqueValues(customer.phones || []);
         let segment = customer.orders.length === 1 ? 'New customer' : 'Returning customer';
         if (customer.spent >= 100000) segment = 'High-value customer'; else if (customer.orders.length >= 5) segment = 'Frequent customer'; else if (daysSince > 60) segment = 'Inactive customer'; else if (daysSince > 30 && customer.orders.length > 1) segment = 'At-risk customer'; else if (customer.orders.length >= 3) segment = 'Regular customer';
-        const needsConfirmation = Boolean(customer.needsConfirmation || addresses.length > 1 || emails.length > 1 || phones.length > 1 || (customer.orders.length > 1 && normalizeCustomerName(customer.name) && customer.orders.some(order => normalizeCustomerName(order.customer_name || '') === normalizeCustomerName(customer.name) && order.customer_email && order.delivery_phone && order.customer_email !== customer.email && order.delivery_phone !== customer.phone)));
+        const needsConfirmation = Boolean(customer.needsConfirmation);
         return { key: customer.key, name: customer.name, phone: customer.phone, email: customer.email, address: addresses[0] || customer.orders.at(-1)?.delivery_address || '—', addresses, emails, phones, orders: customer.orders.length, spent: customer.spent, averageOrderValue: customer.spent / customer.orders.length, firstOrder: first, lastOrder: last, segment: needsConfirmation ? 'Needs confirmation' : segment, needsConfirmation, favoriteProduct: sorted[0]?.name || '—', favoriteItems: sorted.slice(0, 5), orderIds: customer.orders.map(order => order.payment_reference), items: sorted, history: customer.orders.map(order => ({ reference: order.payment_reference, date: order.created_at, total: Number(order.total || 0), status: order.order_status, address: order.delivery_address || '—', items: orderItems(order).map(item => ({ name: item.name, quantity: Number(item.quantity || 0) })) })), notes: notes[customer.key] || '' };
     });
     const products = [...productMap.values()].map(row => ({ key: row.key, id: row.id, name: row.name, units: row.units, revenue: row.revenue, orders: row.orders, averageQuantity: row.units / row.orders, firstSale: row.dates.sort((a, b) => a - b)[0], lastSale: row.dates.sort((a, b) => b - a)[0], customers: [...row.customers.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([key]) => customers.find(customer => customer.key === key)?.name || 'Customer'), alongside: [...row.alongside.values()].sort((a, b) => b.count - a.count).slice(0, 5), bestDays: [...row.days.entries()].sort((a, b) => b[1] - a[1]).slice(0, 2).map(([name]) => name), bestHours: [...row.hours.entries()].sort((a, b) => b[1] - a[1]).slice(0, 2).map(([hour]) => `${hour}:00`), trend: percentChange(row.revenue, previous.products.find(item => item.key === row.key)?.revenue || 0) }));
@@ -551,14 +561,16 @@ app.get('/api/admin/analytics', async (request, response) => {
     if (!verifyAdminToken(request)) return json(response, 401, { error: 'Unauthorized' });
     if (!pool) return json(response, 503, { error: 'DATABASE_URL is required' });
     try {
-        const [ordersResult, notesResult] = await Promise.all([
+        const [ordersResult, notesResult, decisionsResult] = await Promise.all([
             pool.query("SELECT payment_reference, customer_name, customer_email, delivery_phone, delivery_address, items, total, order_status, payment_status, created_at FROM orders WHERE payment_status = 'paid' AND is_demo = FALSE ORDER BY created_at ASC LIMIT 10000"),
-            pool.query('SELECT customer_key, notes FROM customer_notes')
+            pool.query('SELECT customer_key, notes FROM customer_notes'),
+            pool.query('SELECT customer_key_a, customer_key_b, decision FROM customer_match_decisions')
         ]);
         const notes = Object.fromEntries(notesResult.rows.map(row => [row.customer_key, row.notes]));
+        const decisions = Object.fromEntries(decisionsResult.rows.map(row => [customerPairKey(row.customer_key_a, row.customer_key_b), row.decision]));
         const to = request.query.to ? new Date(`${request.query.to}T23:59:59`) : null;
         const from = request.query.from ? new Date(`${request.query.from}T00:00:00`) : null;
-        return json(response, 200, buildAnalytics(ordersResult.rows.filter(order => order.order_status !== 'cancelled'), notes, { from, to }));
+        return json(response, 200, buildAnalytics(ordersResult.rows.filter(order => order.order_status !== 'cancelled'), notes, decisions, { from, to }));
     } catch (error) { console.error('Analytics read failed:', error); return json(response, 500, { error: 'Unable to calculate analytics' }); }
 });
 
@@ -568,6 +580,20 @@ app.patch('/api/admin/customers/:key/notes', async (request, response) => {
     const key = String(request.params.key || ''); const notes = String(request.body?.notes || '').slice(0, 2000);
     try { await pool.query('INSERT INTO customer_notes (customer_key, notes, updated_at) VALUES ($1,$2,NOW()) ON CONFLICT (customer_key) DO UPDATE SET notes=$2, updated_at=NOW()', [key, notes]); return json(response, 200, { success: true }); }
     catch (error) { console.error('Customer notes update failed:', error); return json(response, 500, { error: 'Unable to save customer notes' }); }
+});
+
+app.patch('/api/admin/customers/match', async (request, response) => {
+    if (!verifyAdminToken(request)) return json(response, 401, { error: 'Unauthorized' });
+    if (!pool) return json(response, 503, { error: 'DATABASE_URL is required' });
+    const left = String(request.body?.leftKey || '');
+    const right = String(request.body?.rightKey || '');
+    const decision = String(request.body?.decision || '');
+    if (!left || !right || left === right || !['same', 'different'].includes(decision)) return json(response, 400, { error: 'Invalid customer match decision' });
+    const [a, b] = [left, right].sort();
+    try {
+        await pool.query('INSERT INTO customer_match_decisions (customer_key_a, customer_key_b, decision, updated_at) VALUES ($1,$2,$3,NOW()) ON CONFLICT (customer_key_a, customer_key_b) DO UPDATE SET decision=$3, updated_at=NOW()', [a, b, decision]);
+        return json(response, 200, { success: true });
+    } catch (error) { console.error('Customer match decision failed:', error); return json(response, 500, { error: 'Unable to save customer match decision' }); }
 });
 
 app.patch('/api/admin/orders/:reference/status', async (request, response) => {

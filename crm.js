@@ -62,27 +62,15 @@
             ...normalCards.map(renderCustomerCard)
         ];
         document.getElementById('crm-customers').innerHTML = rendered.length ? `<div class="customer-grid">${rendered.join('')}</div>` : '<p class="notice">No customers match this filter yet.</p>';
-        document.querySelectorAll('[data-confirm-match]').forEach(button => button.addEventListener('click', () => {
+        document.querySelectorAll('[data-confirm-match]').forEach(button => button.addEventListener('click', async () => {
             const keys = String(button.dataset.confirmMatch).split('|');
-            keys.forEach(key => {
-                const customer = (data.customers || []).find(item => item.key === key);
-                if (customer) {
-                    customer.needsConfirmation = false;
-                    customer.segment = 'Returning customer';
-                }
-            });
-            renderCustomers();
+            button.disabled = true;
+            try { await request('/admin/customers/match', { method: 'PATCH', body: JSON.stringify({ leftKey: keys[0], rightKey: keys[1], decision: 'same' }) }); await load(); } catch (error) { button.disabled = false; alert('Could not save this decision.'); }
         }));
-        document.querySelectorAll('[data-decline-match]').forEach(button => button.addEventListener('click', () => {
+        document.querySelectorAll('[data-decline-match]').forEach(button => button.addEventListener('click', async () => {
             const keys = String(button.dataset.declineMatch).split('|');
-            keys.forEach(key => {
-                const customer = (data.customers || []).find(item => item.key === key);
-                if (customer) {
-                    customer.needsConfirmation = false;
-                    customer.segment = customer.orders > 1 ? 'Returning customer' : 'New customer';
-                }
-            });
-            renderCustomers();
+            button.disabled = true;
+            try { await request('/admin/customers/match', { method: 'PATCH', body: JSON.stringify({ leftKey: keys[0], rightKey: keys[1], decision: 'different' }) }); await load(); } catch (error) { button.disabled = false; alert('Could not save this decision.'); }
         }));
         document.querySelectorAll('.crm-save-note').forEach(button => button.addEventListener('click', async () => { const notes = document.querySelector(`.crm-notes[data-customer="${CSS.escape(button.dataset.customer)}"]`).value; await request('/admin/customers/' + encodeURIComponent(button.dataset.customer) + '/notes', { method: 'PATCH', body: JSON.stringify({ notes }) }); button.textContent = 'Saved'; setTimeout(() => button.textContent = 'Save note', 1200); }));
     }
