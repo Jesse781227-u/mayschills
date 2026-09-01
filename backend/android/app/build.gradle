@@ -4,7 +4,7 @@ android {
     namespace = "mayschills.backend"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "mayschills.backend"
+        applicationId "com.mayschills.admin"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
