@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">May's Chills Admin</string>
-    <string name="title_activity_main">May's Chills Admin</string>
+    <string name="mays_chills_app_name">Mays Chills Admin</string>
+    <string name="mays_chills_activity_title">Mays Chills Admin</string>
     <string name="package_name">com.mayschills.admin</string>
     <string name="custom_url_scheme">com.mayschills.admin</string>
 </resources>
