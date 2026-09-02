@@ -1896,6 +1896,39 @@
             .product-modal-variant-btn img {
                 height: 58px;
             }
+
+            .product-modal-content {
+                width: min(100%, 560px);
+                min-width: 0;
+                overflow-x: hidden;
+            }
+
+            .product-modal-main,
+            .product-modal-body,
+            .product-modal-gallery {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .product-modal-title,
+            .product-modal-description,
+            .product-modal-tag,
+            .product-modal-breadcrumb-item {
+                overflow-wrap: anywhere;
+            }
+
+            .product-modal-variant-options {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .product-modal-actions {
+                flex-direction: column;
+            }
+
+            .product-modal-add-btn,
+            .product-modal-inquire-btn {
+                width: 100%;
+            }
         }
 
         /* ===================================== */
@@ -8682,10 +8715,15 @@ function updateCartItemQuantity(id, change) {
 
             if (currentProduct.variantOptions && currentProduct.variantOptions.length) {
                 const selectedVariant = currentProduct.variantOptions.find(option => option.label === currentProductVariant) || currentProduct.variantOptions.find(option => option.default) || currentProduct.variantOptions[0];
-                const customizations = { type: 'salad', choices: { saladOption: selectedVariant.label } };
-                addToCart(currentProduct.id, currentProduct.name, selectedVariant.price, currentProduct.image, { productId: currentProduct.id, customizations, basePrice: selectedVariant.price });
-                showToast(`${currentProduct.name} — ${selectedVariant.label} added to cart!`);
+                const customizableProduct = Object.assign({}, currentProduct, {
+                    name: `${currentProduct.name} — ${selectedVariant.label}`,
+                    price: selectedVariant.price
+                });
                 closeProductModal();
+                setTimeout(() => {
+                    openExtrasModal(customizableProduct);
+                    selectedChoices.saladOption = selectedVariant.label;
+                }, 300);
                 return;
             }
 
@@ -8965,9 +9003,12 @@ function updateCartItemQuantity(id, change) {
                 if (!orderingProduct) return;
                 if (orderingProduct.variantOptions && orderingProduct.variantOptions.length) {
                     const selectedVariant = orderingProduct.variantOptions.find(option => option.label === currentProductVariant) || orderingProduct.variantOptions.find(option => option.default) || orderingProduct.variantOptions[0];
-                    const customizations = { type: 'salad', choices: { saladOption: selectedVariant.label } };
-                    for (let count = 0; count < orderingQuantity; count += 1) addToCart(orderingProduct.id, orderingProduct.name, selectedVariant.price, orderingProduct.image, { productId: orderingProduct.id, customizations, basePrice: selectedVariant.price });
-                    setOrderingScreen('cart');
+                    const customizableProduct = Object.assign({}, orderingProduct, {
+                        name: `${orderingProduct.name} — ${selectedVariant.label}`,
+                        price: selectedVariant.price
+                    });
+                    openExtrasModal(customizableProduct);
+                    selectedChoices.saladOption = selectedVariant.label;
                     return;
                 }
                 if (orderingProduct.onRequest || orderingProduct.options) return openProductModal(orderingProduct);
@@ -9028,9 +9069,10 @@ function updateCartItemQuantity(id, change) {
             products.forEach(product => {
                 const isFavorited = UserManager.isFavorited(product.id);
                 const isAvailable = isMenuItemAvailable(product);
+                const supportsCustomization = productSupportsExtras(product);
               const priceDisplay = product.onRequest ? 'On Request' : `₦${product.price.toLocaleString()}`;
-const buttonText = product.onRequest ? 'Inquire' : '＋';
-const buttonAction = product.onRequest ? 'inquire' : 'add';
+const buttonText = product.onRequest ? 'Inquire' : supportsCustomization ? 'Review & Add' : '＋';
+const buttonAction = product.onRequest ? 'inquire' : supportsCustomization ? 'review' : 'add';
 /* const menuPriceDisplay = product.onRequest
 const explicitMenuPriceDisplay = product.onRequest
     ? 'On Request'
@@ -9121,7 +9163,13 @@ Thank you!`;
         // Optional: Show a toast message
         showToast(`Opening WhatsApp to inquire about ${name}`);
     } else {
-        const productObj = [...saladsParfait, ...sandwichesWraps].find(p => p.id == id);
+        const productObj = [...smoothies, ...juices, ...granolaYogurt, ...saladsParfait, ...sandwichesWraps].find(p => String(p.id) === String(id)) || product;
+        if (action === 'review') {
+            if (productObj && productObj.variantOptions?.length) openProductModal(productObj);
+            else if (productObj && isSandwich(productObj)) openSizePicker(productObj);
+            else if (productObj) openExtrasModal(productObj);
+            return;
+        }
         if (productObj && productObj.variantOptions?.length) {
             openProductModal(productObj);
         } else if (productObj && isSandwich(productObj)) {
@@ -9293,6 +9341,7 @@ Thank you!`;
                 const selectedVariant = product.variantOptions.find(option => option.label === currentProductVariant) || product.variantOptions.find(option => option.default) || product.variantOptions[0];
                 document.getElementById('product-modal-price').textContent = `₦${selectedVariant.price.toLocaleString()}`;
                 document.getElementById('product-modal-add-btn').style.display = 'block';
+                document.getElementById('product-modal-add-btn').innerHTML = productSupportsExtras(product) ? '<i class="hgi-stroke hgi-checkmark-circle-02 modal-icon" aria-hidden="true"></i> Review & Add' : '<i class="hgi-stroke hgi-shopping-cart-01 modal-icon" aria-hidden="true"></i> Buy Now';
                 document.getElementById('product-modal-inquire-btn').style.display = 'none';
             } else if (product.options && product.options.length) {
                 const startingPrice = Math.min(...product.options.map(option => option.price));

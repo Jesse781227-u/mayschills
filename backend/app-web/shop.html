@@ -1872,6 +1872,43 @@
             .product-modal-image-container {
                 aspect-ratio: 4 / 3;
             }
+
+            .product-modal-content {
+                width: min(100%, 560px);
+                min-width: 0;
+                overflow-x: hidden;
+            }
+
+            .product-modal-main {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .product-modal-main,
+            .product-modal-body,
+            .product-modal-gallery {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .product-modal-title,
+            .product-modal-description,
+            .product-modal-tag,
+            .product-modal-breadcrumb-item {
+                overflow-wrap: anywhere;
+            }
+
+            .product-modal-variant-options {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .product-modal-actions {
+                flex-direction: column;
+            }
+
+            .product-modal-add-btn,
+            .product-modal-inquire-btn {
+                width: 100%;
+            }
         }
 
         /* ===================================== */
@@ -4669,6 +4706,8 @@
                         <div class="product-modal-tags" id="product-modal-tags">
                             <!-- Tags will be generated dynamically -->
                         </div>
+
+                        <div class="product-modal-variant-picker" id="product-modal-variant-picker" style="display: none;"></div>
 
                         <!-- Description -->
                         <div class="product-modal-description" id="product-modal-description"></div>
@@ -8495,10 +8534,15 @@ function updateCartItemQuantity(id, change) {
             if (currentProduct.variantOptions && currentProduct.variantOptions.length) {
                 const selectedVariant = currentProduct.variantOptions.find(option => option.label === currentProductVariant) || currentProduct.variantOptions.find(option => option.default) || currentProduct.variantOptions[0];
                 const cartName = `${currentProduct.name} — ${selectedVariant.label}`;
-                const cartId = `${currentProduct.id}_${String(selectedVariant.label).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`;
-                addToCart(cartId, cartName, selectedVariant.price, currentProduct.image);
-                showToast(`${cartName} added to cart!`);
+                const customizableProduct = Object.assign({}, currentProduct, {
+                    name: `${currentProduct.name} — ${selectedVariant.label}`,
+                    price: selectedVariant.price
+                });
                 closeProductModal();
+                setTimeout(() => {
+                    openExtrasModal(customizableProduct);
+                    selectedChoices.saladOption = selectedVariant.label;
+                }, 300);
                 return;
             }
 
@@ -8731,10 +8775,12 @@ function updateCartItemQuantity(id, change) {
                 if (!orderingProduct) return;
                 if (orderingProduct.variantOptions && orderingProduct.variantOptions.length) {
                     const selectedVariant = orderingProduct.variantOptions.find(option => option.label === currentProductVariant) || orderingProduct.variantOptions.find(option => option.default) || orderingProduct.variantOptions[0];
-                    const cartName = `${orderingProduct.name} — ${selectedVariant.label}`;
-                    const cartId = `${orderingProduct.id}_${String(selectedVariant.label).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`;
-                    for (let count = 0; count < orderingQuantity; count += 1) addToCart(cartId, cartName, selectedVariant.price, orderingProduct.image);
-                    setOrderingScreen('cart');
+                    const customizableProduct = Object.assign({}, orderingProduct, {
+                        name: `${orderingProduct.name} — ${selectedVariant.label}`,
+                        price: selectedVariant.price
+                    });
+                    openExtrasModal(customizableProduct);
+                    selectedChoices.saladOption = selectedVariant.label;
                     return;
                 }
                 if (orderingProduct.onRequest || orderingProduct.options) return openProductModal(orderingProduct);
@@ -8795,26 +8841,15 @@ function updateCartItemQuantity(id, change) {
             products.forEach(product => {
                 const isFavorited = UserManager.isFavorited(product.id);
                 const isAvailable = isMenuItemAvailable(product);
-              const priceDisplay = product.onRequest ? 'On Request' : `₦${product.price.toLocaleString()}`;
-const buttonText = product.onRequest ? 'Inquire' : '＋';
-const buttonAction = product.onRequest ? 'inquire' : 'add';
-/* const menuPriceDisplay = product.onRequest
-const explicitMenuPriceDisplay = product.onRequest
-    ? 'On Request'
-    : isSandwich(product)
-        ? `<span class="sandwich-menu-prices"><span><strong>Single</strong> ₦${Number(product.price).toLocaleString()}</span><span><strong>Double</strong> ₦${Number(product.doublePrice).toLocaleString()}</span></span>`
-        : `₦${Number(product.price).toLocaleString()}`;
-    ? 'On Request'
-    : isSandwich(product)
-        ? `<span class="sandwich-menu-prices"><span><strong>Single</strong> â‚¦${product.price.toLocaleString()}</span><span><strong>Double</strong> â‚¦${product.doublePrice.toLocaleString()}</span></span>`
-        : `â‚¦${product.price.toLocaleString()}`;
-                
-*/
-const menuPriceDisplay = product.onRequest
-    ? 'On Request'
-    : isSandwich(product)
-        ? `<span class="sandwich-menu-prices"><span><strong>Single</strong> ₦${Number(product.price).toLocaleString()}</span><span><strong>Double</strong> ₦${Number(product.doublePrice).toLocaleString()}</span></span>`
-        : `₦${Number(product.price).toLocaleString()}`;
+                const supportsCustomization = productSupportsExtras(product);
+                const priceDisplay = product.onRequest ? 'On Request' : `₦${product.price.toLocaleString()}`;
+                const buttonText = product.onRequest ? 'Inquire' : supportsCustomization ? 'Review & Add' : '＋';
+                const buttonAction = product.onRequest ? 'inquire' : supportsCustomization ? 'review' : 'add';
+                const menuPriceDisplay = product.onRequest
+                    ? 'On Request'
+                    : isSandwich(product)
+                        ? `<span class="sandwich-menu-prices"><span><strong>Single</strong> ₦${Number(product.price).toLocaleString()}</span><span><strong>Double</strong> ₦${Number(product.doublePrice).toLocaleString()}</span></span>`
+                        : `₦${Number(product.price).toLocaleString()}`;
                 const card = document.createElement('article');
                 card.className = `card${isAvailable ? '' : ' sold-out'}`;
                 card.setAttribute('role', 'listitem');
@@ -8856,20 +8891,18 @@ const menuPriceDisplay = product.onRequest
                 });
                 
                // Add click event to add button
-const addBtn = card.querySelector('.add-btn');
-addBtn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    if (!isAvailable) { showToast('Sold out · Restocking soon'); return; }
-    const id = this.dataset.id;
-    const name = this.dataset.name;
-    const price = parseFloat(this.dataset.price);
-    const image = this.dataset.image;
-    const action = this.dataset.action;
-    
-    if (action === 'inquire') {
-        // Open WhatsApp with pre-filled enquiry message
-        const whatsappMessage = `Hello MAY'S CHILLS! I'd like to inquire about: ${name}
-        
+                const addBtn = card.querySelector('.add-btn');
+                addBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (!isAvailable) { showToast('Sold out · Restocking soon'); return; }
+                    const id = this.dataset.id;
+                    const name = this.dataset.name;
+                    const price = parseFloat(this.dataset.price);
+                    const image = this.dataset.image;
+                    const action = this.dataset.action;
+
+                    if (action === 'inquire') {
+                        const whatsappMessage = `Hello MAY'S CHILLS! I'd like to inquire about: ${name}
 
 
 Please let me know:
@@ -8878,30 +8911,48 @@ Please let me know:
 3. Additional information I should know
 
 Thank you!`;
-        
-        const encodedMessage = encodeURIComponent(whatsappMessage);
-        const whatsappUrl = `https://wa.me/2348036815517?text=${encodedMessage}`;
-        
-        // Open WhatsApp in new tab
-        window.open(whatsappUrl, '_blank');
-        
-        // Optional: Show a toast message
-        showToast(`Opening WhatsApp to inquire about ${name}`);
-    } else {
-        const productObj = [...saladsParfait, ...sandwichesWraps].find(p => p.id == id);
-        if (productObj && productObj.variantOptions?.length) {
-            openProductModal(productObj);
-        } else if (productObj && isSandwich(productObj)) {
-            openSizePicker(productObj);
-        } else if (productObj && productSupportsExtras(productObj)) {
-            openExtrasModal(productObj);
-        } else {
-            addToCart(id, name, price, image);
-            showToast(`${name} added to cart!`);
-        }
-    }
-});
 
+                        const encodedMessage = encodeURIComponent(whatsappMessage);
+                        const whatsappUrl = `https://wa.me/2348036815517?text=${encodedMessage}`;
+                        window.open(whatsappUrl, '_blank');
+                        showToast(`Opening WhatsApp to inquire about ${name}`);
+                        return;
+                    }
+
+                    const productObj = [...smoothies, ...juices, ...granolaYogurt, ...saladsParfait, ...sandwichesWraps, ...detoxPlans.flatMap(plan => plan.options.map(option => ({
+                        id: `${plan.id}-${option.duration.replace(' ', '-')}`,
+                        name: `${plan.name} - ${option.duration}`,
+                        image: plan.image,
+                        category: 'Detox',
+                        price: option.price,
+                        options: plan.options
+                    })))].find(p => String(p.id) === String(id)) || product;
+
+                    if (action === 'review' || (productObj && productSupportsExtras(productObj))) {
+                        if (productObj && productObj.variantOptions?.length) {
+                            openProductModal(productObj);
+                        } else if (productObj && isSandwich(productObj)) {
+                            openSizePicker(productObj);
+                        } else if (productObj) {
+                            openExtrasModal(productObj);
+                        } else {
+                            addToCart(id, name, price, image);
+                            showToast(`${name} added to cart!`);
+                        }
+                        return;
+                    }
+
+                    if (productObj && productObj.variantOptions?.length) {
+                        openProductModal(productObj);
+                    } else if (productObj && isSandwich(productObj)) {
+                        openSizePicker(productObj);
+                    } else if (productObj && productSupportsExtras(productObj)) {
+                        openExtrasModal(productObj);
+                    } else {
+                        addToCart(id, name, price, image);
+                        showToast(`${name} added to cart!`);
+                    }
+                });
                 // Add click event to favorite button
                 const favoriteBtn = card.querySelector('.favorite-btn');
                 favoriteBtn.addEventListener('click', function(e) {
@@ -9014,37 +9065,39 @@ Thank you!`;
                 .join('');
 
             const variantPicker = document.getElementById('product-modal-variant-picker');
-            if (product.variantOptions && product.variantOptions.length) {
-                const defaultVariant = product.variantOptions.find(option => option.default) || product.variantOptions[0];
-                currentProductVariant = defaultVariant.label;
-                variantPicker.style.display = 'block';
-                variantPicker.innerHTML = `
-                    <div class="product-modal-variant-header">
-                        <span>Choose your salad option</span>
-                        <strong>${defaultVariant.label}</strong>
-                    </div>
-                    <div class="product-modal-variant-options">
-                        ${product.variantOptions.map(option => `
-                            <button type="button" class="product-modal-variant-btn ${option.label === currentProductVariant ? 'selected' : ''}" data-variant-label="${option.label}" data-variant-price="${option.price}">
-                                <span>${option.label}</span>
-                                <strong>₦${option.price.toLocaleString()}</strong>
-                            </button>
-                        `).join('')}
-                    </div>
-                `;
-                variantPicker.querySelectorAll('.product-modal-variant-btn').forEach(button => {
-                    button.addEventListener('click', () => {
-                        currentProductVariant = button.dataset.variantLabel;
-                        variantPicker.querySelectorAll('.product-modal-variant-btn').forEach(item => item.classList.toggle('selected', item.dataset.variantLabel === currentProductVariant));
-                        const selectedVariant = product.variantOptions.find(option => option.label === currentProductVariant) || product.variantOptions[0];
-                        document.getElementById('product-modal-price').textContent = `₦${selectedVariant.price.toLocaleString()}`;
-                        variantPicker.querySelector('.product-modal-variant-header strong').textContent = selectedVariant.label;
+            if (variantPicker) {
+                if (product.variantOptions && product.variantOptions.length) {
+                    const defaultVariant = product.variantOptions.find(option => option.default) || product.variantOptions[0];
+                    currentProductVariant = defaultVariant.label;
+                    variantPicker.style.display = 'block';
+                    variantPicker.innerHTML = `
+                        <div class="product-modal-variant-header">
+                            <span>Choose your salad option</span>
+                            <strong>${defaultVariant.label}</strong>
+                        </div>
+                        <div class="product-modal-variant-options">
+                            ${product.variantOptions.map(option => `
+                                <button type="button" class="product-modal-variant-btn ${option.label === currentProductVariant ? 'selected' : ''}" data-variant-label="${option.label}" data-variant-price="${option.price}">
+                                    <span>${option.label}</span>
+                                    <strong>₦${option.price.toLocaleString()}</strong>
+                                </button>
+                            `).join('')}
+                        </div>
+                    `;
+                    variantPicker.querySelectorAll('.product-modal-variant-btn').forEach(button => {
+                        button.addEventListener('click', () => {
+                            currentProductVariant = button.dataset.variantLabel;
+                            variantPicker.querySelectorAll('.product-modal-variant-btn').forEach(item => item.classList.toggle('selected', item.dataset.variantLabel === currentProductVariant));
+                            const selectedVariant = product.variantOptions.find(option => option.label === currentProductVariant) || product.variantOptions[0];
+                            document.getElementById('product-modal-price').textContent = `₦${selectedVariant.price.toLocaleString()}`;
+                            variantPicker.querySelector('.product-modal-variant-header strong').textContent = selectedVariant.label;
+                        });
                     });
-                });
-            } else {
-                currentProductVariant = null;
-                variantPicker.style.display = 'none';
-                variantPicker.innerHTML = '';
+                } else {
+                    currentProductVariant = null;
+                    variantPicker.style.display = 'none';
+                    variantPicker.innerHTML = '';
+                }
             }
 
             document.getElementById('seller-name').textContent = "MAY'S CHILLS";
@@ -9058,6 +9111,7 @@ Thank you!`;
                 const selectedVariant = product.variantOptions.find(option => option.label === currentProductVariant) || product.variantOptions.find(option => option.default) || product.variantOptions[0];
                 document.getElementById('product-modal-price').textContent = `₦${selectedVariant.price.toLocaleString()}`;
                 document.getElementById('product-modal-add-btn').style.display = 'block';
+                document.getElementById('product-modal-add-btn').innerHTML = '<i class="hgi-stroke hgi-checkmark-circle-02 modal-icon" aria-hidden="true"></i> ' + (productSupportsExtras(product) ? 'Review & Add' : 'Buy Now');
                 document.getElementById('product-modal-inquire-btn').style.display = 'none';
             } else if (product.options && product.options.length) {
                 const startingPrice = Math.min(...product.options.map(option => option.price));
@@ -9075,6 +9129,7 @@ Thank you!`;
             } else {
                 document.getElementById('product-modal-price').textContent = `₦${product.price.toLocaleString()}`;
                 document.getElementById('product-modal-add-btn').style.display = 'block';
+                document.getElementById('product-modal-add-btn').innerHTML = '<i class="hgi-stroke hgi-checkmark-circle-02 modal-icon" aria-hidden="true"></i> ' + (productSupportsExtras(product) ? 'Review & Add' : 'Buy Now');
                 document.getElementById('product-modal-inquire-btn').style.display = 'none';
             }
             
