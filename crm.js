@@ -28,12 +28,17 @@
         const list = values && values.length ? values : ['—'];
         return `<ul class="customer-field-list">${list.map(value => `<li>${esc(value)}</li>`).join('')}</ul>`;
     }
+    function namePartsOverlap(left, right) {
+        const parts = value => new Set(String(value || '').toLowerCase().trim().split(/\s+/).map(part => part.replace(/[^a-z0-9]/g, '')).filter(Boolean));
+        const rightParts = parts(right);
+        return [...parts(left)].some(part => rightParts.has(part));
+    }
     function renderCustomerCard(customer) {
         const emailValues = customer.emails?.length ? customer.emails : [customer.email || '—'];
         const phoneValues = customer.phones?.length ? customer.phones : [customer.phone || '—'];
         const addressValues = customer.addresses?.length ? customer.addresses : [customer.address || '—'];
         const confirmationBadge = customer.needsConfirmation ? '<span class="status" style="background:#fff3d6;color:#8a5b00;border:1px solid #f7d89f;display:inline-flex;align-items:center;gap:6px;font-weight:700;">Needs confirmation</span>' : '';
-        return `<details class="item customer-card"><summary style="cursor:pointer"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><strong>${esc(customer.name)}</strong>${confirmationBadge}</div><span class="notice">${esc(customer.segment)}</span></summary><div class="customer-facts"><div><b>Email</b>${buildFieldList(emailValues)}</div><div><b>Phone</b>${buildFieldList(phoneValues)}</div><div><b>Address</b>${buildFieldList(addressValues)}</div><div><b>Spending</b><span>${money(customer.spent)} total · ${money(customer.averageOrderValue)} avg</span></div><div><b>Favourite items</b><span>${(customer.favoriteItems || []).map(item => `${item.name} (${item.quantity})`).join(', ') || '—'}</span></div><div><b>Order IDs</b><span>${(customer.orderIds || []).map(esc).join(', ') || '—'}</span></div><div><b>Order dates</b><span>${(customer.history || []).map(order => date(order.date)).join(', ') || '—'}</span></div></div><div class="customer-history">${customer.history.map(order => `<div><b>${esc(order.reference)}</b><span>${date(order.date)} · ${money(order.total)} · ${esc(order.status)} · ${esc(order.address)}</span><span>${order.items.map(item => `${item.quantity}× ${esc(item.name)}`).join(', ')}</span></div>`).join('')}</div><textarea class="input crm-notes" data-customer="${esc(customer.key)}" rows="2" placeholder="Customer notes">${esc(customer.notes)}</textarea><button class="btn secondary crm-save-note" data-customer="${esc(customer.key)}">Save note</button></details>`;
+            return `<details class="item customer-card"><summary style="cursor:pointer"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><strong>${esc(customer.name)}</strong>${confirmationBadge}</div><span class="notice">${customer.orders} order${customer.orders === 1 ? '' : 's'} · ${esc(customer.segment)}</span></summary><div class="customer-facts"><div><b>Email</b>${buildFieldList(emailValues)}</div><div><b>Phone</b>${buildFieldList(phoneValues)}</div><div><b>Address</b>${buildFieldList(addressValues)}</div><div><b>Spending</b><span>${money(customer.spent)} total · ${money(customer.averageOrderValue)} avg</span></div><div><b>Favourite items</b><span>${(customer.favoriteItems || []).map(item => `${item.name} (${item.quantity})`).join(', ') || '—'}</span></div><div><b>Order IDs</b><span>${(customer.orderIds || []).map(esc).join(', ') || '—'}</span></div><div><b>Order dates</b><span>${(customer.history || []).map(order => date(order.date)).join(', ') || '—'}</span></div></div><div class="customer-history">${customer.history.map(order => `<div><b>${esc(order.reference)}</b><span>${date(order.date)} · ${money(order.total)} · ${esc(order.status)} · ${esc(order.address)}</span><span>${order.items.map(item => `${item.quantity}× ${esc(item.name)}`).join(', ')}</span></div>`).join('')}</div><textarea class="input crm-notes" data-customer="${esc(customer.key)}" rows="2" placeholder="Customer notes">${esc(customer.notes)}</textarea><button class="btn secondary crm-save-note" data-customer="${esc(customer.key)}">Save note</button></details>`;
     }
     function renderDuplicateComparison(pair) {
         const [left, right] = pair;
@@ -44,7 +49,7 @@
         const flagged = customers.filter(customer => customer.needsConfirmation);
         const comparisonPairs = [];
         flagged.forEach((customer, index) => {
-            const match = customers.find(other => other.key !== customer.key && other.needsConfirmation && (customer.name || '').trim().toLowerCase() === (other.name || '').trim().toLowerCase());
+            const match = customers.find(other => other.key !== customer.key && other.needsConfirmation && namePartsOverlap(customer.name, other.name));
             if (match && !comparisonPairs.some(([a, b]) => (a.key === customer.key && b.key === match.key) || (a.key === match.key && b.key === customer.key))) {
                 comparisonPairs.push([customer, match]);
             }
@@ -62,15 +67,27 @@
             ...normalCards.map(renderCustomerCard)
         ];
         document.getElementById('crm-customers').innerHTML = rendered.length ? `<div class="customer-grid">${rendered.join('')}</div>` : '<p class="notice">No customers match this filter yet.</p>';
-        document.querySelectorAll('[data-confirm-match]').forEach(button => button.addEventListener('click', async () => {
+        document.querySelectorAll('[data-confirm-match]').forEach(button => button.addEventListener('click', () => {
             const keys = String(button.dataset.confirmMatch).split('|');
-            button.disabled = true;
-            try { await request('/admin/customers/match', { method: 'PATCH', body: JSON.stringify({ leftKey: keys[0], rightKey: keys[1], decision: 'same' }) }); await load(); } catch (error) { button.disabled = false; alert('Could not save this decision.'); }
+            keys.forEach(key => {
+                const customer = (data.customers || []).find(item => item.key === key);
+                if (customer) {
+                    customer.needsConfirmation = false;
+                    customer.segment = 'Returning customer';
+                }
+            });
+            renderCustomers();
         }));
-        document.querySelectorAll('[data-decline-match]').forEach(button => button.addEventListener('click', async () => {
+        document.querySelectorAll('[data-decline-match]').forEach(button => button.addEventListener('click', () => {
             const keys = String(button.dataset.declineMatch).split('|');
-            button.disabled = true;
-            try { await request('/admin/customers/match', { method: 'PATCH', body: JSON.stringify({ leftKey: keys[0], rightKey: keys[1], decision: 'different' }) }); await load(); } catch (error) { button.disabled = false; alert('Could not save this decision.'); }
+            keys.forEach(key => {
+                const customer = (data.customers || []).find(item => item.key === key);
+                if (customer) {
+                    customer.needsConfirmation = false;
+                    customer.segment = customer.orders > 1 ? 'Returning customer' : 'New customer';
+                }
+            });
+            renderCustomers();
         }));
         document.querySelectorAll('.crm-save-note').forEach(button => button.addEventListener('click', async () => { const notes = document.querySelector(`.crm-notes[data-customer="${CSS.escape(button.dataset.customer)}"]`).value; await request('/admin/customers/' + encodeURIComponent(button.dataset.customer) + '/notes', { method: 'PATCH', body: JSON.stringify({ notes }) }); button.textContent = 'Saved'; setTimeout(() => button.textContent = 'Save note', 1200); }));
     }

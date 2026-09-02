@@ -493,7 +493,7 @@ function customerKey(order) {
     const name = normalizeCustomerName(order.customer_name || 'customer');
     if (email && email !== 'unknown@example.com') return `email:${email}`;
     if (phone && phone !== '0') return `phone:${phone}`;
-    return `name:${name}`;
+    return `order:${String(order.payment_reference || name)}`;
 }
 
 function identityMatch(orderA, orderB) {
@@ -504,6 +504,16 @@ function identityMatch(orderA, orderB) {
     if (emailA && emailB && emailA === emailB) return true;
     if (phoneA && phoneB && phoneA === phoneB) return true;
     return false;
+}
+
+function customerNameTokens(value) {
+    return new Set(String(value || '').trim().toLowerCase().split(/\s+/).map(token => token.replace(/[^a-z0-9]/g, '')).filter(Boolean));
+}
+
+function namesNeedConfirmation(left, right) {
+    const leftTokens = customerNameTokens(left);
+    const rightTokens = customerNameTokens(right);
+    return [...leftTokens].some(token => rightTokens.has(token));
 }
 
 function customerPairKey(left, right) {
@@ -546,16 +556,25 @@ function buildAnalytics(orders, notes = {}, decisions = {}, range = {}) {
         return { sales, orders: selected.length, units, customers: customers.size, products: [...products.values()] };
     };
     const current = summarize(periodOrders); const previous = summarize(previousOrders);
-    const baseKeys = [...new Set(orders.map(customerKey))];
-    const parent = new Map(baseKeys.map(key => [key, key]));
-    const findRoot = key => { let root = parent.get(key) || key; while (parent.get(root) !== root) root = parent.get(root); let current = key; while (parent.get(current) !== current) { const next = parent.get(current); parent.set(current, root); current = next; } return root; };
-    const union = (left, right) => { const leftRoot = findRoot(left); const rightRoot = findRoot(right); if (leftRoot !== rightRoot) parent.set(rightRoot, leftRoot); };
-    Object.entries(decisions).forEach(([pair, decision]) => { if (decision !== 'same') return; const [left, right] = pair.split('|'); if (parent.has(left) && parent.has(right)) union(left, right); });
+    const parent = orders.map((_order, index) => index);
+    const findRoot = index => { let root = index; while (parent[root] !== root) root = parent[root]; while (parent[index] !== index) { const next = parent[index]; parent[index] = root; index = next; } return root; };
+    const union = (left, right) => { const leftRoot = findRoot(left); const rightRoot = findRoot(right); if (leftRoot !== rightRoot) parent[rightRoot] = leftRoot; };
+    orders.forEach((order, index) => orders.slice(index + 1).forEach((other, otherIndex) => { if (identityMatch(order, other)) union(index, index + otherIndex + 1); }));
+    const orderKeys = orders.map(order => customerKey(order));
+    Object.entries(decisions).forEach(([pair, decision]) => {
+        if (decision !== 'same') return;
+        const [left, right] = pair.split('|');
+        const leftIndex = orderKeys.findIndex(key => key === left);
+        const rightIndex = orderKeys.findIndex(key => key === right);
+        if (leftIndex >= 0 && rightIndex >= 0) union(leftIndex, rightIndex);
+    });
     const customerMap = new Map(); const productMap = new Map(); const daily = new Map(); const hours = new Map();
     orders.forEach(order => {
         const date = new Date(order.created_at); const inPeriod = date >= start && date <= end;
         const normalizedName = String(order.customer_name || 'Customer').trim();
-        let key = findRoot(customerKey(order));
+        const orderIndex = orders.indexOf(order);
+        const root = findRoot(orderIndex);
+        let key = customerKey(orders[root]);
         let customer = customerMap.get(key);
         if (!customer) {
             customer = {
@@ -597,7 +616,7 @@ function buildAnalytics(orders, notes = {}, decisions = {}, range = {}) {
     });
     const groupedCustomers = [...customerMap.values()];
     groupedCustomers.forEach((customer, index) => groupedCustomers.slice(index + 1).forEach(other => {
-        if (normalizeCustomerName(customer.name) && normalizeCustomerName(customer.name) === normalizeCustomerName(other.name) && decisions[customerPairKey(customer.key, other.key)] !== 'different') {
+        if (namesNeedConfirmation(customer.name, other.name) && decisions[customerPairKey(customer.key, other.key)] !== 'different') {
             customer.needsConfirmation = true;
             other.needsConfirmation = true;
         }
