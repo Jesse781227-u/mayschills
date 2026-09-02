@@ -8851,7 +8851,7 @@ const menuPriceDisplay = product.onRequest
                 // Add click event to card for modal
                 card.addEventListener('click', function(e) {
                     if (!e.target.classList.contains('add-btn') && !e.target.classList.contains('favorite-btn')) {
-                        openOrderingDetail(product);
+                        openProductModal(product);
                     }
                 });
                 
@@ -8889,7 +8889,9 @@ Thank you!`;
         showToast(`Opening WhatsApp to inquire about ${name}`);
     } else {
         const productObj = [...saladsParfait, ...sandwichesWraps].find(p => p.id == id);
-        if (productObj && isSandwich(productObj)) {
+        if (productObj && productObj.variantOptions?.length) {
+            openProductModal(productObj);
+        } else if (productObj && isSandwich(productObj)) {
             openSizePicker(productObj);
         } else if (productObj && productSupportsExtras(productObj)) {
             openExtrasModal(productObj);

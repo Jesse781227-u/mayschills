@@ -1622,6 +1622,13 @@
             box-shadow: 0 8px 18px rgba(0, 148, 68, 0.14);
         }
 
+        .product-modal-variant-btn img {
+            width: 100%;
+            height: 74px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
         .product-modal-add-btn,
         .product-modal-inquire-btn {
             flex: 1;
@@ -1867,10 +1874,27 @@
             .product-modal-main {
                 gap: 20px;
                 padding: 20px;
+                grid-template-columns: minmax(0, 1fr);
             }
 
             .product-modal-image-container {
                 aspect-ratio: 4 / 3;
+            }
+
+            .product-modal-variant-options {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 6px;
+            }
+
+            .product-modal-variant-btn {
+                min-width: 0;
+                padding: 7px 6px;
+                font-size: 11px;
+                overflow-wrap: anywhere;
+            }
+
+            .product-modal-variant-btn img {
+                height: 58px;
             }
         }
 
@@ -2729,10 +2753,15 @@
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 8px;
+            width: 100%;
+            min-width: 0;
         }
 
         .ordering-salad-option {
             position: relative;
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
             min-height: 112px;
             padding: 13px 10px 10px;
             border: 1.5px solid rgba(23, 53, 40, 0.12);
@@ -2755,6 +2784,15 @@
             box-shadow: 0 8px 18px rgba(0, 148, 68, 0.12);
         }
 
+        .ordering-salad-option-image {
+            width: 100%;
+            height: 54px;
+            display: block;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
         .ordering-salad-option-icon {
             display: block;
             margin-bottom: 8px;
@@ -2766,6 +2804,7 @@
             padding-right: 12px;
             font-size: 12px;
             line-height: 1.25;
+            overflow-wrap: anywhere;
         }
 
         .ordering-salad-option-price {
@@ -2787,7 +2826,7 @@
             text-transform: uppercase;
         }
 
-        .ordering-salad-option-badge + .ordering-salad-option-icon {
+        .ordering-salad-option-badge + .ordering-salad-option-image {
             margin-top: 8px;
         }
 
@@ -2823,8 +2862,8 @@
                 border-radius: 13px;
             }
 
-            .ordering-salad-option-icon {
-                font-size: 17px;
+            .ordering-salad-option-image {
+                height: 45px;
             }
 
             .ordering-salad-option-name {
@@ -6601,14 +6640,7 @@ showBrowserNotification(order) {
     if (Notification.permission === "granted") {
         this.createBrowserNotification(order);
     } 
-    // Otherwise, ask for permission
-    else if (Notification.permission !== "denied") {
-        Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-                this.createBrowserNotification(order);
-            }
-        });
-    }
+    // Permission requests are temporarily disabled. Existing grants still work.
 },
 
 // Create the actual browser notification
@@ -8690,10 +8722,15 @@ function updateCartItemQuantity(id, change) {
             return Number(product.price || 0);
         }
 
-        // Add an image URL to each salad option when the preparation photos are ready.
-        // Example: { label: 'With Egg', price: 8000, image: 'images/salad-egg.jpg' }
+        const SALAD_OPTION_IMAGES = {
+            'With Egg': 'https://i.ibb.co/W4t47hCK/g-VBj-Q.jpg',
+            'With Avocado': 'https://i.ibb.co/N29gGF2r/fegxd.jpg',
+            'With Avocado & Egg': 'https://i.ibb.co/x8hWMfty/images-5.jpg'
+        };
+
+        // A product can override these shared preparation images with option.image or variantImages.
         function getSaladOptionImage(product, option) {
-            return option?.image || product?.variantImages?.[option?.label] || product?.image;
+            return option?.image || product?.variantImages?.[option?.label] || SALAD_OPTION_IMAGES[option?.label] || product?.image;
         }
 
         function orderingAllProducts() {
@@ -8796,13 +8833,13 @@ function updateCartItemQuantity(id, change) {
             if (product.variantOptions && product.variantOptions.length) {
                 const defaultVariant = product.variantOptions.find(option => option.default) || product.variantOptions[0];
                 currentProductVariant = defaultVariant.label;
-                document.getElementById('ordering-detail-image').src = getSaladOptionImage(product, defaultVariant);
+                // Keep the large hero image as the salad photo; option photos stay inside the cards.
+                document.getElementById('ordering-detail-image').src = product.image;
                 saladConfig.hidden = false;
                 saladOptions.innerHTML = product.variantOptions.map(option => {
-                    const icon = option.label.includes('Avocado') ? (option.label.includes('Egg') ? '🥚🥑' : '🥑') : '🥚';
                     return `<button class="ordering-salad-option ${option.label === currentProductVariant ? 'selected' : ''}" type="button" data-ordering-variant="${option.label}">
                         ${option.default ? '<span class="ordering-salad-option-badge">Most popular</span>' : ''}
-                        <span class="ordering-salad-option-icon" aria-hidden="true">${icon}</span>
+                        <img class="ordering-salad-option-image" src="${getSaladOptionImage(product, option)}" alt="${option.label}">
                         <span class="ordering-salad-option-name">${option.label}</span>
                         <span class="ordering-salad-option-price">₦${option.price.toLocaleString()}</span>
                         <span class="ordering-salad-option-check" aria-hidden="true">✓</span>
@@ -8833,7 +8870,8 @@ function updateCartItemQuantity(id, change) {
         function updateOrderingSaladPrice() {
             if (!orderingProduct?.variantOptions?.length) return;
             const selectedVariant = orderingProduct.variantOptions.find(option => option.label === currentProductVariant) || orderingProduct.variantOptions[0];
-            document.getElementById('ordering-detail-image').src = getSaladOptionImage(orderingProduct, selectedVariant);
+            // Variant changes should not replace the main salad photo with an ingredient photo.
+            document.getElementById('ordering-detail-image').src = orderingProduct.image;
             document.getElementById('ordering-detail-price').textContent = `₦${selectedVariant.price.toLocaleString()}`;
             document.getElementById('ordering-detail-add').innerHTML = `<i class="hgi-stroke hgi-checkmark-circle-02" aria-hidden="true"></i> Review &amp; Add · ₦${selectedVariant.price.toLocaleString()}`;
         }
@@ -9046,7 +9084,7 @@ const menuPriceDisplay = product.onRequest
                 // Add click event to card for modal
                 card.addEventListener('click', function(e) {
                     if (!e.target.classList.contains('add-btn') && !e.target.classList.contains('favorite-btn')) {
-                        openOrderingDetail(product);
+                        openProductModal(product);
                     }
                 });
                 
@@ -9085,7 +9123,7 @@ Thank you!`;
     } else {
         const productObj = [...saladsParfait, ...sandwichesWraps].find(p => p.id == id);
         if (productObj && productObj.variantOptions?.length) {
-            openOrderingDetail(productObj);
+            openProductModal(productObj);
         } else if (productObj && isSandwich(productObj)) {
             openSizePicker(productObj);
         } else if (productObj && productSupportsExtras(productObj)) {
@@ -9221,6 +9259,7 @@ Thank you!`;
                     <div class="product-modal-variant-options">
                         ${product.variantOptions.map(option => `
                             <button type="button" class="product-modal-variant-btn ${option.label === currentProductVariant ? 'selected' : ''}" data-variant-label="${option.label}" data-variant-price="${option.price}">
+                                <img src="${getSaladOptionImage(product, option)}" alt="${option.label}">
                                 <span>${option.label}</span>
                                 <strong>₦${option.price.toLocaleString()}</strong>
                             </button>
@@ -9232,6 +9271,7 @@ Thank you!`;
                         currentProductVariant = button.dataset.variantLabel;
                         variantPicker.querySelectorAll('.product-modal-variant-btn').forEach(item => item.classList.toggle('selected', item.dataset.variantLabel === currentProductVariant));
                         const selectedVariant = product.variantOptions.find(option => option.label === currentProductVariant) || product.variantOptions[0];
+                        document.getElementById('product-modal-image').src = product.image;
                         document.getElementById('product-modal-price').textContent = `₦${selectedVariant.price.toLocaleString()}`;
                         variantPicker.querySelector('.product-modal-variant-header strong').textContent = selectedVariant.label;
                     });

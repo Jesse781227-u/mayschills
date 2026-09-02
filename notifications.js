@@ -1,4 +1,7 @@
 (function () {
+    // Temporarily keep the notification permission prompt hidden.
+    // Set to true when order-update subscriptions should be offered again.
+    const NOTIFICATION_PROMPT_ENABLED = false;
     const API = () => (window.MAYCHILLS_API_URL || 'https://mayschillsbackend.onrender.com');
     const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
@@ -25,6 +28,7 @@
         button.textContent = 'Order updates enabled'; button.disabled = true;
     }
     async function showAfterOrder(details = {}) {
+        if (!NOTIFICATION_PROMPT_ENABLED) return;
         if ('serviceWorker' in navigator && 'PushManager' in window) {
             const registration = await navigator.serviceWorker.getRegistration('/');
             if (registration && await registration.pushManager.getSubscription()) return;
@@ -43,7 +47,7 @@
         prompt.querySelector('#mc-close-push').onclick = () => prompt.remove();
         prompt.querySelector('#mc-enable-push').onclick = async event => { const error = prompt.querySelector('#mc-push-error'); try { await enable(event.currentTarget, details); setTimeout(() => prompt.remove(), 1200); } catch (reason) { error.textContent = reason.message; } };
     }
-    function showOnShopLoad() { if (/\/shop(?:\.html)?$/.test(location.pathname) || location.pathname === '/') showAfterOrder({ demo: true }).catch(() => {}); }
+    function showOnShopLoad() { if (NOTIFICATION_PROMPT_ENABLED && (/\/shop(?:\.html)?$/.test(location.pathname) || location.pathname === '/')) showAfterOrder({ demo: true }).catch(() => {}); }
     window.MayChillsNotifications = { enable, showAfterOrder };
     if (document.readyState === 'complete') showOnShopLoad(); else window.addEventListener('load', showOnShopLoad, { once: true });
 })();
