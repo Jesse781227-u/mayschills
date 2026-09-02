@@ -36,4 +36,6 @@ customerSort.addEventListener('change',renderCustomers);document.addEventListene
 </script><script>
 document.head.insertAdjacentHTML('beforeend','<link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css">');
 ['hgi-home-05','hgi-bell-dot','hgi-user-group-03','hgi-boxes'].forEach((icon,index)=>{const target=document.querySelectorAll('.bottom-nav .nav-icon')[index];if(target)target.outerHTML=`<i class="hgi hgi-stroke hgi-rounded ${icon}" aria-hidden="true"></i>`});
+</script><script>
+document.getElementById('login-form').addEventListener('submit',async e=>{e.preventDefault();e.stopImmediatePropagation();const button=e.submitter;button.disabled=true;try{const d=await request('/admin/login',{method:'POST',body:JSON.stringify({password:$('password').value})});token=d.token;sessionStorage.setItem('maychills_admin_token',token);$('login-panel').classList.add('hidden');$('app').classList.remove('hidden');Promise.all([loadAnalytics(),loadOrders(),loadInventory()]).catch(()=>{})}catch(err){$('login-error').textContent=err.message==='Invalid password'?'Invalid password':'Unable to reach the admin API.'}finally{button.disabled=false}},true);
 </script></body></html>
