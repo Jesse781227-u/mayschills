@@ -1883,18 +1883,28 @@
 
             .product-modal-variant-options {
                 grid-template-columns: repeat(3, minmax(0, 1fr));
-                gap: 6px;
+                gap: 4px;
             }
 
             .product-modal-variant-btn {
                 min-width: 0;
-                padding: 7px 6px;
-                font-size: 11px;
+                padding: 6px 3px;
+                font-size: 10px;
                 overflow-wrap: anywhere;
+                overflow: hidden;
+                text-align: center;
+            }
+
+            .product-modal-variant-btn span,
+            .product-modal-variant-btn strong {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                width: 100%;
             }
 
             .product-modal-variant-btn img {
-                height: 58px;
+                height: 48px;
             }
 
             .product-modal-content {
@@ -8724,6 +8734,13 @@ function updateCartItemQuantity(id, change) {
                     openExtrasModal(customizableProduct);
                     selectedChoices.saladOption = selectedVariant.label;
                 }, 300);
+                return;
+            }
+
+            // Wraps and parfaits must go through the add/remove customization screen.
+            if (['wrap', 'parfait'].includes(getProductCustomizationType(currentProduct))) {
+                closeProductModal();
+                setTimeout(() => openExtrasModal(currentProduct), 300);
                 return;
             }
 
