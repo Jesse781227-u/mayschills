@@ -645,11 +645,13 @@ function formatCustomizationLines(item) {
         .replace(/\b\w/g, character => character.toUpperCase());
     const lines = [];
     if (!item.customizations && Array.isArray(item.customizationSummary)) return item.customizationSummary.map(String);
-    if (customizations.type) lines.push(`Customization type: ${label(customizations.type)}`);
+    const isSalad = customizations.type === 'salad';
+    if (customizations.type && !isSalad) lines.push(`Customization type: ${label(customizations.type)}`);
     const choices = customizations.choices || {};
     const choiceLabels = { saladOption: 'Salad option', protein: 'Protein selection', chickenStyle: 'Chicken style', toppings: 'Toppings', placement: 'Topping placement', honey: 'Honey preference' };
     Object.entries(choices).forEach(([key, value]) => {
         if (value === '' || value === null || value === undefined || value === 'DEFAULT' || value === 'MIXED') return;
+        if (isSalad && key === 'chickenStyle') return;
         const rendered = Array.isArray(value) ? value.map(label).join(', ') : String(value).split('+').map(label).join(' + ');
         lines.push(`${choiceLabels[key] || label(key)}: ${rendered}`);
     });
