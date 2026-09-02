@@ -3065,7 +3065,7 @@
         }
 
         .customization-hint {
-            margin: -4px 0 12px;
+            margin: -4px 0 12px 8px;
             color: var(--muted);
             font-size: 12px;
         }
@@ -4868,9 +4868,6 @@
                             <div class="product-modal-dots-container" id="product-modal-dots">
                                 <!-- Dots will be generated dynamically -->
                             </div>
-                            <button class="product-modal-similar-btn" id="find-similar-btn">
-                                <i class="hgi-stroke hgi-search-01 modal-icon" aria-hidden="true"></i> Find Similar
-                            </button>
                         </div>
                     </div>
 
@@ -4901,25 +4898,6 @@
                         <!-- Description -->
                         <div class="product-modal-description" id="product-modal-description"></div>
                         <div class="product-modal-ingredients" id="product-modal-ingredients" style="display: none;"></div>
-
-                        <!-- Seller Section -->
-                        <div class="product-modal-seller">
-                            <div class="product-modal-seller-info">
-                                <img class="product-modal-seller-avatar" id="seller-avatar" src="" alt="">
-                                <div class="product-modal-seller-details">
-                                    <h4 id="seller-name"></h4>
-                                    <div class="product-modal-seller-rating">
-                                        <span class="stars" id="seller-rating">
-                                            <!-- Stars will be generated dynamically -->
-                                        </span>
-                                        <span id="seller-rating-value"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <button class="product-modal-seller-link" id="view-all-listings">
-                                All listings →
-                            </button>
-                        </div>
 
                         <!-- Reviews Section -->
                         <div class="reviews-section">
@@ -8089,7 +8067,7 @@ function getOrderTypeText(type) {
 
               if (removalKey) {
                   html += '<div class="extras-section-title">Leave out ingredients</div>';
-                  html += '<p class="customization-hint">   Select anything you do not want included.</p>';
+                  html += '<p class="customization-hint">Select anything you do not want included.</p>';
                   html += '<div class="customization-removals">';
                   REMOVABLE_INGREDIENTS[removalKey].forEach((ingredient, index) => {
                       const removalId = `remove_${removalKey}_${index}`;
@@ -8419,7 +8397,7 @@ function getOrderTypeText(type) {
                 });
             }
             if (rule?.removable?.length) {
-                html += '<div class="extras-section-title">Leave out ingredients</div><p class="customization-hint">   Select anything you do not want included.</p><div class="customization-removals">';
+                html += '<div class="extras-section-title">Leave out ingredients</div><p class="customization-hint">Select anything you do not want included.</p><div class="customization-removals">';
                 rule.removable.forEach((ingredientId, index) => {
                     const ingredient = INGREDIENTS[ingredientId] || { label: ingredientId, available: true };
                     if (ingredient.available === false) {
@@ -9365,11 +9343,6 @@ Thank you!`;
                 variantPicker.innerHTML = '';
             }
 
-            document.getElementById('seller-name').textContent = "MAY'S CHILLS";
-            document.getElementById('seller-avatar').src = 'https://i.ibb.co/yFgsqx49/IMG-20251112-WA0082.jpg';
-            document.getElementById('seller-avatar').alt = "MAY'S CHILLS";
-            document.getElementById('seller-rating').innerHTML = Array.from({ length: 5 }, () => '<i class="hgi-stroke hgi-star" aria-hidden="true"></i>').join('');
-            document.getElementById('seller-rating-value').textContent = 'Trusted kitchen';
             document.getElementById('product-modal-favorite').innerHTML = `<i class="hgi-stroke ${UserManager.isFavorited(product.id) ? 'hgi-favourite' : 'hgi-heart-add-01'} modal-icon" aria-hidden="true"></i>`;
             
             if (product.variantOptions && product.variantOptions.length) {
