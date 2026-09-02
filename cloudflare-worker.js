@@ -36,7 +36,7 @@ async function sendEmailNotification(order, transaction, env) {
 
         const templateParams = {
             to_email: env.BUSINESS_EMAIL,
-            to_name: "MAY'S CHILLS",
+            to_name: "Mayschills",
             order_id: 'MCH-' + order.id.slice(-8),
             customer_name: order.customerName || 'Guest Customer',
             customer_email: order.customerEmail || 'No email provided',
@@ -87,7 +87,7 @@ async function sendTelegramNotification(order, transaction, env) {
             : `\n<b>Fulfilment</b>\nType: ${order.type === 'pickup' ? 'Pickup' : 'In-house dining'}\nTime: ${order.deliverySlot || 'Not specified'}`;
 
         const message = [
-            "<b>✅ New Paid Order - May's Chills</b>",
+            "<b>✅ New Paid Order - Mayschills</b>",
             '',
             `<b>Order ID:</b> MCH-${order.id.slice(-8)}`,
             `<b>Customer:</b> ${order.customerName || 'Guest'}`,

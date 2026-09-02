@@ -1,6 +1,6 @@
 {
-  "name": "May's Chills",
-  "short_name": "May's Chills",
+  "name": "Mayschills",
+  "short_name": "Mayschills",
   "start_url": "/shop.html",
   "scope": "/",
   "display": "standalone",

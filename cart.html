@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Cart - MAY'S CHILLS</title>
+    <title>Your Cart - Mayschills</title>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css">
     <style>
@@ -170,7 +170,7 @@
     document.getElementById('close-share-modal').onclick = () => document.getElementById('share-modal').classList.remove('visible');
     document.getElementById('create-shared-cart').onclick = async () => { const items=cart.filter(item=>item.id !== 'delivery_fee'); const subtotal=items.reduce((sum,item)=>sum + Number(item.price||0)*Number(item.quantity||0),0); const button=document.getElementById('create-shared-cart'); button.disabled=true; try { const response=await fetch(`${API_BASE}/api/shared-carts`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items,subtotal,creatorName:localStorage.getItem('maychills_current_user') ? JSON.parse(localStorage.getItem('maychills_current_user')).name : 'A customer'})}); const data=await response.json(); if(!response.ok) throw new Error(data.error||'Unable to create shared cart'); sharedCart=data.sharedCart; localStorage.setItem('maychills_shared_cart_token',sharedCart.token); const link=`${location.origin}/checkout.html?sharedCart=${encodeURIComponent(sharedCart.token)}`; document.getElementById('share-link').value=link; document.getElementById('share-ready').hidden=false; button.hidden=true; renderSharedStatus(); } catch(error) { toast(error.message); } finally { button.disabled=false; } };
     document.getElementById('copy-share-link').onclick = async () => { await navigator.clipboard?.writeText(document.getElementById('share-link').value); toast('Link copied'); };
-    document.getElementById('native-share').onclick = async () => { const url=document.getElementById('share-link').value; if(navigator.share) await navigator.share({title:"May's Chills shared cart",text:'Someone else can pay for this order.',url}); else { await navigator.clipboard?.writeText(url); toast('Link copied'); } };
+    document.getElementById('native-share').onclick = async () => { const url=document.getElementById('share-link').value; if(navigator.share) await navigator.share({title:"Mayschills shared cart",text:'Someone else can pay for this order.',url}); else { await navigator.clipboard?.writeText(url); toast('Link copied'); } };
     document.getElementById('cancel-shared-cart').onclick = async () => { if(!sharedCart?.token) return; await fetch(`${API_BASE}/api/shared-carts/${encodeURIComponent(sharedCart.token)}/cancel`,{method:'POST'}); sharedCart.status='cancelled'; renderSharedStatus(); document.getElementById('share-modal').classList.remove('visible'); };
     render();
     refreshTracking();

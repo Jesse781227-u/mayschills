@@ -10,7 +10,7 @@
     const logo = document.createElement('img');
     logo.className = 'login-logo';
     logo.src = 'https://i.ibb.co/hJNHPS8T/IMG-20251112-WA0082.jpg';
-    logo.alt = "May's Chills logo";
+    logo.alt = "Mayschills logo";
     login.prepend(logo);
 
     const wrapper = document.createElement('div');

@@ -1,4 +1,4 @@
-# May's Chills admin setup
+# Mayschills admin setup
 
 The admin panel is available at `/admin.html` (or `/admin` if the host is configured to remove `.html`). It is protected by the Worker API, not by a password stored in the page.
 

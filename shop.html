@@ -6,7 +6,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://i.ibb.co/hJNHPS8T/IMG-20251112-WA0082.jpg">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>MAY'S CHILLS - Mobile Menu</title>
+    <title>Mayschills - Mobile Menu</title>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css">
     <link rel="icon" type="image/png" href="https://i.ibb.co/yFgsqx49/IMG-20251112-WA0082.jpg">
@@ -4608,7 +4608,7 @@
     <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
         <div class="loading-logo">
-            <img src="https://i.ibb.co/hJNHPS8T/IMG-20251112-WA0082.jpg" alt="MAY'S CHILLS">
+            <img src="https://i.ibb.co/hJNHPS8T/IMG-20251112-WA0082.jpg" alt="Mayschills">
         </div>
         <div class="loading-bar-container">
             <div class="loading-bar" id="loadingBar"></div>
@@ -4630,7 +4630,7 @@
             <section class="ordering-screen active" id="ordering-home-screen" aria-label="Home">
                 <div class="ordering-topbar">
                     <button class="ordering-icon-btn" type="button" aria-label="Open menu"><i class="hgi-stroke hgi-menu-01" aria-hidden="true"></i></button>
-                    <h1>MAY'S CHILLS</h1>
+                    <h1>Mayschills</h1>
                     <button class="ordering-icon-btn ordering-avatar" id="ordering-account-btn" type="button" aria-label="Open account"><img src="https://i.ibb.co/yFgsqx49/IMG-20251112-WA0082.jpg" alt="Account"></button>
                 </div>
 
@@ -4718,7 +4718,7 @@
         <!-- Mobile Header -->
         <header class="mobile-header">
             <div>
-                <div class="shop-name">MAY'S CHILLS</div>
+                <div class="shop-name">Mayschills</div>
                 <div class="tagline">Full Mobile Menu</div>
             </div>
 
@@ -6032,7 +6032,7 @@ const TelegramNotifier = {
               ].join('\n');
 
         return [
-            "<b>New Paid Order - May's Chills</b>",
+            "<b>New Paid Order - Mayschills</b>",
             '',
             `<b>Order ID:</b> ${this.escapeHtml('MCH-' + order.id.slice(-8))}`,
             `<b>Customer:</b> ${this.escapeHtml(order.customerName || 'Guest Customer')}`,
@@ -6419,7 +6419,7 @@ async sendOrderNotificationEmail(order, transaction) {
         const templateParams = {
             // REQUIRED: Who receives this email (YOUR BUSINESS)
             to_email: businessEmail,
-            to_name: "MAY'S CHILLS",
+            to_name: "Mayschills",
             
             // Order info
             order_id: 'MCH-' + order.id.slice(-8),
@@ -6507,7 +6507,7 @@ async sendCustomerConfirmation(order) {
             delivery_info: order.type === 'delivery' ? 
                 `Your order will be delivered to: ${order.deliveryAddress}` :
                 'Your order is ready for pickup.',
-            business_name: "MAY'S CHILLS",
+            business_name: "Mayschills",
             business_phone: "+234 803 681 5517"
         };
 
@@ -6598,7 +6598,7 @@ async sendCustomerConfirmationEmail(order) {
     try {
         const customerTemplateParams = {
             to_email: order.customerEmail,
-            subject: `Your May's Chills Order #${order.id.slice(-8)} is Confirmed!`,
+            subject: `Your Mayschills Order #${order.id.slice(-8)} is Confirmed!`,
             customer_name: order.customerName,
             order_id: order.id,
             order_date: new Date(order.date).toLocaleString('en-US', {
@@ -9156,7 +9156,7 @@ addBtn.addEventListener('click', function(e) {
     
     if (action === 'inquire') {
         // Open WhatsApp with pre-filled enquiry message
-        const whatsappMessage = `Hello MAY'S CHILLS! I'd like to inquire about: ${name}
+        const whatsappMessage = `Hello Mayschills! I'd like to inquire about: ${name}
         
 
 
@@ -9810,7 +9810,7 @@ const DeliveryLocationSystem = {
     generateWhatsAppMessage() {
         const orderSummary = this.generateOrderSummary();
         
-        return `Hello MAY'S CHILLS!
+        return `Hello Mayschills!
 
 ORDER SUMMARY:
 ${orderSummary.items}
@@ -10010,7 +10010,7 @@ function generateWhatsAppMessage() {
     // Get delivery instructions if any
     const instructions = document.getElementById('delivery-instructions').value.trim();
     
-    return `Hello MAY'S CHILLS!
+    return `Hello Mayschills!
 
 ORDER SUMMARY:
 ${cartItems}
@@ -10673,7 +10673,7 @@ generateWhatsAppMessage = function() {
     const slotText = DeliveryLocationSystem.slotText || 'Auto-allocated delivery slot';
     const instructions = document.getElementById('delivery-instructions').value.trim();
 
-    return `Hello MAY'S CHILLS!
+    return `Hello Mayschills!
 
 I would like to place an order:
 
@@ -11033,7 +11033,7 @@ document.getElementById('product-modal-add-btn').addEventListener('click', addFr
 document.getElementById('product-modal-inquire-btn').addEventListener('click', function() {
     if (currentProduct) {
         const product = currentProduct;
-        const whatsappMessage = `Hello MAY'S CHILLS! I'd like to inquire about: ${product.name}
+        const whatsappMessage = `Hello Mayschills! I'd like to inquire about: ${product.name}
 
 
 

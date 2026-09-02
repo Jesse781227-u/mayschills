@@ -1,4 +1,4 @@
-# Render Webhook Setup - May's Chills
+# Render Webhook Setup - Mayschills
 
 ## ⚡ Quick Deploy (5 minutes)
 

@@ -190,7 +190,7 @@ async function readAvailability() {
 app.get('/health', (_request, response) => json(response, 200, { status: 'ok' }));
 
 app.get('/', (_request, response) => json(response, 200, {
-    name: "May's Chills backend",
+    name: "Mayschills backend",
     status: 'ok',
     health: '/health'
 }));
@@ -707,14 +707,14 @@ function orderStatusMessage(status, customerName = 'there') {
     const messages = {
         received: `Thank you, ${firstName}. We have received your order and it is now in our queue.`,
         preparing: `Good news, ${firstName} — we are carefully preparing your order now.`,
-        ready: `Your order is ready, ${firstName}. We look forward to serving you at May's Chills.`,
+        ready: `Your order is ready, ${firstName}. We look forward to serving you at Mayschills.`,
         in_transit: `Your order is in transit, ${firstName}. It will be with you shortly.`,
         out_for_delivery: `Your order is in transit, ${firstName}. It will be with you shortly.`,
         delivered: `Your order has been delivered, ${firstName}. We hope you enjoy every sip and bite!`,
-        picked_up: `Your order has been picked up, ${firstName}. Thank you for choosing May's Chills.`,
+        picked_up: `Your order has been picked up, ${firstName}. Thank you for choosing Mayschills.`,
         cancelled: `Your order has been cancelled, ${firstName}. Please contact us if you need any assistance.`
     };
-    return messages[status] || `There is a new update regarding your May's Chills order, ${firstName}.`;
+    return messages[status] || `There is a new update regarding your Mayschills order, ${firstName}.`;
 }
 
 function verifyPaystackSignature(request, rawBody) {
@@ -798,7 +798,7 @@ async function sendEmail(order) {
             user_id: process.env.EMAILJS_KEY,
             template_params: {
                 to_email: process.env.BUSINESS_EMAIL,
-                to_name: "MAY'S CHILLS",
+                to_name: "Mayschills",
                 order_id: `MCH-${String(order.id).slice(-8)}`,
                 customer_name: order.customerName || 'Guest Customer',
                 customer_email: order.customerEmail || 'No email provided',
@@ -840,7 +840,7 @@ async function sendTelegram(order) {
     const note = order.orderNotes || order.order_notes ? `\n<b>Note:</b> ${escapeTelegram(order.orderNotes || order.order_notes)}` : '';
     const gift = order.isGift ? `\n<b>Gift recipient:</b> ${escapeTelegram(order.giftDetails?.recipientName || 'N/A')}\n<b>Recipient phone:</b> ${escapeTelegram(order.giftDetails?.recipientPhone || 'N/A')}${order.giftDetails?.message ? `\n<b>Gift message:</b> ${escapeTelegram(order.giftDetails.message)}` : ''}` : '';
     const message = [
-        "<b>New Paid Order - May's Chills</b>",
+        "<b>New Paid Order - Mayschills</b>",
         `<b>Order:</b> MCH-${escapeTelegram(String(order.id).slice(-8))}`,
         `<b>Customer:</b> ${escapeTelegram(order.customerName || 'Guest Customer')}`,
         `<b>Phone:</b> ${escapeTelegram(order.deliveryPhone || 'N/A')}`,
@@ -918,7 +918,7 @@ async function sendOrderPush(order, message) {
     for (const row of result.rows) {
         try {
             await webpush.sendNotification(row.subscription, JSON.stringify({
-                title: "Your May's Chills order",
+                title: "Your Mayschills order",
                 body: message,
                 reference: order.paymentReference || order.payment_reference
             }));
@@ -1056,5 +1056,5 @@ app.post('/webhook', async (request, response) => {
 });
 
 initializeDatabase()
-    .then(() => app.listen(port, () => { console.log(`May's Chills backend listening on ${port}`); setInterval(() => processScheduledNotifications().catch(error => console.error('Scheduled notification processing failed:', error)), 60 * 1000); }))
+    .then(() => app.listen(port, () => { console.log(`Mayschills backend listening on ${port}`); setInterval(() => processScheduledNotifications().catch(error => console.error('Scheduled notification processing failed:', error)), 60 * 1000); }))
     .catch(error => { console.error('Database initialization failed:', error); process.exit(1); });
