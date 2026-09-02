@@ -62,9 +62,9 @@
     <section class="card gift-panel">
         <label class="checkbox-row"><input id="is-gift" type="checkbox"> <strong>Buy as a gift</strong></label>
         <div class="gift-fields" id="gift-fields" hidden>
-            <label for="recipient-name">Recipient name</label><input id="recipient-name" placeholder="Who is this for?">
-            <label for="recipient-phone">Recipient phone number</label><input id="recipient-phone" placeholder="08012345678">
-            <label for="gift-message">Gift message (optional)</label><textarea id="gift-message" placeholder="Hope you enjoy this!"></textarea>
+            <label for="recipient-name">Recipient's name</label><input id="recipient-name" placeholder="Who is this for?">
+            <label for="recipient-phone">Recipient's phone number</label><input id="recipient-phone" placeholder="08012345678">
+            <label for="gift-message">Note for recipient</label><textarea id="gift-message" placeholder="Hope you enjoy this!"></textarea>
             <p style="font-size:12px;color:#78652e;margin:0">The recipient will see the gift message, not the price.</p>
         </div>
     </section>
@@ -210,7 +210,7 @@
         const address = document.getElementById('address').value.trim();
         if (!name || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert('Please enter your name and a valid email.');
         if (!/^(\+234|0)[789][01]\d{8}$/.test(phone)) return alert('Please enter a valid Nigerian phone number.');
-        if (isGift && (!recipientName || !/^(\+234|0)[789][01]\d{8}$/.test(recipientPhone))) return alert('Please enter the recipient name and a valid recipient phone number.');
+        if (isGift && (!recipientName || !/^(\+234|0)[789][01]\d{8}$/.test(recipientPhone))) return alert('Please enter the Recipient's name and a valid Recipient's phone number.');
         if (orderType === 'delivery' && (!document.getElementById('area').value || !address || !deliveryFee)) return alert('Please select a delivery area and enter your exact address.');
         if (!selectedTime) return alert('Please select a time for your order.');
         if (!items.length || !summaryTotal()) return alert('Your cart is empty.');
