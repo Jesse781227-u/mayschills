@@ -8089,7 +8089,7 @@ function getOrderTypeText(type) {
 
               if (removalKey) {
                   html += '<div class="extras-section-title">Leave out ingredients</div>';
-                  html += '<p class="customization-hint">Select anything you do not want included.</p>';
+                  html += '<p class="customization-hint">   Select anything you do not want included.</p>';
                   html += '<div class="customization-removals">';
                   REMOVABLE_INGREDIENTS[removalKey].forEach((ingredient, index) => {
                       const removalId = `remove_${removalKey}_${index}`;
@@ -8419,7 +8419,7 @@ function getOrderTypeText(type) {
                 });
             }
             if (rule?.removable?.length) {
-                html += '<div class="extras-section-title">Leave out ingredients</div><p class="customization-hint">Select anything you do not want included.</p><div class="customization-removals">';
+                html += '<div class="extras-section-title">Leave out ingredients</div><p class="customization-hint">   Select anything you do not want included.</p><div class="customization-removals">';
                 rule.removable.forEach((ingredientId, index) => {
                     const ingredient = INGREDIENTS[ingredientId] || { label: ingredientId, available: true };
                     if (ingredient.available === false) {
