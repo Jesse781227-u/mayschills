@@ -9071,8 +9071,8 @@ function updateCartItemQuantity(id, change) {
                 const isAvailable = isMenuItemAvailable(product);
                 const supportsCustomization = productSupportsExtras(product);
               const priceDisplay = product.onRequest ? 'On Request' : `₦${product.price.toLocaleString()}`;
-const buttonText = product.onRequest ? 'Inquire' : supportsCustomization ? 'Review & Add' : '＋';
-const buttonAction = product.onRequest ? 'inquire' : supportsCustomization ? 'review' : 'add';
+const buttonText = product.onRequest ? 'Inquire' : '＋';
+const buttonAction = product.onRequest ? 'inquire' : 'add';
 /* const menuPriceDisplay = product.onRequest
 const explicitMenuPriceDisplay = product.onRequest
     ? 'On Request'
@@ -9362,6 +9362,13 @@ Thank you!`;
                 document.getElementById('product-modal-inquire-btn').style.display = 'none';
             }
             
+            const modalAddButton = document.getElementById('product-modal-add-btn');
+            if (modalAddButton.style.display !== 'none') {
+                modalAddButton.innerHTML = productSupportsExtras(product)
+                    ? '<i class="hgi-stroke hgi-checkmark-circle-02 modal-icon" aria-hidden="true"></i> Review & Add'
+                    : '<i class="hgi-stroke hgi-shopping-cart-01 modal-icon" aria-hidden="true"></i> Buy Now';
+            }
+
             // Display reviews for this product
             ReviewSystem.displayProductReviews(product.id);
             

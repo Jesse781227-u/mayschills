@@ -8843,8 +8843,8 @@ function updateCartItemQuantity(id, change) {
                 const isAvailable = isMenuItemAvailable(product);
                 const supportsCustomization = productSupportsExtras(product);
                 const priceDisplay = product.onRequest ? 'On Request' : `₦${product.price.toLocaleString()}`;
-                const buttonText = product.onRequest ? 'Inquire' : supportsCustomization ? 'Review & Add' : '＋';
-                const buttonAction = product.onRequest ? 'inquire' : supportsCustomization ? 'review' : 'add';
+                const buttonText = product.onRequest ? 'Inquire' : '＋';
+                const buttonAction = product.onRequest ? 'inquire' : 'add';
                 const menuPriceDisplay = product.onRequest
                     ? 'On Request'
                     : isSandwich(product)
