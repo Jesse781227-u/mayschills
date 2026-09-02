@@ -639,15 +639,45 @@ function verifyPaystackSignature(request, rawBody) {
 
 function formatCustomizationLines(item) {
     const customizations = item.customizations || {};
+    const label = value => String(value || '')
+        .replace(/^ex_/, '')
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, character => character.toUpperCase());
     const lines = [];
-    (customizations.removed || []).forEach(id => lines.push(`Removed: ${id}`));
-    Object.entries(customizations.substitutions || {}).forEach(([from, to]) => lines.push(`Substitute: ${from} -> ${to}`));
+    if (!item.customizations && Array.isArray(item.customizationSummary)) return item.customizationSummary.map(String);
+    const choices = customizations.choices || {};
+    if (choices.saladOption) lines.push(`Salad option: ${label(choices.saladOption)}`);
+    if (choices.protein) lines.push(`Protein: ${choices.protein.split('+').map(label).join(' + ')}`);
+    if (choices.chickenStyle) lines.push(`Chicken style: ${label(choices.chickenStyle)}`);
+    if (choices.toppings && choices.toppings !== 'DEFAULT') lines.push(`Toppings: ${label(choices.toppings)}`);
+    if (choices.placement && choices.placement !== 'MIXED') lines.push(`Topping placement: ${label(choices.placement)}`);
+    if (choices.honey && choices.honey !== 'DEFAULT') lines.push(`Honey: ${label(choices.honey)}`);
+    (customizations.removed || []).forEach(id => lines.push(`Removed: ${label(id)}`));
+    Object.entries(customizations.substitutions || {}).forEach(([from, to]) => lines.push(`Substitute: ${label(from)} -> ${label(to)}`));
     (customizations.additions || []).forEach(addition => {
         const quantity = Number(addition.quantity || 1);
         const price = Number(addition.price || 0) * quantity;
-        lines.push(`Added: ${quantity > 1 ? `${quantity}x ` : ''}${addition.name || addition.id}${price ? ` +NGN${price.toLocaleString()}` : ''}`);
+        lines.push(`Added: ${quantity > 1 ? `${quantity}x ` : ''}${addition.name || label(addition.id)}${price ? ` +NGN${price.toLocaleString()}` : ''}`);
     });
+    const customizationTotal = Number(item.customizationTotal || 0);
+    if (customizationTotal) lines.push(`Customization total: +NGN${customizationTotal.toLocaleString()}`);
     return lines;
+}
+
+function normalizeOrderItems(items) {
+    let parsed = items;
+    if (typeof parsed === 'string') {
+        try { parsed = JSON.parse(parsed); } catch (_error) { parsed = []; }
+    }
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map(item => {
+        if (!item || typeof item !== 'object') return item;
+        let customizations = item.customizations || null;
+        if (typeof customizations === 'string') {
+            try { customizations = JSON.parse(customizations); } catch (_error) { customizations = null; }
+        }
+        return { ...item, customizations };
+    });
 }
 
 function buildItemsText(items) {
@@ -867,7 +897,7 @@ app.post('/webhook', async (request, response) => {
         if (payload.event !== 'charge.success' && payload.data?.status !== 'success') return json(response, 200, { received: true });
         const payment = payload.data || payload;
         const metadata = payment.metadata || {};
-        const items = metadata.items || metadata.cartItems || [];
+        const items = normalizeOrderItems(metadata.items || metadata.cartItems || []);
         const schedule = scheduleFor(metadata);
         const customerName = [payment.customer?.first_name, payment.customer?.last_name].filter(Boolean).join(' ') || metadata.customerName || 'Customer';
         const order = {
@@ -876,7 +906,7 @@ app.post('/webhook', async (request, response) => {
             customerEmail: payment.customer?.email || metadata.customerEmail || 'unknown@example.com',
             customerName,
             deliveryPhone: payment.customer?.phone || metadata.deliveryPhone || 'N/A',
-            items: Array.isArray(items) ? items : [],
+            items,
             subtotal: Number(metadata.subtotal || 0),
             deliveryFee: Number(metadata.deliveryFee || 0),
             total: Number(payment.amount || 0) / 100,

@@ -8564,8 +8564,9 @@ function updateCartItemQuantity(id, change) {
 
             // Wraps and parfaits must go through the add/remove customization screen.
             if (['wrap', 'parfait'].includes(getProductCustomizationType(currentProduct))) {
+                const customizableProduct = currentProduct;
                 closeProductModal();
-                setTimeout(() => openExtrasModal(currentProduct), 300);
+                setTimeout(() => openExtrasModal(customizableProduct), 300);
                 return;
             }
 
@@ -8573,8 +8574,9 @@ function updateCartItemQuantity(id, change) {
                 closeProductModal();
                 setTimeout(() => openSizePicker(currentProduct), 300);
             } else if (productSupportsExtras(currentProduct)) {
+                const customizableProduct = currentProduct;
                 closeProductModal();
-                setTimeout(() => openExtrasModal(currentProduct), 300);
+                setTimeout(() => openExtrasModal(customizableProduct), 300);
             } else {
                 addToCart(currentProduct.id, currentProduct.name, currentProduct.price, currentProduct.image);
                 showToast(`${currentProduct.name} added to cart!`);

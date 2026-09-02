@@ -6020,7 +6020,22 @@ const TelegramNotifier = {
     buildOrderMessage(order, transaction) {
         const itemsText = order.items.map(item => {
             const itemTotal = Number(item.price || 0) * Number(item.quantity || 0);
-            return `• ${this.escapeHtml(item.quantity)}x ${this.escapeHtml(item.name)} — ${this.escapeHtml(this.formatCurrency(itemTotal))}`;
+            const customizations = item.customizations || {};
+            const choices = customizations.choices || {};
+            const details = [
+                choices.saladOption && `Salad option: ${choices.saladOption}`,
+                choices.protein && `Protein: ${choices.protein.split('+').join(' + ')}`,
+                choices.chickenStyle && `Chicken style: ${choices.chickenStyle}`,
+                choices.toppings && choices.toppings !== 'DEFAULT' && `Toppings: ${choices.toppings}`,
+                choices.placement && choices.placement !== 'MIXED' && `Topping placement: ${choices.placement}`,
+                choices.honey && choices.honey !== 'DEFAULT' && `Honey: ${choices.honey}`,
+                ...(customizations.removed || []).map(value => `Removed: ${value}`),
+                ...Object.entries(customizations.substitutions || {}).map(([from, to]) => `Substitute: ${from} -> ${to}`),
+                ...(customizations.additions || []).map(addition => `Added: ${Number(addition.quantity || 1) > 1 ? `${addition.quantity}x ` : ''}${addition.name || addition.id}${addition.price ? ` +${this.formatCurrency(Number(addition.price) * Number(addition.quantity || 1))}` : ''}`),
+                item.customizationTotal && `Customization total: +${this.formatCurrency(item.customizationTotal)}`,
+                ...(!item.customizations && Array.isArray(item.customizationSummary) ? item.customizationSummary : [])
+            ].filter(Boolean).map(value => `\n  • ${this.escapeHtml(value)}`).join('');
+            return `• ${this.escapeHtml(item.quantity)}x ${this.escapeHtml(item.name)} — ${this.escapeHtml(this.formatCurrency(itemTotal))}${details}`;
         }).join('\n');
 
         const locationDetails = order.type === 'delivery'
@@ -6339,7 +6354,7 @@ async createOrderAfterPayment(transaction, metadata) {
         
         const order = {
             id: transaction.reference,
-            items: cart.filter(item => item.id !== 'delivery_fee').map(item => ({
+                items: cart.filter(item => item.id !== 'delivery_fee').map(item => ({
                 id: item.id,
                 productId: item.productId || item.id,
                 name: item.name,
@@ -8739,8 +8754,9 @@ function updateCartItemQuantity(id, change) {
 
             // Wraps and parfaits must go through the add/remove customization screen.
             if (['wrap', 'parfait'].includes(getProductCustomizationType(currentProduct))) {
+                const customizableProduct = currentProduct;
                 closeProductModal();
-                setTimeout(() => openExtrasModal(currentProduct), 300);
+                setTimeout(() => openExtrasModal(customizableProduct), 300);
                 return;
             }
 
@@ -8748,8 +8764,9 @@ function updateCartItemQuantity(id, change) {
                 closeProductModal();
                 setTimeout(() => openSizePicker(currentProduct), 300);
             } else if (productSupportsExtras(currentProduct)) {
+                const customizableProduct = currentProduct;
                 closeProductModal();
-                setTimeout(() => openExtrasModal(currentProduct), 300);
+                setTimeout(() => openExtrasModal(customizableProduct), 300);
             } else {
                 addToCart(currentProduct.id, currentProduct.name, currentProduct.price, currentProduct.image);
                 showToast(`${currentProduct.name} added to cart!`);
@@ -10892,7 +10909,9 @@ function showOrderSummaryModal() {
                 name: item.name,
                 price: item.price,
                 quantity: item.quantity,
-                customizations: item.customizations || null
+                    customizations: item.customizations || null,
+                    customizationTotal: item.customizationTotal || 0,
+                    customizationSummary: item.customizations ? getCustomizationLines(item) : []
             })),
             subtotal: cart.filter(item => item.id !== 'delivery_fee').reduce((sum, item) => sum + item.price * item.quantity, 0),
             deliveryFee: deliveryFee,
