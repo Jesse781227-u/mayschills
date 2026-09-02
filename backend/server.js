@@ -639,29 +639,37 @@ function verifyPaystackSignature(request, rawBody) {
 
 function formatCustomizationLines(item) {
     const customizations = item.customizations || {};
-    const label = value => String(value || '')
+    const label = value => String(value ?? '')
         .replace(/^ex_/, '')
         .replace(/_/g, ' ')
         .replace(/\b\w/g, character => character.toUpperCase());
     const lines = [];
     if (!item.customizations && Array.isArray(item.customizationSummary)) return item.customizationSummary.map(String);
+    if (customizations.type) lines.push(`Customization type: ${label(customizations.type)}`);
     const choices = customizations.choices || {};
-    if (choices.saladOption) lines.push(`Salad option: ${label(choices.saladOption)}`);
-    if (choices.protein) lines.push(`Protein: ${choices.protein.split('+').map(label).join(' + ')}`);
-    if (choices.chickenStyle) lines.push(`Chicken style: ${label(choices.chickenStyle)}`);
-    if (choices.toppings && choices.toppings !== 'DEFAULT') lines.push(`Toppings: ${label(choices.toppings)}`);
-    if (choices.placement && choices.placement !== 'MIXED') lines.push(`Topping placement: ${label(choices.placement)}`);
-    if (choices.honey && choices.honey !== 'DEFAULT') lines.push(`Honey: ${label(choices.honey)}`);
+    const choiceLabels = { saladOption: 'Salad option', protein: 'Protein selection', chickenStyle: 'Chicken style', toppings: 'Toppings', placement: 'Topping placement', honey: 'Honey preference' };
+    Object.entries(choices).forEach(([key, value]) => {
+        if (value === '' || value === null || value === undefined || value === 'DEFAULT' || value === 'MIXED') return;
+        const rendered = Array.isArray(value) ? value.map(label).join(', ') : String(value).split('+').map(label).join(' + ');
+        lines.push(`${choiceLabels[key] || label(key)}: ${rendered}`);
+    });
     (customizations.removed || []).forEach(id => lines.push(`Removed: ${label(id)}`));
     Object.entries(customizations.substitutions || {}).forEach(([from, to]) => lines.push(`Substitute: ${label(from)} -> ${label(to)}`));
     (customizations.additions || []).forEach(addition => {
         const quantity = Number(addition.quantity || 1);
-        const price = Number(addition.price || 0) * quantity;
-        lines.push(`Added: ${quantity > 1 ? `${quantity}x ` : ''}${addition.name || label(addition.id)}${price ? ` +NGN${price.toLocaleString()}` : ''}`);
+        const unitPrice = Number(addition.price || 0);
+        const price = unitPrice * quantity;
+        const style = addition.style ? ` (${addition.style})` : '';
+        const priceText = unitPrice ? ` +NGN${unitPrice.toLocaleString()} each${quantity > 1 ? ` (NGN${price.toLocaleString()} total)` : ''}` : '';
+        lines.push(`Added extra: ${quantity > 1 ? `${quantity}x ` : ''}${addition.name || label(addition.id)}${style}${priceText}`);
     });
     const customizationTotal = Number(item.customizationTotal || 0);
-    if (customizationTotal) lines.push(`Customization total: +NGN${customizationTotal.toLocaleString()}`);
+    lines.push(`Total customization cost: +NGN${customizationTotal.toLocaleString()}`);
     return lines;
+}
+
+function escapeTelegram(value) {
+    return String(value ?? '').replace(/[&<>]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[character]);
 }
 
 function normalizeOrderItems(items) {
@@ -680,11 +688,12 @@ function normalizeOrderItems(items) {
     });
 }
 
-function buildItemsText(items) {
+function buildItemsText(items, escapeValues = false) {
     return items.map(item => {
         const total = Number(item.price || 0) * Number(item.quantity || 0);
-        const details = formatCustomizationLines(item).map(line => `\n  - ${line}`).join('');
-        return `${item.quantity}x ${item.name} - NGN${total.toLocaleString()}${details}`;
+        const render = value => escapeValues ? escapeTelegram(value) : value;
+        const details = formatCustomizationLines(item).map(line => `\n  - ${render(line)}`).join('');
+        return `${item.quantity}x ${render(item.name)} - NGN${total.toLocaleString()}${details}`;
     }).join('\n');
 }
 
@@ -728,33 +737,37 @@ async function sendTelegram(order) {
     if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) return false;
     const extraDetails = order.type === 'delivery'
         ? [
-            `<b>Area:</b> ${order.deliveryArea || 'N/A'}`,
-            `<b>Address:</b> ${order.deliveryAddress || 'N/A'}`
+            `<b>Area:</b> ${escapeTelegram(order.deliveryArea || 'N/A')}`,
+            `<b>Address:</b> ${escapeTelegram(order.deliveryAddress || 'N/A')}`
         ]
         : [
-            `<b>Pickup time:</b> ${order.pickupTime || order.deliverySlot || 'Not specified'}`
+            `<b>Pickup time:</b> ${escapeTelegram(order.pickupTime || order.deliverySlot || 'Not specified')}`
         ];
-    const note = order.orderNotes || order.order_notes ? `\n<b>Note:</b> ${order.orderNotes || order.order_notes}` : '';
+    const note = order.orderNotes || order.order_notes ? `\n<b>Note:</b> ${escapeTelegram(order.orderNotes || order.order_notes)}` : '';
     const message = [
         "<b>New Paid Order - May's Chills</b>",
-        `<b>Order:</b> MCH-${String(order.id).slice(-8)}`,
-        `<b>Customer:</b> ${order.customerName || 'Guest Customer'}`,
-        `<b>Phone:</b> ${order.deliveryPhone || 'N/A'}`,
+        `<b>Order:</b> MCH-${escapeTelegram(String(order.id).slice(-8))}`,
+        `<b>Customer:</b> ${escapeTelegram(order.customerName || 'Guest Customer')}`,
+        `<b>Phone:</b> ${escapeTelegram(order.deliveryPhone || 'N/A')}`,
         ...extraDetails,
-        '', '<b>Items</b>', buildItemsText(order.items), '',
+        '', '<b>Items</b>', buildItemsText(order.items, true), '',
         `<b>Subtotal:</b> NGN${Number(order.subtotal || 0).toLocaleString()}`,
         `<b>Delivery:</b> NGN${Number(order.deliveryFee || 0).toLocaleString()}`,
         `<b>Total:</b> NGN${Number(order.total || 0).toLocaleString()}`,
-        `<b>Fulfilment:</b> ${order.type || 'N/A'}`,
-        `<b>Time:</b> ${order.deliverySlot || order.pickupTime || 'Not specified'}`,
+        `<b>Fulfilment:</b> ${escapeTelegram(order.type || 'N/A')}`,
+        `<b>Time:</b> ${escapeTelegram(order.deliverySlot || order.pickupTime || 'Not specified')}`,
         note
     ].join('\n');
-    const response = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: process.env.TELEGRAM_CHAT_ID, text: message, parse_mode: 'HTML' })
-    });
-    return response.ok;
+    const chunks = message.match(/[\s\S]{1,3900}(?:\n|$)/g) || [message];
+    for (const chunk of chunks) {
+        const response = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: process.env.TELEGRAM_CHAT_ID, text: chunk, parse_mode: 'HTML' })
+        });
+        if (!response.ok) return false;
+    }
+    return true;
 }
 
 function lagosParts(date = new Date()) {
