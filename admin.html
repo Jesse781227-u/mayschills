@@ -1,3 +1,4 @@
+async function request(path,options={}){const response=await fetch(API+path,{...options,headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})}});if(!response.ok){const data=await response.json().catch(()=>({}));throw new Error(data.error||'Request failed');}return response.json();}
 <!doctype html>
 <script src="crm.js" defer></script><script src="admin-login.js" defer></script>
 <link rel="icon" type="image/jpeg" href="https://i.ibb.co/hJNHPS8T/IMG-20251112-WA0082.jpg">

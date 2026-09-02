@@ -6,7 +6,11 @@ import webpush from 'web-push';
 const { Pool } = pg;
 const app = express();
 const port = Number(process.env.PORT || 3000);
-const frontendUrl = (process.env.FRONTEND_URL || '*').trim().replace(/\/$/, '') || '*';
+const configuredFrontendUrls = (process.env.FRONTEND_URL || '*')
+    .split(',')
+    .map(url => url.trim().replace(/\/$/, ''))
+    .filter(Boolean);
+const allowedFrontendUrls = new Set([...configuredFrontendUrls, 'capacitor://localhost', 'http://localhost', 'https://localhost']);
 const pool = process.env.DATABASE_URL
     ? new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } })
     : null;
@@ -24,7 +28,10 @@ app.use(express.json({
     verify: (request, _response, buffer) => { request.rawBody = Buffer.from(buffer); }
 }));
 app.use((request, response, next) => {
-    response.header('Access-Control-Allow-Origin', frontendUrl);
+    const requestOrigin = String(request.headers.origin || '').replace(/\/$/, '');
+    if (allowedFrontendUrls.has('*') || allowedFrontendUrls.has(requestOrigin)) {
+        response.header('Access-Control-Allow-Origin', allowedFrontendUrls.has('*') ? '*' : requestOrigin);
+    }
     response.header('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
     response.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     if (request.method === 'OPTIONS') return response.sendStatus(204);
@@ -331,7 +338,10 @@ app.post('/api/shared-carts/:token/cancel', async (request, response) => {
 
 app.post('/api/admin/login', (request, response) => {
     const { password } = request.body || {};
-    if (!process.env.ADMIN_PASSWORD || password !== process.env.ADMIN_PASSWORD) {
+    if (!process.env.ADMIN_PASSWORD) {
+        return json(response, 503, { error: 'Admin login is not configured on the backend' });
+    }
+    if (password !== process.env.ADMIN_PASSWORD) {
         return json(response, 401, { error: 'Invalid password' });
     }
     const token = signAdminToken({ role: 'admin', exp: Date.now() + 8 * 60 * 60 * 1000 });
