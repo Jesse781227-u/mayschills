@@ -10,7 +10,7 @@ const configuredFrontendUrls = (process.env.FRONTEND_URL || '*')
     .split(',')
     .map(url => url.trim().replace(/\/$/, ''))
     .filter(Boolean);
-const allowedFrontendUrls = new Set([...configuredFrontendUrls, 'capacitor://localhost', 'http://localhost', 'https://localhost']);
+const allowedFrontendUrls = new Set([...configuredFrontendUrls, 'capacitor://localhost', 'http://localhost', 'https://localhost', 'http://localhost:5500', 'http://127.0.0.1:5500']);
 const pool = process.env.DATABASE_URL
     ? new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } })
     : null;
