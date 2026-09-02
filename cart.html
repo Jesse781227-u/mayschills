@@ -32,6 +32,7 @@
         .row.total { border-top:1px solid #eee; padding-top:14px; margin-top:5px; font-size:18px; color:var(--text); }
         .checkout, .back { width:100%; border:0; border-radius:999px; padding:14px 18px; font:600 15px Rubik; cursor:pointer; }
         .checkout { background:linear-gradient(135deg,var(--green),var(--light-green)); color:white; margin-top:8px; }
+        .share { width:100%; border:1px solid var(--green); border-radius:999px; padding:13px 18px; font:600 15px Rubik; cursor:pointer; background:var(--white); color:var(--green); margin-top:8px; }
         .back { background:transparent; color:var(--green); margin-top:8px; }
         .toast { position:fixed; left:50%; bottom:20px; transform:translateX(-50%); background:#222; color:white; padding:11px 16px; border-radius:999px; font-size:13px; }
         .tracking { background:var(--white); border-radius:18px; padding:15px; margin-bottom:18px; box-shadow:0 7px 22px #00000008; }
@@ -39,6 +40,18 @@
         .tracking p { margin:5px 0; color:var(--muted); font-size:13px; line-height:1.45; }
         .tracking-status { color:var(--text)!important; font-weight:600; }
         .tracking-time { font-size:12px!important; }
+        .share-status { background:#f0f9f0; border:1px solid #d5ecd5; border-radius:16px; padding:13px; margin-bottom:14px; color:var(--green); font-size:13px; line-height:1.45; }
+        .share-status strong { display:block; font-size:15px; margin-bottom:4px; }
+        .modal-backdrop { position:fixed; inset:0; background:#0008; display:none; align-items:flex-end; justify-content:center; padding:12px; z-index:5; }
+        .modal-backdrop.visible { display:flex; }
+        .share-modal { width:min(100%,430px); max-height:90vh; overflow:auto; background:var(--white); border-radius:22px; padding:20px; }
+        .share-modal h2 { color:var(--green); margin:0 0 8px; }
+        .share-modal p { color:var(--muted); font-size:13px; line-height:1.45; }
+        .share-modal-list { border-top:1px solid #eee; border-bottom:1px solid #eee; padding:10px 0; margin:14px 0; }
+        .share-modal-row { display:flex; justify-content:space-between; gap:12px; padding:6px 0; font-size:13px; }
+        .share-modal-link { display:flex; gap:7px; margin:12px 0; }
+        .share-modal-link input { min-width:0; flex:1; border:1px solid #ddd; border-radius:10px; padding:10px; }
+        .close-modal { width:100%; border:0; background:transparent; color:var(--muted); padding:11px; cursor:pointer; }
     </style>
 </head>
 <body>
@@ -49,6 +62,7 @@
         <button class="icon-button" aria-label="Cart"><i class="hgi-stroke hgi-shopping-cart-01"></i></button>
     </div>
     <section id="tracking" class="tracking" aria-live="polite" hidden></section>
+    <section id="shared-status" class="share-status" aria-live="polite" hidden></section>
     <section id="items" aria-live="polite"></section>
     <section class="summary">
         <div class="row"><span>Items</span><strong id="count">0</strong></div>
@@ -56,15 +70,34 @@
         <div class="row"><span>Delivery charge</span><strong>₦0</strong></div>
         <div class="row total"><span>Total</span><strong id="total">₦0</strong></div>
         <button class="checkout" id="checkout" type="button">Proceed to Checkout</button>
+        <button class="share" id="share-cart" type="button">↗ Share Cart</button>
         <button class="back" id="continue" type="button">Continue Shopping</button>
     </section>
 </main>
+<div class="modal-backdrop" id="share-modal" role="dialog" aria-modal="true" aria-labelledby="share-title">
+    <section class="share-modal">
+        <h2 id="share-title">Share this cart</h2>
+        <p>Let someone else pay for your order. They’ll review the items and complete payment.</p>
+        <strong>Your cart</strong>
+        <div class="share-modal-list" id="share-preview"></div>
+        <div class="row total"><span>Total</span><strong id="share-total">₦0</strong></div>
+        <button class="checkout" id="create-shared-cart" type="button">Create Shared Cart</button>
+        <div id="share-ready" hidden>
+            <p><strong>Your shared cart is ready!</strong><br>Send this link to the person paying for you.</p>
+            <div class="share-modal-link"><input id="share-link" readonly><button class="share" id="copy-share-link" type="button">Copy</button></div>
+            <button class="share" id="native-share" type="button">Share</button>
+            <button class="close-modal" id="cancel-shared-cart" type="button">Cancel Share</button>
+        </div>
+        <button class="close-modal" id="close-share-modal" type="button">Close</button>
+    </section>
+</div>
 <script>
     const money = value => `₦${Number(value || 0).toLocaleString()}`;
     let cart = JSON.parse(localStorage.getItem('maychills_cart') || '[]');
     const save = () => localStorage.setItem('maychills_cart', JSON.stringify(cart));
     const toast = message => { const node = document.createElement('div'); node.className='toast'; node.textContent=message; document.body.appendChild(node); setTimeout(()=>node.remove(),2200); };
     const API_BASE = window.MAYCHILLS_API_URL || 'https://mayschillsbackend.onrender.com';
+    let sharedCart = null;
     const statusCopy = { received:'We have received your order and it is in our queue.', preparing:'We are carefully preparing your order now.', ready:'Your order is ready for pickup.', in_transit:'Your order is in transit and will be with you shortly.', out_for_delivery:'Your order is in transit and will be with you shortly.', delivered:'Your order has been delivered. Enjoy!', picked_up:'Your order has been picked up. Thank you for choosing May’s Chills.', cancelled:'This order has been cancelled.' };
     function renderTracking(order) {
         const box = document.getElementById('tracking'); if (!order) { box.hidden=true; return; }
@@ -108,6 +141,22 @@
                 </div>
             </article>`).join('') : '<div class="empty"><i class="hgi-stroke hgi-shopping-cart-01"></i><p>Your cart is empty</p></div>';
     }
+    function renderSharePreview() {
+        const items = cart.filter(item => item.id !== 'delivery_fee');
+        document.getElementById('share-preview').innerHTML = items.map(item => `<div class="share-modal-row"><span>${item.name} × ${item.quantity}</span><strong>${money(Number(item.price || 0) * Number(item.quantity || 0))}</strong></div>`).join('');
+        document.getElementById('share-total').textContent = money(items.reduce((sum,item)=>sum + Number(item.price || 0) * Number(item.quantity || 0),0));
+    }
+    function renderSharedStatus() {
+        const node = document.getElementById('shared-status');
+        if (!node || !sharedCart) return;
+        node.hidden = false;
+        const statusText = sharedCart.status === 'paid' ? 'Paid' : sharedCart.status === 'cancelled' ? 'Share cancelled' : sharedCart.status === 'expired' ? 'Shared cart expired' : 'Waiting for payment';
+        node.innerHTML = `<strong>${statusText}</strong>${sharedCart.status === 'paid' ? 'Your shared cart has been paid for.' : sharedCart.status === 'awaiting_payment' ? 'Someone has your cart.' : 'Create a new shared cart to try again.'}`;
+    }
+    async function refreshSharedCart() {
+        const token = localStorage.getItem('maychills_shared_cart_token'); if (!token) return;
+        try { const response = await fetch(`${API_BASE}/api/shared-carts/${encodeURIComponent(token)}`, { cache:'no-store' }); if (!response.ok) return; sharedCart = (await response.json()).sharedCart; renderSharedStatus(); } catch (_) {}
+    }
     document.getElementById('items').addEventListener('click', event => {
         const button = event.target.closest('[data-change]'); if (!button) return;
         const item = cart.find(entry => String(entry.id) === String(button.dataset.id)); if (!item) return;
@@ -117,9 +166,17 @@
     });
     document.getElementById('back').onclick = document.getElementById('continue').onclick = () => window.location.href='shop.html';
     document.getElementById('checkout').onclick = () => cart.length ? window.location.href='checkout.html' : toast('Your cart is empty');
+    document.getElementById('share-cart').onclick = () => { if (!cart.filter(item => item.id !== 'delivery_fee').length) return toast('Your cart is empty'); renderSharePreview(); document.getElementById('share-ready').hidden=true; document.getElementById('create-shared-cart').hidden=false; document.getElementById('share-modal').classList.add('visible'); };
+    document.getElementById('close-share-modal').onclick = () => document.getElementById('share-modal').classList.remove('visible');
+    document.getElementById('create-shared-cart').onclick = async () => { const items=cart.filter(item=>item.id !== 'delivery_fee'); const subtotal=items.reduce((sum,item)=>sum + Number(item.price||0)*Number(item.quantity||0),0); const button=document.getElementById('create-shared-cart'); button.disabled=true; try { const response=await fetch(`${API_BASE}/api/shared-carts`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items,subtotal,creatorName:localStorage.getItem('maychills_current_user') ? JSON.parse(localStorage.getItem('maychills_current_user')).name : 'A customer'})}); const data=await response.json(); if(!response.ok) throw new Error(data.error||'Unable to create shared cart'); sharedCart=data.sharedCart; localStorage.setItem('maychills_shared_cart_token',sharedCart.token); const link=`${location.origin}/checkout.html?sharedCart=${encodeURIComponent(sharedCart.token)}`; document.getElementById('share-link').value=link; document.getElementById('share-ready').hidden=false; button.hidden=true; renderSharedStatus(); } catch(error) { toast(error.message); } finally { button.disabled=false; } };
+    document.getElementById('copy-share-link').onclick = async () => { await navigator.clipboard?.writeText(document.getElementById('share-link').value); toast('Link copied'); };
+    document.getElementById('native-share').onclick = async () => { const url=document.getElementById('share-link').value; if(navigator.share) await navigator.share({title:"May's Chills shared cart",text:'Someone else can pay for this order.',url}); else { await navigator.clipboard?.writeText(url); toast('Link copied'); } };
+    document.getElementById('cancel-shared-cart').onclick = async () => { if(!sharedCart?.token) return; await fetch(`${API_BASE}/api/shared-carts/${encodeURIComponent(sharedCart.token)}/cancel`,{method:'POST'}); sharedCart.status='cancelled'; renderSharedStatus(); document.getElementById('share-modal').classList.remove('visible'); };
     render();
     refreshTracking();
+    refreshSharedCart();
     setInterval(refreshTracking, 15000);
+    setInterval(refreshSharedCart, 15000);
 </script>
 </body>
 </html>

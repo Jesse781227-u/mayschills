@@ -65,6 +65,8 @@ async function initializeDatabase() {
             ready_target_at TIMESTAMPTZ,
             manager_reminded_at TIMESTAMPTZ,
             customer_reminded_at TIMESTAMPTZ,
+            is_gift BOOLEAN NOT NULL DEFAULT FALSE,
+            gift_details JSONB NOT NULL DEFAULT '{}'::jsonb,
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
             notified_at TIMESTAMPTZ
         )
@@ -83,6 +85,22 @@ async function initializeDatabase() {
     await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS manager_reminded_at TIMESTAMPTZ`);
     await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_reminded_at TIMESTAMPTZ`);
     await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS is_demo BOOLEAN NOT NULL DEFAULT FALSE`);
+    await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS is_gift BOOLEAN NOT NULL DEFAULT FALSE`);
+    await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS gift_details JSONB NOT NULL DEFAULT '{}'::jsonb`);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS shared_carts (
+            id BIGSERIAL PRIMARY KEY,
+            token TEXT UNIQUE NOT NULL,
+            status TEXT NOT NULL DEFAULT 'awaiting_payment' CHECK (status IN ('awaiting_payment','paid','expired','cancelled')),
+            items JSONB NOT NULL DEFAULT '[]'::jsonb,
+            subtotal NUMERIC(12,2) NOT NULL DEFAULT 0,
+            creator_name TEXT NOT NULL DEFAULT 'A customer',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            expires_at TIMESTAMPTZ NOT NULL
+        )
+    `);
+    await pool.query('CREATE INDEX IF NOT EXISTS shared_carts_token_idx ON shared_carts (token)');
+    await pool.query('CREATE INDEX IF NOT EXISTS orders_created_at_idx ON orders (created_at DESC)');
     await pool.query(`
         CREATE TABLE IF NOT EXISTS push_subscriptions (
             endpoint TEXT PRIMARY KEY,
@@ -270,6 +288,47 @@ app.get('/api/orders/:reference/status', async (request, response) => {
     } catch (error) { console.error('Order tracking read failed:', error); return json(response, 500, { error: 'Unable to read order status' }); }
 });
 
+app.get('/api/shared-carts/:token', async (request, response) => {
+    if (!pool) return json(response, 503, { error: 'DATABASE_URL is required' });
+    try {
+        const result = await pool.query('SELECT token, status, items, subtotal, creator_name, created_at, expires_at FROM shared_carts WHERE token = $1 LIMIT 1', [String(request.params.token || '').trim()]);
+        if (!result.rowCount) return json(response, 404, { error: 'Shared cart not found' });
+        const cart = result.rows[0];
+        if (cart.status === 'awaiting_payment' && new Date(cart.expires_at).getTime() <= Date.now()) {
+            await pool.query("UPDATE shared_carts SET status = 'expired' WHERE token = $1 AND status = 'awaiting_payment'", [cart.token]);
+            cart.status = 'expired';
+        }
+        return json(response, 200, { sharedCart: { token: cart.token, status: cart.status, items: cart.items, subtotal: Number(cart.subtotal), creatorName: cart.creator_name, createdAt: cart.created_at, expiresAt: cart.expires_at } });
+    } catch (error) { console.error('Shared cart read failed:', error); return json(response, 500, { error: 'Unable to read shared cart' }); }
+});
+
+app.post('/api/shared-carts', async (request, response) => {
+    if (!pool) return json(response, 503, { error: 'DATABASE_URL is required' });
+    const items = Array.isArray(request.body?.items) ? request.body.items : [];
+    const subtotal = Number(request.body?.subtotal || 0);
+    const creatorName = String(request.body?.creatorName || 'A customer').trim().slice(0, 120) || 'A customer';
+    if (!items.length || !Number.isFinite(subtotal) || subtotal <= 0) return json(response, 400, { error: 'A non-empty cart is required' });
+    const token = crypto.randomBytes(9).toString('base64url');
+    try {
+        const result = await pool.query(`
+            INSERT INTO shared_carts (token, items, subtotal, creator_name, expires_at)
+            VALUES ($1, $2::jsonb, $3, $4, NOW() + INTERVAL '24 hours')
+            RETURNING token, status, items, subtotal, creator_name, created_at, expires_at
+        `, [token, JSON.stringify(items), subtotal, creatorName]);
+        const cart = result.rows[0];
+        return json(response, 201, { sharedCart: { token: cart.token, status: cart.status, items: cart.items, subtotal: Number(cart.subtotal), creatorName: cart.creator_name, createdAt: cart.created_at, expiresAt: cart.expires_at } });
+    } catch (error) { console.error('Shared cart create failed:', error); return json(response, 500, { error: 'Unable to create shared cart' }); }
+});
+
+app.post('/api/shared-carts/:token/cancel', async (request, response) => {
+    if (!pool) return json(response, 503, { error: 'DATABASE_URL is required' });
+    try {
+        const result = await pool.query("UPDATE shared_carts SET status = 'cancelled' WHERE token = $1 AND status = 'awaiting_payment' RETURNING token, status", [String(request.params.token || '').trim()]);
+        if (!result.rowCount) return json(response, 404, { error: 'Shared cart is unavailable or already paid' });
+        return json(response, 200, { sharedCart: result.rows[0] });
+    } catch (error) { console.error('Shared cart cancellation failed:', error); return json(response, 500, { error: 'Unable to cancel shared cart' }); }
+});
+
 app.post('/api/admin/login', (request, response) => {
     const { password } = request.body || {};
     if (!process.env.ADMIN_PASSWORD || password !== process.env.ADMIN_PASSWORD) {
@@ -379,7 +438,7 @@ app.get('/api/admin/orders', async (request, response) => {
     if (!pool) return json(response, 503, { error: 'DATABASE_URL is required' });
     try {
         const result = await pool.query(`
-            SELECT id, payment_reference, customer_name, customer_email, delivery_phone, is_demo,
+            SELECT id, payment_reference, customer_name, customer_email, delivery_phone, is_demo, is_gift, gift_details,
                    order_type, delivery_address, delivery_area, delivery_slot, order_notes,
                    items, subtotal, delivery_fee, total, payment_status, order_status, notification_status,
                    requested_fulfillment_at, dispatch_at, ready_target_at, manager_reminded_at, customer_reminded_at,
@@ -728,7 +787,11 @@ async function sendEmail(order) {
                 payment_reference: order.paymentReference || 'N/A',
                 payment_status: 'PAID',
                 payment_method: 'Paystack',
-                order_date: order.date
+                order_date: order.date,
+                is_gift: order.isGift ? 'YES' : 'NO',
+                gift_recipient_name: order.giftDetails?.recipientName || '',
+                gift_recipient_phone: order.giftDetails?.recipientPhone || '',
+                gift_message: order.giftDetails?.message || ''
             }
         })
     });
@@ -746,6 +809,7 @@ async function sendTelegram(order) {
             `<b>Pickup time:</b> ${escapeTelegram(order.pickupTime || order.deliverySlot || 'Not specified')}`
         ];
     const note = order.orderNotes || order.order_notes ? `\n<b>Note:</b> ${escapeTelegram(order.orderNotes || order.order_notes)}` : '';
+    const gift = order.isGift ? `\n<b>Gift recipient:</b> ${escapeTelegram(order.giftDetails?.recipientName || 'N/A')}\n<b>Recipient phone:</b> ${escapeTelegram(order.giftDetails?.recipientPhone || 'N/A')}${order.giftDetails?.message ? `\n<b>Gift message:</b> ${escapeTelegram(order.giftDetails.message)}` : ''}` : '';
     const message = [
         "<b>New Paid Order - May's Chills</b>",
         `<b>Order:</b> MCH-${escapeTelegram(String(order.id).slice(-8))}`,
@@ -758,7 +822,7 @@ async function sendTelegram(order) {
         `<b>Total:</b> NGN${Number(order.total || 0).toLocaleString()}`,
         `<b>Fulfilment:</b> ${escapeTelegram(order.type || 'N/A')}`,
         `<b>Time:</b> ${escapeTelegram(order.deliverySlot || order.pickupTime || 'Not specified')}`,
-        note
+        note, gift
     ].join('\n');
     const chunks = message.match(/[\s\S]{1,3900}(?:\n|$)/g) || [message];
     for (const chunk of chunks) {
@@ -871,8 +935,8 @@ async function saveOrder(order) {
         INSERT INTO orders (
             payment_reference, customer_name, customer_email, delivery_phone, order_type,
             delivery_address, delivery_area, delivery_slot, order_notes, items,
-            subtotal, delivery_fee, total, requested_fulfillment_at, dispatch_at, ready_target_at
-        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb,$11,$12,$13,$14,$15,$16)
+            subtotal, delivery_fee, total, is_gift, gift_details, requested_fulfillment_at, dispatch_at, ready_target_at
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb,$11,$12,$13,$14,$15::jsonb,$16,$17,$18)
         ON CONFLICT (payment_reference) DO UPDATE SET
             customer_name = EXCLUDED.customer_name,
             customer_email = EXCLUDED.customer_email,
@@ -886,6 +950,8 @@ async function saveOrder(order) {
             subtotal = EXCLUDED.subtotal,
             delivery_fee = EXCLUDED.delivery_fee,
             total = EXCLUDED.total,
+            is_gift = EXCLUDED.is_gift,
+            gift_details = EXCLUDED.gift_details,
             requested_fulfillment_at = COALESCE(orders.requested_fulfillment_at, EXCLUDED.requested_fulfillment_at),
             dispatch_at = COALESCE(orders.dispatch_at, EXCLUDED.dispatch_at),
             ready_target_at = COALESCE(orders.ready_target_at, EXCLUDED.ready_target_at)
@@ -894,7 +960,7 @@ async function saveOrder(order) {
         order.paymentReference, order.customerName, order.customerEmail, order.deliveryPhone,
         order.type, order.deliveryAddress, order.deliveryArea, order.deliverySlot,
         order.orderNotes, JSON.stringify(order.items), order.subtotal, order.deliveryFee, order.total,
-        order.requestedFulfillmentAt, order.dispatchAt, order.readyTargetAt
+        Boolean(order.isGift), JSON.stringify(order.giftDetails || {}), order.requestedFulfillmentAt, order.dispatchAt, order.readyTargetAt
     ]);
     return result.rows[0];
 }
@@ -931,12 +997,16 @@ app.post('/webhook', async (request, response) => {
             deliverySlot: metadata.deliverySlot,
             pickupTime: metadata.pickupTime,
             orderNotes: metadata.orderNotes,
+            isGift: Boolean(metadata.isGift),
+            giftDetails: metadata.giftDetails || {},
+            sharedCartToken: metadata.sharedCartToken || null,
             requestedFulfillmentAt: schedule.requested,
             dispatchAt: schedule.dispatchAt,
             readyTargetAt: schedule.readyTarget,
             date: new Date().toISOString()
         };
         await saveOrder(order);
+        if (order.sharedCartToken) await pool.query("UPDATE shared_carts SET status = 'paid' WHERE token = $1 AND status = 'awaiting_payment'", [order.sharedCartToken]);
         const claim = await pool.query(`
             UPDATE orders SET notification_status = 'sending'
             WHERE payment_reference = $1 AND notification_status IN ('pending', 'not_configured')

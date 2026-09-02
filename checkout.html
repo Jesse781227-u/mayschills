@@ -36,6 +36,13 @@
         .primary, .secondary { width:100%; border:0; border-radius:999px; padding:14px 18px; font:600 15px Rubik; cursor:pointer; }
         .primary { background:linear-gradient(135deg,var(--green),var(--light-green)); color:#fff; }
         .secondary { background:transparent; color:var(--green); margin-top:5px; }
+        .shared-banner, .gift-panel { background:#effaf0; border:1px solid #d5ecd5; border-radius:14px; padding:14px; margin-bottom:14px; }
+        .shared-banner strong, .gift-panel strong { display:block; color:var(--green); margin-bottom:5px; }
+        .gift-panel { background:#fff8e8; border-color:#f1dfad; }
+        .gift-panel strong { color:#946a00; }
+        .gift-fields[hidden] { display:none; }
+        .checkbox-row { display:flex; align-items:center; gap:9px; font-size:14px; color:#444; }
+        .checkbox-row input { width:18px; height:18px; margin:0; }
     </style>
 </head>
 <body>
@@ -45,22 +52,33 @@
         <h1>Checkout</h1>
         <span></span>
     </div>
+    <div class="shared-banner" id="shared-banner" hidden></div>
     <section class="card"><h2>Order summary</h2><div id="summary"></div><div class="row total"><span>Total</span><strong id="total">₦0</strong></div></section>
     <section class="card">
         <h2>Order type</h2>
         <div class="choices"><button class="choice active" data-type="pickup" type="button">Pick up</button><button class="choice" data-type="delivery" type="button">Delivery</button></div>
         <div style="margin-top:14px"><label for="name">Name</label><input id="name" autocomplete="name" placeholder="Your name" required><label for="email">Email for payment receipt</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com" required><label for="phone">Phone number</label><input id="phone" autocomplete="tel" placeholder="08012345678" required><div id="pickupFields"><label for="pickupTime">Pickup time</label><select id="pickupTime"></select></div><div id="deliveryFields" hidden><label for="area">Delivery area</label><select id="area"><option value="">Loading delivery areas...</option></select><label for="deliveryTime">Delivery time</label><select id="deliveryTime"></select><label for="address">Exact delivery address</label><textarea id="address" placeholder="House number, street and landmarks"></textarea><button class="secondary" id="getQuote" type="button">Check Uber courier price</button><div id="quoteNotice" style="color:var(--muted);font-size:13px;margin-top:2px"></div></div><label for="notes">Order note / allergies (optional)</label><textarea id="notes" placeholder="Any special instructions"></textarea><div id="feeNotice" style="color:var(--green);font-size:13px;margin-top:2px"></div></div>
     </section>
+    <section class="card gift-panel">
+        <label class="checkbox-row"><input id="is-gift" type="checkbox"> <strong>Buy as a gift</strong></label>
+        <div class="gift-fields" id="gift-fields" hidden>
+            <label for="recipient-name">Recipient name</label><input id="recipient-name" placeholder="Who is this for?">
+            <label for="recipient-phone">Recipient phone number</label><input id="recipient-phone" placeholder="08012345678">
+            <label for="gift-message">Gift message (optional)</label><textarea id="gift-message" placeholder="Hope you enjoy this!"></textarea>
+            <p style="font-size:12px;color:#78652e;margin:0">The recipient will see the gift message, not the price.</p>
+        </div>
+    </section>
     <button class="primary" id="place" type="button">Continue to Payment</button>
     <button class="secondary" id="backCart" type="button">Back to Cart</button>
 </main>
 <script>
     const cart = JSON.parse(localStorage.getItem('maychills_cart') || '[]');
-    const items = cart.filter(item => item.id !== 'delivery_fee');
+    let items = cart.filter(item => item.id !== 'delivery_fee');
     const money = value => `₦${Number(value || 0).toLocaleString()}`;
-    const total = items.reduce((sum,item) => sum + Number(item.price || 0) * Number(item.quantity || 0), 0);
-    document.getElementById('summary').innerHTML = items.length ? items.map(item => `<div class="item"><span>${item.quantity} × ${item.name}</span><span>${money(item.price * item.quantity)}</span></div>`).join('') : '<p>Your cart is empty.</p>';
-    document.getElementById('total').textContent = money(total);
+    let total = 0;
+    const sharedCartToken = new URLSearchParams(location.search).get('sharedCart');
+    function renderSummary() { total = items.reduce((sum,item) => sum + Number(item.price || 0) * Number(item.quantity || 0), 0); document.getElementById('summary').innerHTML = items.length ? items.map(item => `<div class="item"><span>${item.quantity} × ${item.name}</span><span>${money(item.price * item.quantity)}</span></div>`).join('') : '<p>Your cart is empty.</p>'; document.getElementById('total').textContent = money(total); }
+    renderSummary();
     document.querySelectorAll('[data-type]').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('[data-type]').forEach(item => item.classList.remove('active')); button.classList.add('active'); }));
     document.getElementById('back').onclick = document.getElementById('backCart').onclick = () => window.location.href='cart.html';
     const paystackKey = 'pk_test_2dd7a595bb168c3274db3c0e488fbbb84d28fb06';
@@ -75,6 +93,19 @@
         document.getElementById('total').textContent = format(summaryTotal());
         document.getElementById('feeNotice').textContent = orderType === 'delivery' && deliveryFee ? `Delivery charge: ${format(deliveryFee)}` : '';
     }
+    async function loadSharedCart() {
+        if (!sharedCartToken) return;
+        try {
+            const response = await fetch(`${window.MAYCHILLS_API_URL || 'https://mayschillsbackend.onrender.com'}/api/shared-carts/${encodeURIComponent(sharedCartToken)}`, { cache:'no-store' });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Shared cart unavailable');
+            if (data.sharedCart.status !== 'awaiting_payment') throw new Error(data.sharedCart.status === 'expired' ? 'This shared cart has expired. Ask the sender to create a new link.' : 'This shared cart is no longer available.');
+            items = Array.isArray(data.sharedCart.items) ? data.sharedCart.items : [];
+            renderSummary();
+            const banner = document.getElementById('shared-banner'); banner.hidden = false; banner.innerHTML = '<strong>Someone shared this order with you</strong>Review the order below and complete payment.<br><small>This is a snapshot of the order when it was shared.</small>';
+        } catch (error) { const banner = document.getElementById('shared-banner'); banner.hidden = false; banner.innerHTML = `<strong>Shared cart unavailable</strong>${error.message}`; document.getElementById('place').disabled = true; }
+    }
+    document.getElementById('is-gift').onchange = event => { document.getElementById('gift-fields').hidden = !event.target.checked; };
     async function loadDeliveryAreas() {
         const response = await fetch('shop.html');
         const html = await response.text();
@@ -172,9 +203,14 @@
         const name = document.getElementById('name').value.trim();
         const email = document.getElementById('email').value.trim();
         const phone = document.getElementById('phone').value.trim().replace(/\s/g, '');
+        const isGift = document.getElementById('is-gift').checked;
+        const recipientName = document.getElementById('recipient-name').value.trim();
+        const recipientPhone = document.getElementById('recipient-phone').value.trim().replace(/\s/g, '');
+        const giftMessage = document.getElementById('gift-message').value.trim();
         const address = document.getElementById('address').value.trim();
         if (!name || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert('Please enter your name and a valid email.');
         if (!/^(\+234|0)[789][01]\d{8}$/.test(phone)) return alert('Please enter a valid Nigerian phone number.');
+        if (isGift && (!recipientName || !/^(\+234|0)[789][01]\d{8}$/.test(recipientPhone))) return alert('Please enter the recipient name and a valid recipient phone number.');
         if (orderType === 'delivery' && (!document.getElementById('area').value || !address || !deliveryFee)) return alert('Please select a delivery area and enter your exact address.');
         if (!selectedTime) return alert('Please select a time for your order.');
         if (!items.length || !summaryTotal()) return alert('Your cart is empty.');
@@ -193,12 +229,13 @@
         if (!window.PaystackPop) return alert('Payment is still loading. Please try again.');
         button.disabled = true; button.textContent = 'Opening Paystack...';
         const reference = 'MCH_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
-        const metadata = { orderType, customerName:name, customerEmail:email, deliveryPhone:phone, deliveryAddress:orderType === 'delivery' ? address : null, deliveryArea:orderType === 'delivery' ? selectedArea : null, deliveryFee:orderType === 'delivery' ? deliveryFee : 0, uberQuoteId:orderType === 'delivery' ? uberQuoteId : null, deliverySlot:orderType === 'delivery' ? document.getElementById('deliveryTime').selectedOptions[0].textContent : null, deliverySlotKey:orderType === 'delivery' ? document.getElementById('deliveryTime').value : null, pickupTime:orderType === 'pickup' ? document.getElementById('pickupTime').selectedOptions[0].textContent : null, pickupTimeValue:orderType === 'pickup' ? document.getElementById('pickupTime').value : null, requestedFulfillmentAt:orderType === 'pickup' ? document.getElementById('pickupTime').value : null, orderNotes:document.getElementById('notes').value.trim(), items:items.map(item => ({ id:item.id, productId:item.productId, name:item.name, basePrice:Number(item.basePrice || item.price || 0), price:Number(item.price || 0), unitPrice:Number(item.unitPrice || item.price || 0), quantity:Number(item.quantity || 0), customizationTotal:Number(item.customizationTotal || 0), customizations:item.customizations || null, customizationSummary:Array.isArray(item.customizationSummary) ? item.customizationSummary : [] })), subtotal:total };
+        const metadata = { orderType, customerName:name, customerEmail:email, deliveryPhone:phone, deliveryAddress:orderType === 'delivery' ? address : null, deliveryArea:orderType === 'delivery' ? selectedArea : null, deliveryFee:orderType === 'delivery' ? deliveryFee : 0, uberQuoteId:orderType === 'delivery' ? uberQuoteId : null, deliverySlot:orderType === 'delivery' ? document.getElementById('deliveryTime').selectedOptions[0].textContent : null, deliverySlotKey:orderType === 'delivery' ? document.getElementById('deliveryTime').value : null, pickupTime:orderType === 'pickup' ? document.getElementById('pickupTime').selectedOptions[0].textContent : null, pickupTimeValue:orderType === 'pickup' ? document.getElementById('pickupTime').value : null, requestedFulfillmentAt:orderType === 'pickup' ? document.getElementById('pickupTime').value : null, orderNotes:document.getElementById('notes').value.trim(), sharedCartToken, isGift, giftDetails:isGift ? { recipientName, recipientPhone, message:giftMessage } : {}, items:items.map(item => ({ id:item.id, productId:item.productId, name:item.name, basePrice:Number(item.basePrice || item.price || 0), price:Number(item.price || 0), unitPrice:Number(item.unitPrice || item.price || 0), quantity:Number(item.quantity || 0), customizationTotal:Number(item.customizationTotal || 0), customizations:item.customizations || null, customizationSummary:Array.isArray(item.customizationSummary) ? item.customizationSummary : [] })), subtotal:total };
         const payment = new window.PaystackPop();
         payment.newTransaction({ key:paystackKey, email, amount:Math.round(summaryTotal() * 100), currency:'NGN', ref:reference, reference, metadata, onSuccess: response => { localStorage.setItem('maychills_last_order', JSON.stringify({...metadata, total:summaryTotal(), reference:response.reference || reference, date:new Date().toISOString()})); localStorage.removeItem('maychills_cart'); document.querySelector('main').innerHTML='<div class="card" style="margin-top:35vh;text-align:center"><h2>Payment successful</h2><p>Your order has been received.</p><button class="primary" onclick="location.href=\'shop.html\'">Return to menu</button></div>'; window.MayChillsNotifications?.showAfterOrder({ email, name }); }, onCancel: () => { button.disabled=false; button.textContent='Continue to Payment'; }, onError: error => { button.disabled=false; button.textContent='Continue to Payment'; alert(error?.message || 'Payment could not be completed.'); } });
     };
     loadDeliveryAreas().catch(() => { document.getElementById('area').innerHTML = '<option value="">Unable to load delivery areas</option>'; });
     updateSummary();
+    loadSharedCart();
 </script>
 </body>
 </html>
